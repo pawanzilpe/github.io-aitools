@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Port Scanner</title>
+    <style>
+        body { font-family: Arial; }
+        #result { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Port Scanner</h1>
+    <input type="text" id="ip" placeholder="IP Address">
+    <input type="text" id="portRange" placeholder="1-100">
+    <button onclick="scanPorts()">Scan</button>
+    <div id="result"></div>
+    <script>
+        function scanPorts() {
+            const ports = document.getElementById("portRange").value.split("-");
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = "Scanning...";
+            
+            // Simulate scanning
+            setTimeout(() => {
+                let openPorts = [];
+                for(let i=parseInt(ports[0]); i<=parseInt(ports[1]); i++) {
+                    if(Math.random() > 0.9) openPorts.push(i);
+                }
+                resultDiv.innerHTML = openPorts.length ? 
+                    "Open Ports: " + openPorts.join(", ") : 
+                    "No open ports found";
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

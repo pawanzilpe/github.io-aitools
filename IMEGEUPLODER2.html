@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSLR-Quality Photo Enhancer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            max-width: 800px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .upload-area {
+            border: 2px dashed #ccc;
+            padding: 30px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-area:hover {
+            border-color: #4CAF50;
+            background: #f9f9f9;
+        }
+        #fileInput {
+            display: none;
+        }
+        .btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #45a049;
+        }
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        .image-preview {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 20px;
+        }
+        .image-box {
+            flex: 1;
+            text-align: center;
+        }
+        .image-box img {
+            max-width: 100%;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .slider-container {
+            margin: 10px 0;
+        }
+        .slider-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .slider {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📷 DSLR-Quality Photo Enhancer</h1>
+        
+        <div class="upload-area" id="uploadArea">
+            <h3>⬆ Upload Your Photo</h3>
+            <p>Drag & drop or click to select an image</p>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+        
+        <div class="controls">
+            <button id="enhanceBtn" class="btn" disabled>Enhance Photo (AI)</button>
+            <button id="downloadBtn" class="btn" disabled>Download HD Image</button>
+        </div>
+        
+        <div class="slider-container">
+            <label for="sharpness">Sharpness:</label>
+            <input type="range" id="sharpness" class="slider" min="0" max="2" step="0.1" value="1" disabled>
+        </div>
+        
+        <div class="image-preview">
+            <div class="image-box">
+                <h3>Original Photo</h3>
+                <img id="originalImage" src="" alt="Original" style="display: none;">
+                <canvas id="originalCanvas"></canvas>
+            </div>
+            <div class="image-box">
+                <h3>Enhanced Photo (DSLR Style)</h3>
+                <canvas id="enhancedCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const enhanceBtn = document.getElementById('enhanceBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const originalImage = document.getElementById('originalImage');
+        const originalCanvas = document.getElementById('originalCanvas');
+        const enhancedCanvas = document.getElementById('enhancedCanvas');
+        const sharpnessSlider = document.getElementById('sharpness');
+        
+        // Canvas Context
+        const originalCtx = originalCanvas.getContext('2d');
+        const enhancedCtx = enhancedCanvas.getContext('2d');
+        
+        let uploadedImage = null;
+        
+        // Event Listeners
+        uploadArea.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleImageUpload);
+        enhanceBtn.addEventListener('click', enhanceImage);
+        downloadBtn.addEventListener('click', downloadImage);
+        sharpnessSlider.addEventListener('input', applyEnhancements);
+        
+        // Handle Image Upload
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                originalImage.src = event.target.result;
+                originalImage.onload = function() {
+                    // Set canvas dimensions
+                    const maxWidth = 600;
+                    const ratio = maxWidth / originalImage.width;
+                    const height = originalImage.height * ratio;
+                    
+                    originalCanvas.width = enhancedCanvas.width = maxWidth;
+                    originalCanvas.height = enhancedCanvas.height = height;
+                    
+                    // Draw original image
+                    originalCtx.drawImage(originalImage, 0, 0, maxWidth, height);
+                    
+                    uploadedImage = originalImage;
+                    enhanceBtn.disabled = false;
+                    sharpnessSlider.disabled = false;
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Enhance Image (AI-like adjustments)
+        function enhanceImage() {
+            if (!uploadedImage) return;
+            
+            // Copy original to enhanced canvas first
+            enhancedCtx.drawImage(uploadedImage, 0, 0, enhancedCanvas.width, enhancedCanvas.height);
+            
+            // Apply enhancements
+            applyEnhancements();
+            
+            downloadBtn.disabled = false;
+        }
+        
+        // Apply Filters & Adjustments
+        function applyEnhancements() {
+            if (!uploadedImage) return;
+            
+            // Re-draw original
+            enhancedCtx.drawImage(uploadedImage, 0, 0, enhancedCanvas.width, enhancedCanvas.height);
+            
+            // Get image data
+            const imageData = enhancedCtx.getImageData(0, 0, enhancedCanvas.width, enhancedCanvas.height);
+            const data = imageData.data;
+            const sharpnessValue = parseFloat(sharpnessSlider.value);
+            
+            // Apply sharpness & color correction
+            for (let i = 0; i < data.length; i += 4) {
+                // Increase contrast slightly
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+                
+                // Vibrant colors (slight saturation boost)
+                const max = Math.max(r, g, b);
+                const min = Math.min(r, g, b);
+                const delta = (max - min) / 255;
+                const adjustment = 1.0 + (0.3 * delta); // More saturation for colorful areas
+                
+                data[i] = Math.min(255, r * adjustment);
+                data[i + 1] = Math.min(255, g * adjustment);
+                data[i + 2] = Math.min(255, b * adjustment);
+                
+                // Sharpness (edge enhancement)
+                if (sharpnessValue > 1) {
+                    // Simple sharpening (for demo)
+                    if (i > 4 && i < data.length - 8) {
+                        const factor = 0.3 * (sharpnessValue - 1);
+                        data[i] = Math.min(255, data[i] + (data[i] - data[i - 4]) * factor);
+                        data[i + 1] = Math.min(255, data[i + 1] + (data[i + 1] - data[i - 3]) * factor);
+                        data[i + 2] = Math.min(255, data[i + 2] + (data[i + 2] - data[i - 2]) * factor);
+                    }
+                }
+            }
+            
+            enhancedCtx.putImageData(imageData, 0, 0);
+            
+            // Apply blur effect (background bokeh simulation)
+            if (document.getElementById('bokehEffect').checked) {
+                simulateBokehEffect();
+            }
+        }
+        
+        // Simulate Bokeh (Blur Background)
+        function simulateBokehEffect() {
+            // This is a simplified version (real bokeh requires depth map)
+            enhancedCtx.filter = 'blur(4px)';
+            enhancedCtx.globalCompositeOperation = 'destination-over';
+            enhancedCtx.drawImage(uploadedImage, 0, 0, enhancedCanvas.width, enhancedCanvas.height);
+            enhancedCtx.filter = 'none';
+            enhancedCtx.globalCompositeOperation = 'source-over';
+        }
+        
+        // Download Enhanced Image
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = 'enhanced-photo.png';
+            link.href = enhancedCanvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+</html>

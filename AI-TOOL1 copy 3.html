@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>सार्वजनिक जानकारी खोजक</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input {
+            flex: 1;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        .tab.active {
+            border-bottom: 3px solid #3498db;
+            font-weight: bold;
+        }
+        .result-section {
+            border: 1px solid #eee;
+            padding: 20px;
+            border-radius: 5px;
+            min-height: 200px;
+        }
+        .result-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #eee;
+        }
+        .not-found {
+            color: #e74c3c;
+            font-style: italic;
+        }
+        .image-results {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .image-results img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .disclaimer {
+            background: #fff8e1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>सार्वजनिक जानकारी खोजक</h1>
+        
+        <div class="tab-container">
+            <div class="tab active" data-tab="phone">फोन नंबर से खोजें</div>
+            <div class="tab" data-tab="image">इमेज से खोजें</div>
+            <div class="tab" data-tab="social">सोशल मीडिया खोज</div>
+        </div>
+        
+        <!-- Phone Search Tab -->
+        <div class="tab-content active" id="phone-tab">
+            <div class="search-box">
+                <input type="text" id="phoneInput" placeholder="फोन नंबर डालें (जैसे: 98XXXXXX21)">
+                <button onclick="searchPhone()">खोजें</button>
+            </div>
+            <div class="result-section" id="phoneResults">
+                <p>यहाँ परिणाम दिखाई देंगे...</p>
+            </div>
+        </div>
+        
+        <!-- Image Search Tab -->
+        <div class="tab-content" id="image-tab">
+            <div class="search-box">
+                <input type="file" id="imageInput" accept="image/*">
+                <button onclick="searchImage()">इमेज खोजें</button>
+            </div>
+            <div class="result-section" id="imageResults">
+                <p>यहाँ इमेज खोज परिणाम दिखाई देंगे...</p>
+            </div>
+        </div>
+        
+        <!-- Social Media Search Tab -->
+        <div class="tab-content" id="social-tab">
+            <div class="search-box">
+                <input type="text" id="usernameInput" placeholder="यूजरनेम डालें (जैसे: john.doe)">
+                <button onclick="searchSocial()">खोजें</button>
+            </div>
+            <div class="result-section" id="socialResults">
+                <p>यहाँ सोशल मीडिया परिणाम दिखाई देंगे...</p>
+            </div>
+        </div>
+        
+        <div class="disclaimer">
+            <strong>डिस्क्लेमर:</strong> यह टूल सिर्फ सार्वजनिक रूप से उपलब्ध जानकारी दिखाता है। किसी की निजी जानकारी बिना अनुमति के प्राप्त करना गैरकानूनी है।
+        </div>
+    </div>
+
+    <script>
+        // टैब स्विचिंग
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+            });
+        });
+
+        // फोन नंबर से खोज
+        function searchPhone() {
+            const phone = document.getElementById('phoneInput').value.trim();
+            if (!phone) return alert("कृपया फोन नंबर डालें");
+            
+            const results = document.getElementById('phoneResults');
+            results.innerHTML = '<p>खोज जारी है...</p>';
+            
+            // सिम्युलेटेड रिजल्ट (असल में API कॉल होगा)
+            setTimeout(() => {
+                if (phone === '9876543210') {
+                    results.innerHTML = `
+                        <div class="result-item">
+                            <h3>Truecaller पर उपलब्ध जानकारी:</h3>
+                            <p>नाम: राज शर्मा</p>
+                            <p>स्थान: दिल्ली, भारत</p>
+                            <p>स्पैम रिपोर्ट: 2 बार</p>
+                        </div>
+                        <div class="result-item">
+                            <h3>अन्य स्रोत:</h3>
+                            <p><a href="https://www.google.com/search?q=${phone}" target="_blank">Google पर खोजें</a></p>
+                        </div>
+                    `;
+                } else {
+                    results.innerHTML = `
+                        <div class="result-item">
+                            <p class="not-found">इस नंबर से संबंधित कोई सार्वजनिक जानकारी उपलब्ध नहीं है</p>
+                            <p>आप मैन्युअली खोज सकते हैं: <a href="https://www.truecaller.com/search/in/${phone}" target="_blank">Truecaller पर खोजें</a></p>
+                        </div>
+                    `;
+                }
+            }, 1500);
+        }
+
+        // इमेज रिवर्स सर्च
+        function searchImage() {
+            const fileInput = document.getElementById('imageInput');
+            if (!fileInput.files.length) return alert("कृपया एक इमेज चुनें");
+            
+            const results = document.getElementById('imageResults');
+            results.innerHTML = '<p>इमेज विश्लेषण जारी है...</p>';
+            
+            // सिम्युलेटेड रिजल्ट
+            setTimeout(() => {
+                results.innerHTML = `
+                    <div class="result-item">
+                        <h3>इमेज खोज परिणाम:</h3>
+                        <p>संभावित मिलान:</p>
+                        <div class="image-results">
+                            <img src="https://via.placeholder.com/100?text=Similar+1" alt="Similar Image 1">
+                            <img src="https://via.placeholder.com/100?text=Similar+2" alt="Similar Image 2">
+                        </div>
+                        <p>अधिक जानकारी के लिए: <a href="https://images.google.com/searchbyimage?image_url=uploaded" target="_blank">Google Images पर खोजें</a></p>
+                    </div>
+                `;
+            }, 2000);
+        }
+
+        // सोशल मीडिया खोज
+        function searchSocial() {
+            const username = document.getElementById('usernameInput').value.trim();
+            if (!username) return alert("कृपया यूजरनेम डालें");
+            
+            const results = document.getElementById('socialResults');
+            results.innerHTML = '<p>सोशल मीडिया खोज जारी है...</p>';
+            
+            setTimeout(() => {
+                results.innerHTML = `
+                    <div class="result-item">
+                        <h3>${username} के लिए परिणाम:</h3>
+                        <ul>
+                            <li><a href="https://www.instagram.com/${username}" target="_blank">Instagram प्रोफाइल</a></li>
+                            <li><a href="https://www.facebook.com/${username}" target="_blank">Facebook प्रोफाइल</a></li>
+                            <li><a href="https://twitter.com/${username}" target="_blank">Twitter प्रोफाइल</a></li>
+                        </ul>
+                    </div>
+                    <div class="result-item">
+                        <h3>Google पर खोजें:</h3>
+                        <p><a href="https://www.google.com/search?q=${username}" target="_blank">${username} के बारे में और जानकारी</a></p>
+                    </div>
+                `;
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #6a4c93, #8a6cb3);
+            color: white;
+        }
+        
+        .calculator {
+            width: 320px;
+            background-color: #2c3e50;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+        
+        .display {
+            padding: 20px;
+            text-align: right;
+            background-color: #34495e;
+        }
+        
+        .display-input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: white;
+            font-size: 24px;
+            text-align: right;
+            outline: none;
+        }
+        
+        .display-result {
+            font-size: 18px;
+            color: #95a5a6;
+            min-height: 27px;
+        }
+        
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            padding: 10px;
+        }
+        
+        button {
+            border: none;
+            padding: 15px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            opacity: 0.8;
+        }
+        
+        .number {
+            background-color: #7f8c8d;
+            color: white;
+        }
+        
+        .operator {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .function {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .equals {
+            background-color: #2ecc71;
+            color: white;
+            grid-column: span 2;
+        }
+        
+        .clear {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .memory {
+            background-color: #9b59b6;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display">
+            <input type="text" class="display-input" id="display" readonly>
+            <div class="display-result" id="result"></div>
+        </div>
+        <div class="buttons">
+            <!-- Memory Functions -->
+            <button class="memory" onclick="memoryClear()">MC</button>
+            <button class="memory" onclick="memoryRecall()">MR</button>
+            <button class="memory" onclick="memoryAdd()">M+</button>
+            <button class="memory" onclick="memorySubtract()">M-</button>
+            <button class="clear" onclick="clearDisplay()">C</button>
+            
+            <!-- Trigonometric Functions -->
+            <button class="function" onclick="addToDisplay('Math.sin(')">sin</button>
+            <button class="function" onclick="addToDisplay('Math.cos(')">cos</button>
+            <button class="function" onclick="addToDisplay('Math.tan(')">tan</button>
+            <button class="function" onclick="addToDisplay('Math.asin(')">sin⁻¹</button>
+            <button class="function" onclick="addToDisplay('Math.acos(')">cos⁻¹</button>
+            
+            <!-- Logarithmic and Constants -->
+            <button class="function" onclick="addToDisplay('Math.log(')">log</button>
+            <button class="function" onclick="addToDisplay('Math.log10(')">log10</button>
+            <button class="function" onclick="addToDisplay('Math.PI')">π</button>
+            <button class="function" onclick="addToDisplay('Math.E')">e</button>
+            <button class="operator" onclick="addToDisplay('')">x^y</button>
+            
+            <!-- Numbers and Basic Operators -->
+            <button class="number" onclick="addToDisplay('7')">7</button>
+            <button class="number" onclick="addToDisplay('8')">8</button>
+            <button class="number" onclick="addToDisplay('9')">9</button>
+            <button class="operator" onclick="addToDisplay('/')">÷</button>
+            <button class="function" onclick="addToDisplay('Math.sqrt(')">√</button>
+            
+            <button class="number" onclick="addToDisplay('4')">4</button>
+            <button class="number" onclick="addToDisplay('5')">5</button>
+            <button class="number" onclick="addToDisplay('6')">6</button>
+            <button class="operator" onclick="addToDisplay('*')">×</button>
+            <button class="function" onclick="addToDisplay('(')">(</button>
+            
+            <button class="number" onclick="addToDisplay('1')">1</button>
+            <button class="number" onclick="addToDisplay('2')">2</button>
+            <button class="number" onclick="addToDisplay('3')">3</button>
+            <button class="operator" onclick="addToDisplay('-')">-</button>
+            <button class="function" onclick="addToDisplay(')')">)</button>
+            
+            <button class="number" onclick="addToDisplay('0')">0</button>
+            <button class="number" onclick="addToDisplay('.')">.</button>
+            <button class="equals" onclick="calculate()">=</button>
+            <button class="operator" onclick="addToDisplay('+')">+</button>
+        </div>
+    </div>
+
+    <script>
+        let memory = 0;
+        const display = document.getElementById('display');
+        const resultDisplay = document.getElementById('result');
+        
+        // Add value to display
+        function addToDisplay(value) {
+            display.value += value;
+        }
+        
+        // Clear display
+        function clearDisplay() {
+            display.value = '';
+            resultDisplay.textContent = '';
+        }
+        
+        // Calculate result
+        function calculate() {
+            try {
+                // Replace trigonometric functions with proper syntax
+                let expression = display.value
+                    .replace(/Math\.sin\(/g, 'Math.sin((')
+                    .replace(/Math\.cos\(/g, 'Math.cos((')
+                    .replace(/Math\.tan\(/g, 'Math.tan((')
+                    .replace(/Math\.asin\(/g, 'Math.asin((')
+                    .replace(/Math\.acos\(/g, 'Math.acos((')
+                    .replace(/Math\.atan\(/g, 'Math.atan((')
+                    .replace(/Math\.sqrt\(/g, 'Math.sqrt((')
+                    .replace(/Math\.log\(/g, 'Math.log((')
+                    .replace(/Math\.log10\(/g, 'Math.log10((')
+                    + Array.from(display.value.matchAll(/Math\.\w+\(/g)).length * ')';
+                
+                // Evaluate the expression
+                const result = eval(expression);
+                resultDisplay.textContent = '= ' + result;
+            } catch (error) {
+                resultDisplay.textContent = 'Error';
+            }
+        }
+        
+        // Memory functions
+        function memoryClear() {
+            memory = 0;
+        }
+        
+        function memoryRecall() {
+            display.value += memory;
+        }
+        
+        function memoryAdd() {
+            try {
+                memory += eval(display.value);
+                clearDisplay();
+            } catch (error) {
+                resultDisplay.textContent = 'Error';
+            }
+        }
+        
+        function memorySubtract() {
+            try {
+                memory -= eval(display.value);
+                clearDisplay();
+            } catch (error) {
+                resultDisplay.textContent = 'Error';
+            }
+        }
+        
+        // Keyboard support
+        document.addEventListener('keydown', function(event) {
+            if (/[0-9\.\+\-\*\/\(\)]/.test(event.key)) {
+                addToDisplay(event.key);
+            } else if (event.key === 'Enter') {
+                calculate();
+            } else if (event.key === 'Escape') {
+                clearDisplay();
+            } else if (event.key === 'Backspace') {
+                display.value = display.value.slice(0, -1);
+            }
+        });
+    </script>
+</body>
+</html>

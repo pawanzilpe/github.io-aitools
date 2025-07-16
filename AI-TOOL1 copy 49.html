@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+        
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        
+        .tab-button.active {
+            background: rgba(255, 255, 255, 0.3);
+            font-weight: 600;
+        }
+        
+        #videoPlayer {
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        #videoPlayer:hover {
+            transform: scale(1.01);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+        
+        .generate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.5);
+        }
+        
+        #progressBar {
+            transition: width 0.3s ease;
+        }
+        
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="py-10">
+    <div class="container mx-auto px-4 max-w-6xl">
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-3">AI Video Generator</h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Transform your text or images into stunning professional videos instantly</p>
+        </header>
+        
+        <!-- Main Content -->
+        <div class="glass-effect p-6 mb-12">
+            <!-- Tabs -->
+            <div class="flex space-x-2 mb-6">
+                <button id="textTab" class="tab-button active px-4 py-2 rounded-full">Text to Video</button>
+                <button id="imageTab" class="tab-button px-4 py-2 rounded-full">Image to Video</button>
+            </div>
+            
+            <!-- Text to Video Section -->
+            <div id="textSection" class="">
+                <div class="mb-6">
+                    <label for="videoText" class="block text-gray-700 font-medium mb-2">Enter Your Text</label>
+                    <textarea id="videoText" rows="4" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Type your text here to generate a video..."></textarea>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-gray-700 font-medium mb-2">Select Theme</label>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div>
+                            <input type="radio" name="theme" id="business" value="business" class="hidden peer" checked>
+                            <label for="business" class="block p-3 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-purple-500 peer-checked:bg-purple-50 text-center">
+                                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/25f12c29-9cca-4859-a715-0874f7467e52.png" alt="Professional business theme with office setting and formal color scheme" class="w-full h-20 object-cover rounded mb-2">
+                                <span>Business</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" name="theme" id="creative" value="creative" class="hidden peer">
+                            <label for="creative" class="block p-3 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-purple-500 peer-checked:bg-purple-50 text-center">
+                                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/577f65ae-5cdf-4ce1-95be-d9f6d634c58d.png" alt="Colorful artistic theme with paint splatters and abstract shapes" class="w-full h-20 object-cover rounded mb-2">
+                                <span>Creative</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" name="theme" id="minimal" value="minimal" class="hidden peer">
+                            <label for="minimal" class="block p-3 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-purple-500 peer-checked:bg-purple-50 text-center">
+                                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/319eede4-4afc-4a1e-bcb2-ec9cf7791e57.png" alt="Clean minimalist theme with simple lines and white space" class="w-full h-20 object-cover rounded mb-2">
+                                <span>Minimal</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" name="theme" id="tech" value="tech" class="hidden peer">
+                            <label for="tech" class="block p-3 border border-gray-300 rounded-lg cursor-pointer peer-checked:border-purple-500 peer-checked:bg-purple-50 text-center">
+                                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/a66c3f6e-9065-4b3e-9ea8-63eccf10cbad.png" alt="Futuristic technology theme with digital elements and blue tones" class="w-full h-20 object-cover rounded mb-2">
+                                <span>Tech</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" id="addMusic" class="rounded text-purple-500 focus:ring-purple-500 mr-2">
+                        <span class="text-gray-700">Add Background Music</span>
+                    </label>
+                </div>
+                
+                <button id="generateBtn" class="generate-btn text-white px-8 py-3 rounded-full font-medium w-full md:w-auto">
+                    Generate Video
+                </button>
+            </div>
+            
+            <!-- Image to Video Section -->
+            <div id="imageSection" class="hidden">
+                <div class="mb-6">
+                    <label class="block text-gray-700 font-medium mb-2">Upload Image</label>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                        <input type="file" id="imageUpload" accept="image/*" class="hidden">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/5b2cd447-3fb0-49b7-96cf-d8d95af930e2.png" alt="Placeholder for user uploaded image to convert to video" id="imagePreview" class="w-full max-h-64 object-contain mb-4">
+                        <button id="uploadBtn" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-6 py-2 rounded-lg transition">
+                            Choose Image
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <label for="animationStyle" class="block text-gray-700 font-medium mb-2">Select Animation Style</label>
+                    <select id="animationStyle" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <option value="zoom">Zoom In/Out</option>
+                        <option value="pan">Pan Left/Right</option>
+                        <option value="kenBurns">Ken Burns Effect</option>
+                        <option value="slide">Slide Show</option>
+                    </select>
+                </div>
+                
+                <div class="mb-6">
+                    <label for="videoDuration" class="block text-gray-700 font-medium mb-2">Video Duration (seconds)</label>
+                    <input type="range" id="videoDuration" min="5" max="60" value="15" class="w-full">
+                    <div class="text-right text-gray-600"><span id="durationValue">15</span> seconds</div>
+                </div>
+                
+                <button id="generateImageBtn" class="generate-btn text-white px-8 py-3 rounded-full font-medium w-full md:w-auto">
+                    Generate Video from Image
+                </button>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div id="progressContainer" class="hidden mt-6">
+                <div class="mb-2 flex justify-between">
+                    <span class="text-gray-700">Generating video...</span>
+                    <span id="progressPercentage" class="text-gray?700">0%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div id="progressBar" class="bg-purple-500 h-2.5 rounded-full" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <!-- Result Section -->
+            <div id="resultSection" class="hidden mt-10">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Your Generated Video</h3>
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="flex-1">
+                        <video id="videoPlayer" controls class="w-full rounded-lg"></video>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="text-lg font-medium text-gray-700 mb-3">Video Details</h4>
+                        <div id="videoDetails" class="bg-gray-50 p-4 rounded-lg">
+                            <!-- Video details will be inserted here -->
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button id="downloadBtn" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg mr-3">
+                                Download Video
+                            </button>
+                            <button id="shareBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg">
+                                Share Online
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Features Section -->
+        <div class="glass-effect p-6 mb-12">
+            <h3 class="text-2xl font-semibold text-gray-800 mb-6">Features</h3>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-purple-500 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                        </svg>
+                    </div>
+                    <h4 class="text-lg font-medium text-gray-800 mb-2">AI-Powered</h4>
+                    <p class="text-gray-600">Our advanced AI analyzes your content to create the perfect video composition.</p>
+                </div>
+                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-purple-500 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                        </svg>
+                    </div>
+                    <h4 class="text-lg font-medium text-gray-800 mb-2">Multiple Themes</h4>
+                    <p class="text-gray-600">Choose from various professional themes to match your brand or personal style.</p>
+                </div>
+                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-purple-500 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <h4 class="text-lg font-medium text-gray-800 mb-2">High Quality</h4>
+                    <p class="text-gray-600">Generates videos in full HD resolution with smooth animations and transitions.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- How It Works Section -->
+        <div class="glass-effect p-6">
+            <h3 class="text-2xl font-semibold text-gray-800 mb-6">How It Works</h3>
+            <div class="space-y-6">
+                <div class="flex items-start">
+                    <div class="bg-purple-100 text-purple-800 rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4">1</div>
+                    <div>
+                        <h4 class="text-lg font-medium text-gray-800 mb-1">Enter Text or Upload Image</h4>
+                        <p class="text-gray-600">Type your message or upload an image you want to transform into a video.</p>
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <div class="bg-purple-100 text-purple-800 rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4">2</div>
+                    <div>
+                        <h4 class="text-lg font-medium text-gray-800 mb-1">Customize Options</h4>
+                        <p class="text-gray-600">Select your preferred theme, animation style, and other customization options.</p>
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <div class="bg-purple-100 text-purple-800 rounded-full w-8 h-8 flex items-center justify-center font-bold mr-4">3</div>
+                    <div>
+                        <h4 class="text-lg font-medium text-gray-800 mb-1">Generate & Download</h4>
+                        <p class="text-gray-600">Wait a few moments while our AI creates your video, then download or share it.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="text-center py-8 text-gray-600 mt-12">
+        <p>© 2023 AI Video Generator. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const textTab = document.getElementById('textTab');
+        const imageTab = document.getElementById('imageTab');
+        const textSection = document.getElementById('textSection');
+        const imageSection = document.getElementById('imageSection');
+        const generateBtn = document.getElementById('generateBtn');
+        const generateImageBtn = document.getElementById('generateImageBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressPercentage = document.getElementById('progressPercentage');
+        const resultSection = document.getElementById('resultSection');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const videoDetails = document.getElementById('videoDetails');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const shareBtn = document.getElementById('shareBtn');
+        const videoDuration = document.getElementById('videoDuration');
+        const durationValue = document.getElementById('durationValue');
+        const imageUpload = document.getElementById('imageUpload');
+        const imagePreview = document.getElementById('imagePreview');
+        const uploadBtn = document.getElementById('uploadBtn');
+        
+        // Tab switching functionality
+        textTab.addEventListener('click', () => {
+            textSection.classList.remove('hidden');
+            imageSection.classList.add('hidden');
+            textTab.classList.add('active');
+            imageTab.classList.remove('active');
+        });
+        
+        imageTab.addEventListener('click', () => {
+            imageSection.classList.remove('hidden');
+            textSection.classList.add('hidden');
+            imageTab.classList.add('active');
+            textTab.classList.remove('active');
+        });
+        
+        // Update duration display
+        videoDuration.addEventListener('input', () => {
+            durationValue.textContent = videoDuration.value;
+        });
+        
+        // Image upload preview
+        uploadBtn.addEventListener('click', () => {
+            imageUpload.click();
+        });
+        
+        imageUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    imagePreview.src = event.target.result;
+                    imagePreview.alt = "User uploaded image for video generation: " + file.name;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Simulate video generation for text
+        generateBtn.addEventListener('click', () => {
+            const text = document.getElementById('videoText').value;
+            const theme = document.querySelector('input[name="theme"]:checked').value;
+            const addMusic = document.getElementById('addMusic').checked;
+            
+            if (!text) {
+                alert('Please enter some text to generate a video');
+                return;
+            }
+            
+            startGeneration();
+        });
+        
+        // Simulate video generation for image
+        generateImageBtn.addEventListener('click', () => {
+            if (!imageUpload.files || imageUpload.files.length === 0) {
+                alert('Please upload an image to generate a video');
+                return;
+            }
+            
+            startGeneration();
+        });
+        
+        // Start generation progress
+        function startGeneration() {
+            progressContainer.classList.remove('hidden');
+            resultSection.classList.add('hidden');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                progressBar.style.width = `${progress}%`;
+                progressPercentage.textContent = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(showResult, 500);
+                }
+            }, 200);
+        }
+        
+        // Show result after generation
+        function showResult() {
+            progressContainer.classList.add('hidden');
+            resultSection.classList.remove('hidden');
+            
+            // In a real app, this would be the actual generated video URL
+            videoPlayer.src = "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4";
+            
+            // Simulated video details
+            videoDetails.innerHTML = `
+                <p class="mb-2"><span class="font-medium">Format:</span> MP4 (H.264)</p>
+                <p class="mb-2"><span class="font-medium">Resolution:</span> 1280×720 (HD)</p>
+                <p class="mb-2"><span class="font-medium">Duration:</span> ${videoDuration.value} seconds</p>
+                <p class="mb-2"><span class="font-medium">File Size:</span> ~1.5 MB</p>
+            `;
+        }
+        
+        // Download video
+        downloadBtn.addEventListener('click', () => {
+            alert('In a real application, this would download the video file');
+        });
+        
+        // Share video
+        shareBtn.addEventListener('click', () => {
+            alert('In a real application, this would share the video on social media');
+        });
+    </script>
+</body>
+</html>

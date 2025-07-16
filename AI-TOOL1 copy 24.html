@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Analytics Blossom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .flower-center {
+            animation: pulse 5s infinite;
+        }
+        .flower-petal {
+            animation: rotation 20s infinite linear;
+            transform-origin: center;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        @keyframes rotation {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .user-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .scroll-container {
+            scrollbar-width: thin;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Flower-themed header -->
+        <div class="flex flex-col items-center mb-12">
+            <div class="relative w-48 h-48 mb-6">
+                <div class="absolute inset-0 flex items-center justify-center flower-center">
+                    <div class="w-24 h-24 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full"></div>
+                </div>
+                <div class="absolute inset-0 flower-petal">
+                    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-24 bg-gradient-to-br from-pink-300 to-pink-500 rounded-lg"></div>
+                    <div class="absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 w-24 h-16 bg-gradient-to-br from-purple-300 to-purple-500 rounded-lg"></div>
+                    <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 w-16 h-24 bg-gradient-to-t from-blue-300 to-blue-500 rounded-lg"></div>
+                    <div class="absolute left-0 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-16 bg-gradient-to-bl from-green-300 to-green-500 rounded-lg"></div>
+                </div>
+            </div>
+            <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">Social Analytics Blossom</h1>
+            <p class="text-gray-600 text-center max-w-md">Enter a username to see bloomed connections</p>
+        </div>
+
+        <!-- Input form -->
+        <div class="max-w-xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6 mb-10">
+            <div class="flex">
+                <input 
+                    type="text" 
+                    placeholder="@username" 
+                    class="flex-grow px-4 py-3 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                <button class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-r-lg font-semibold hover:opacity-90 transition">
+                    Analyze
+                </button>
+            </div>
+            <div class="mt-4 text-sm text-gray-500">
+                <p>Note: This demo shows simulated data. Real social media APIs have strict limits on accessing private user information.</p>
+            </div>
+        </div>
+
+        <!-- Results section -->
+        <div class="hidden" id="resultsSection">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold text-gray-800">Followers Analysis</h2>
+                <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">24 connections</span>
+            </div>
+
+            <!-- Stats cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-blue-500">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-blue-100 rounded-lg mr-4">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/16ae9d02-fed4-4c71-8149-3d579e96e419.png" alt="User icon representing people" />
+                        </div>
+                        <div>
+                            <h3 class="text-gray-500 text-sm">Total Followers</h3>
+                            <p class="text-2xl font-semibold">24</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-purple-500">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-purple-100 rounded-lg mr-4">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/c9485047-b5c1-4b69-9304-da059758b3f5.png" alt="Email icon representing contact information" />
+                        </div>
+                        <div>
+                            <h3 class="text-gray-500 text-sm">Contacts Found</h3>
+                            <p class="text-2xl font-semibold">8</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-yellow-500">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-yellow-100 rounded-lg mr-4">
+                            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/41cc4eab-0540-4b3f-9a65-9b0a18a0e7fb.png" alt="Map pin icon representing locations" />
+                        </div>
+                        <div>
+                            <h3 class="text-gray-500 text-sm">Locations</h3>
+                            <p class="text-2xl font-semibold">5</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User list -->
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-gray-100">
+                    <h3 class="font-medium text-gray-800">Followers List</h3>
+                </div>
+                <div class="scroll-container max-h-[500px] overflow-y-auto">
+                    <!-- Sample user card 1 -->
+                    <div class="user-card p-4 border-b border-gray-100 hover:bg-gray-50 transition cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 mr-4">
+                                <img class="w-12 h-12 rounded-full" src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/ae2074a9-292b-45de-9bfc-ea4b2a5a03b8.png" alt="Profile picture of techno_guy123">
+                            </div>
+                            <div class="flex-grow">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="font-medium">techno_guy123</h4>
+                                    <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Verified</span>
+                                </div>
+                                <div class="text-sm text-gray-500 mt-1">
+                                    <div class="flex items-center">
+                                        <span class="mr-4">active 2h ago</span>
+                                        <span>San Francisco</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 px-2">
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <span class="text-gray-500">Email:</span>
+                                    <span>user*@gmail.com</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500">Phone:</span>
+                                    <span>+1 *** *** 1234</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sample user card 2 -->
+                    <div class="user-card p-4 border-b border-gray-100 hover:bg-gray-50 transition cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 mr-4">
+                                <img class="w-12 h-12 rounded-full" src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/5dbdaac2-f818-4caa-a18b-ccae6ec3ab92.png" alt="Profile picture of creative_soul">
+                            </div>
+                            <div class="flex-grow">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="font-medium">creative_soul</h4>
+                                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Influencer</span>
+                                </div>
+                                <div class="text-sm text-gray-500 mt-1">
+                                    <div class="flex items-center">
+                                        <span class="mr-4">active yesterday</span>
+                                        <span>New York</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 px-2">
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <span class="text-gray-500">Email:</span>
+                                    <span>contact@creatives.com</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500">Phone:</span>
+                                    <span>Not available</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sample user card 3 -->
+                    <div class="user-card p-4 hover:bg-gray-50 transition cursor-pointer">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 mr-4">
+                                <img class="w-12 h-12 rounded-full" src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/d061c9b0-f1a7-4940-a3de-8401c20c2982.png" alt="Profile picture of travel_bug">
+                            </div>
+                            <div class="flex-grow">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="font-medium">travel_bug</h4>
+                                    <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">Traveler</span>
+                                </div>
+                                <div class="text-sm text-gray-500 mt-1">
+                                    <div class="flex items-center">
+                                        <span class="mr-4">active 1w ago</span>
+                                        <span>Multiple locations</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 px-2">
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <span class="text-gray-500">Email:</span>
+                                    <span>travel**@outlook.com</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500">Phone:</span>
+                                    <span>+44 *** *** 5678</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center text-sm text-gray-500">
+                <p>Important: The data shown is simulated for demo purposes only. This tool does not actually scrape or store any private user information.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelector('button').addEventListener('click', function() {
+            const username = document.querySelector('input').value.trim();
+            if(username) {
+                document.getElementById('resultsSection').classList.remove('hidden');
+                
+                // Smooth scroll to results
+                document.getElementById('resultsSection').scrollIntoView({
+                    behavior: 'smooth'
+                });
+                
+                // Here you would normally make an API call
+                console.log(`Would fetch data for: ${username}`);
+            } else {
+                alert('Please enter a username first');
+            }
+        });
+    </script>
+</body>
+</html>

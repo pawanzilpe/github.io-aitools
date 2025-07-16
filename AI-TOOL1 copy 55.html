@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Search Hub - Search, View & Download Any Content</title>
+    <style>
+        :root {
+            --primary: #4285F4;
+            --secondary: #34A853;
+            --danger: #EA4335;
+            --warning: #FBBC05;
+            --dark: #202124;
+            --light: #f8f9fa;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+            color: var(--danger);
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #3367d6;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: #e8f0fe;
+        }
+        
+        .search-container {
+            display: flex;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 24px;
+            overflow: hidden;
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+        
+        #search-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            font-size: 16px;
+            outline: none;
+        }
+        
+        #search-btn {
+            padding: 0 25px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .search-options {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .search-option {
+            padding: 8px 15px;
+            background-color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .search-option.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .search-option:hover:not(.active) {
+            background-color: #f1f3f4;
+        }
+        
+        .results-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .result-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .result-title {
+            font-size: 20px;
+            color: #1a0dab;
+            margin-bottom: 5px;
+        }
+        
+        .result-url {
+            color: #006621;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .result-snippet {
+            color: #4d5156;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .result-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        
+        .action-btn i {
+            margin-right: 5px;
+        }
+        
+        .download-btn {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+        }
+        
+        .save-btn {
+            background-color: #f1f3f4;
+            border: none;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .video-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .video-thumbnail {
+            position: relative;
+            height: 180px;
+            background-color: #000;
+        }
+        
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .video-duration {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .video-info {
+            padding: 12px;
+        }
+        
+        .video-title {
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .video-channel {
+            color: #606060;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .video-stats {
+            display: flex;
+            justify-content: space-between;
+            color: #606060;
+            font-size: 13px;
+        }
+        
+        .wiki-result {
+            margin-bottom: 30px;
+        }
+        
+        .wiki-title {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        .wiki-content {
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .wiki-image {
+            float: right;
+            margin-left: 20px;
+            margin-bottom: 20px;
+            max-width: 300px;
+            border-radius: 8px;
+        }
+        
+        .login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .modal-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .modal-footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .social-login {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .social-btn {
+            padding: 10px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .google-btn {
+            background-color: white;
+            border: 1px solid #dadce0;
+        }
+        
+        .google-btn i {
+            color: var(--danger);
+            margin-right: 10px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .download-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .download-option {
+            padding: 8px 15px;
+            background-color: #f1f3f4;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .download-option:hover {
+            background-color: #e8eaed;
+        }
+        
+        @media (max-width: 768px) {
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .wiki-image {
+                float: none;
+                margin: 0 auto 20px;
+                display: block;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-search"></i>
+                Universal Search Hub
+            </div>
+            <div class="auth-buttons">
+                <button class="btn btn-outline" id="login-btn"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+                <button class="btn btn-primary" id="signup-btn"><i class="fas fa-user-plus"></i> Sign Up</button>
+            </div>
+        </header>
+        
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Search anything...">
+            <button id="search-btn"><i class="fas fa-search"></i></button>
+        </div>
+        
+        <div class="search-options">
+            <div class="search-option active" data-type="all">All</div>
+            <div class="search-option" data-type="web">Web</div>
+            <div class="search-option" data-type="videos">Videos</div>
+            <div class="search-option" data-type="images">Images</div>
+            <div class="search-option" data-type="wiki">Wikipedia</div>
+            <div class="search-option" data-type="news">News</div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="web">Web Results</div>
+            <div class="tab" data-tab="videos">Videos</div>
+            <div class="tab" data-tab="images">Images</div>
+            <div class="tab" data-tab="wiki">Wikipedia</div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <p>Searching the web...</p>
+        </div>
+        
+        <div class="tab-content active" id="web-results">
+            <div class="results-container" id="web-results-container">
+                <!-- Web search results will appear here -->
+                <div style="text-align: center; padding: 50px; color: #70757a;">
+                    <i class="fas fa-search" style="font-size: 50px; margin-bottom: 20px; color: #dadce0;"></i>
+                    <h3>Enter a search query to find information</h3>
+                    <p>Results from Google, Wikipedia, and other sources will appear here</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="videos-results">
+            <div class="video-grid" id="videos-container">
+                <!-- Video results will appear here -->
+                <div style="text-align: center; padding: 50px; color: #70757a; grid-column: 1 / -1;">
+                    <i class="fas fa-video" style="font-size: 50px; margin-bottom: 20px; color: #dadce0;"></i>
+                    <h3>Search for videos</h3>
+                    <p>YouTube and other video platform results will appear here</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="images-results">
+            <div style="text-align: center; padding: 50px; color: #70757a;">
+                <i class="fas fa-image" style="font-size: 50px; margin-bottom: 20px; color: #dadce0;"></i>
+                <h3>Search for images</h3>
+                <p>Image results from across the web will appear here</p>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="wiki-results">
+            <div id="wiki-container">
+                <!-- Wikipedia results will appear here -->
+                <div style="text-align: center; padding: 50px; color: #70757a;">
+                    <i class="fab fa-wikipedia-w" style="font-size: 50px; margin-bottom: 20px; color: #dadce0;"></i>
+                    <h3>Search for Wikipedia articles</h3>
+                    <p>Wikipedia content will appear here with rich formatting</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Login Modal -->
+    <div class="login-modal" id="login-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Sign In</h3>
+                <p>Access your saved searches and downloads</p>
+            </div>
+            <div class="form-group">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" placeholder="Enter your password">
+            </div>
+            <button class="btn btn-primary" style="width: 100%;">Sign In</button>
+            
+            <div class="social-login">
+                <p>Or sign in with</p>
+                <div class="social-btn google-btn" id="google-signin">
+                    <i class="fab fa-google"></i>
+                    Sign in with Google
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <p>Don't have an account? <a href="#" id="switch-to-signup">Sign up</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Signup Modal -->
+    <div class="login-modal" id="signup-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Create Account</h3>
+                <p>Save your searches and download history</p>
+            </div>
+            <div class="form-group">
+                <label for="signup-name">Full Name</label>
+                <input type="text" id="signup-name" placeholder="Enter your full name">
+            </div>
+            <div class="form-group">
+                <label for="signup-email">Email</label>
+                <input type="email" id="signup-email" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="signup-password">Password</label>
+                <input type="password" id="signup-password" placeholder="Create a password">
+            </div>
+            <button class="btn btn-primary" style="width: 100%;">Create Account</button>
+            
+            <div class="social-login">
+                <p>Or sign up with</p>
+                <div class="social-btn google-btn" id="google-signup">
+                    <i class="fab fa-google"></i>
+                    Sign up with Google
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <p>Already have an account? <a href="#" id="switch-to-login">Sign in</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab') + '-results';
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // Search type selection
+        document.querySelectorAll('.search-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.search-option').forEach(o => o.classList.remove('active'));
+                option.classList.add('active');
+                // In a real app, this would filter search results
+            });
+        });
+        
+        // Modal functionality
+        const loginBtn = document.getElementById('login-btn');
+        const signupBtn = document.getElementById('signup-btn');
+        const loginModal = document.getElementById('login-modal');
+        const signupModal = document.getElementById('signup-modal');
+        const switchToSignup = document.getElementById('switch-to-signup');
+        const switchToLogin = document.getElementById('switch-to-login');
+        
+        loginBtn.addEventListener('click', () => {
+            loginModal.style.display = 'flex';
+        });
+        
+        signupBtn.addEventListener('click', () => {
+            signupModal.style.display = 'flex';
+        });
+        
+        switchToSignup.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginModal.style.display = 'none';
+            signupModal.style.display = 'flex';
+        });
+        
+        switchToLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            signupModal.style.display = 'none';
+            loginModal.style.display = 'flex';
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.style.display = 'none';
+            }
+            if (e.target === signupModal) {
+                signupModal.style.display = 'none';
+            }
+        });
+        
+        // Search functionality
+        const searchInput = document.getElementById('search-input');
+        const searchBtn = document.getElementById('search-btn');
+        const loadingDiv = document.getElementById('loading');
+        
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch();
+        });
+        
+        function performSearch() {
+            const query = searchInput.value.trim();
+            if (!query) return;
+            
+            loadingDiv.style.display = 'block';
+            
+            // Clear previous results
+            document.getElementById('web-results-container').innerHTML = '';
+            document.getElementById('videos-container').innerHTML = '';
+            document.getElementById('wiki-container').innerHTML = '';
+            
+            // Simulate API calls with setTimeout
+            setTimeout(() => {
+                loadingDiv.style.display = 'none';
+                
+                // Generate mock web results
+                generateWebResults(query);
+                
+                // Generate mock video results
+                generateVideoResults(query);
+                
+                // Generate mock Wikipedia results
+                generateWikiResults(query);
+            }, 1500);
+        }
+        
+        function generateWebResults(query) {
+            const container = document.getElementById('web-results-container');
+            
+            const mockResults = [
+                {
+                    title:` ${query} - Official Website`,
+                    url:` https://www.${query.toLowerCase().replace(/\s+/g, '')}.com`,
+                    snippet: `The official website for ${query}. Find information, resources, and more about ${query}.`,
+                    downloadOptions: ['PDF', 'Text', 'HTML']
+                },
+                {
+                    title:` What is ${query}? - Complete Guide`,
+                    url:` https://www.${query.toLowerCase().replace(/\s+/g, '')}-guide.com`,
+                    snippet:` Learn everything you need to know about ${query}. This comprehensive guide covers all aspects of ${query} from beginner to advanced levels.`,
+                    downloadOptions: ['PDF', 'Word']
+                },
+                {
+                    title: `${query} News and Updates`,
+                    url: `https://news.${query.toLowerCase().replace(/\s+/g, '')}.com`,
+                    snippet: `Stay updated with the latest news and developments about ${query}. Our team brings you real-time updates and analysis.`,
+                    downloadOptions: ['PDF']
+                },
+                {
+                    title:` How to use ${query} - Tutorial`,
+                    url: `https://tutorials.${query.toLowerCase().replace(/\s+/g, '')}.org`,
+                    snippet: `Step-by-step tutorial on how to use ${query} effectively. Perfect for beginners who want to learn ${query} quickly.`,
+                    downloadOptions: ['PDF', 'Word', 'Excel']
+                }
+            ];
+            
+            mockResults.forEach(result => {
+                const resultCard = document.createElement('div');
+                resultCard.className = 'result-card';
+                
+                const downloadOptionsHTML = result.downloadOptions.map(option => 
+                    <div class="download-option">${option}</div>
+                ).join('');
+                
+                resultCard.innerHTML = `
+                    <div class="result-header">
+                        <div>
+                            <h3 class="result-title">${result.title}</h3>
+                            <div class="result-url">${result.url}</div>
+                        </div>
+                    </div>
+                    <div class="result-snippet">${result.snippet}</div>
+                    <div class="result-actions">
+                        <button class="action-btn download-btn"><i class="fas fa-download"></i> Download</button>
+                        <button class="action-btn save-btn"><i class="fas fa-bookmark"></i> Save</button>
+                    </div>
+                    <div class="download-options">
+                        ${downloadOptionsHTML}
+                    </div>
+                `;
+                
+                container.appendChild(resultCard);
+            });
+        }
+        
+        function generateVideoResults(query) {
+            const container = document.getElementById('videos-container');
+            
+            const mockVideos = [
+                {
+                    title:` Introduction to ${query} - Beginner's Guide`,
+                    channel:` 'Tech Tutorials'`,
+                    views: '1.2M views',
+                    time: '2 years ago',
+                    duration: '10:45',
+                    thumbnail: 'https://i.ytimg.com/vi/9bZkp7q19f0/hqdefault.jpg'
+                },
+                {
+                    title: `${query} Explained in 5 Minutes`,
+                    channel: 'Quick Learn',
+                    views: '856K views',
+                    time: '8 months ago',
+                    duration: '5:12',
+                    thumbnail: 'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg'
+                },
+                {
+                    title: Advanced `${query} Techniques - Full Course`,
+                    channel: 'Code Masters',
+                    views: '350K views',
+                    time: '1 year ago',
+                    duration: '1:25:36',
+                    thumbnail: 'https://i.ytimg.com/vi/PkZNo7MFNFg/hqdefault.jpg'
+                },
+                {
+                    title:` ${query} vs Alternatives - Comparison`,
+                    channel: 'Tech Compare',
+                    views: '420K views',
+                    time: '6 months ago',
+                    duration: '15:30',
+                    thumbnail: 'https://i.ytimg.com/vi/7ghhRHRP6t4/hqdefault.jpg'
+                }
+            ];
+            
+            mockVideos.forEach(video => {
+                const videoCard = document.createElement('div');
+                videoCard.className = 'video-card';
+                
+                videoCard.innerHTML = `
+                    <div class="video-thumbnail">
+                        <img src="${video.thumbnail}" alt="${video.title}">
+                        <div class="video-duration">${video.duration}</div>
+                    </div>
+                    <div class="video-info">
+                        <h4 class="video-title">${video.title}</h4>
+                        <div class="video-channel">${video.channel}</div>
+                        <div class="video-stats">
+                            <span>${video.views}</span>
+                            <span>${video.time}</span>
+                        </div>
+                    </div>
+                    <div class="download-options" style="padding: 0 12px 12px;">
+                        <div class="download-option">MP4 720p</div>
+                        <div class="download-option">MP4 1080p</div>
+                        <div class="download-option">MP3 Audio</div>
+                    </div>
+                `;
+                
+                container.appendChild(videoCard);
+            });
+        }
+        
+        function generateWikiResults(query) {
+            const container = document.getElementById('wiki-container');
+            
+            container.innerHTML = `
+                <div class="wiki-result">
+                    <h2 class="wiki-title">${query}</h2>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Wikipedia-logo-v2.svg/1200px-Wikipedia-logo-v2.svg.png" class="wiki-image" alt="Wikipedia">
+                    <div class="wiki-content">
+                        <p>${query} is a concept/technology/term that refers to... (This would be the actual Wikipedia content fetched from Wikipedia API in a real implementation).</p>
+                        <p>The history of ${query} dates back to... with significant developments occurring in...</p>
+                        <p>Modern applications of ${query} include... with notable examples being...</p>
+                        <h3>Key Features</h3>
+                        <ul>
+                            <li>Feature 1 of ${query}</li>
+                            <li>Feature 2 that makes ${query} unique</li>
+                            <li>Important aspect 3 of ${query}</li>
+                        </ul>
+                        <h3>Usage</h3>
+                        <p>${query} is primarily used for... with common applications in...</p>
+                    </div>
+                    <div class="download-options">
+                        <div class="download-option">Download as PDF</div>
+                        <div class="download-option">Download as Text</div>
+                        <div class="download-option">Download as Word</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Google Sign-In functionality (mock)
+        document.getElementById('google-signin').addEventListener('click', () => {
+            alert('In a real implementation, this would trigger Google OAuth sign-in');
+        });
+        
+        document.getElementById('google-signup').addEventListener('click', () => {
+            alert('In a real implementation, this would trigger Google OAuth sign-up');
+        });
+    </script>
+</body>
+</html>

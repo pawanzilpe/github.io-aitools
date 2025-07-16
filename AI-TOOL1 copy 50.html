@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);
+            min-height: 100vh;
+        }
+        
+        .video-preview {
+            background: linear-gradient(45deg, #e0e0e0 25%, #f0f0f0 25%, #f0f0f0 50%, #e0e0e0 50%, #e0e0e0 75%, #f0f0f0 75%);
+            background-size: 20px 20px;
+        }
+        
+        .generating::after {
+            content: "...";
+            animation: ellipsis 1.5s infinite;
+        }
+        
+        @keyframes ellipsis {
+            0% { content: "."; }
+            33% { content: ".."; }
+            66% { content: "..."; }
+        }
+        
+        .style-option:hover img {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .style-option img {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="py-8 px-4 md:px-12 lg:px-24">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-3">AI <span class="text-blue-600">Video</span> Generator</h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Transform your ideas into stunning videos with artificial intelligence. Simply describe what you want to see, and our AI will bring it to life.</p>
+        </header>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Left Column - Input Section -->
+            <div class="bg-white rounded-2xl shadow-xl p-6 lg:p-8">
+                <div class="mb-8">
+                    <label for="video-prompt" class="block text-lg font-medium text-gray-700 mb-2">Describe your video</label>
+                    <textarea 
+                        id="video-prompt" 
+                        rows="5" 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" 
+                        placeholder="A futuristic cityscape at night with flying cars and neon lights, cinematic style..."
+                    ></textarea>
+                    <p class="text-sm text-gray-500 mt-2">Be as descriptive as possible for best results.</p>
+                </div>
+                
+                <div class="mb-8">
+                    <h3 class="text-lg font-medium text-gray-700 mb-4">Select a video style</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <!-- Style Options -->
+                        <div class="style-option">
+                            <input type="radio" name="video-style" id="cinematic" value="cinematic" class="hidden peer" checked>
+                            <label for="cinematic" class="block cursor-pointer">
+                                <img src="https://placehold.co/300x200" alt="Cinematic style video with dramatic lighting and professional camera work" class="w-full h-32 object-cover rounded-lg border-2 border-transparent peer-checked:border-blue-500">
+                                <span class="block text-center mt-2 font-medium">Cinematic</span>
+                            </label>
+                        </div>
+                        
+                        <div class="style-option">
+                            <input type="radio" name="video-style" id="cartoon" value="cartoon" class="hidden peer">
+                            <label for="cartoon" class="block cursor-pointer">
+                                <img src="https://placehold.co/300x200" alt="Animated cartoon style with bright colors and simple shapes" class="w-full h-32 object-cover rounded-lg border-2 border-transparent peer-checked:border-blue-500">
+                                <span class="block text-center mt-2 font-medium">Cartoon</span>
+                            </label>
+                        </div>
+                        
+                        <div class="style-option">
+                            <input type="radio" name="video-style" id="watercolor" value="watercolor" class="hidden peer">
+                            <label for="watercolor" class="block cursor-pointer">
+                                <img src="https://placehold.co/300x200" alt="Watercolor painting style with soft edges and artistic brush strokes" class="w-full h-32 object-cover rounded-lg border-2 border-transparent peer-checked:border-blue-500">
+                                <span class="block text-center mt-2 font-medium">Watercolor</span>
+                            </label>
+                        </div>
+                        
+                        <div class="style-option">
+                            <input type="radio" name="video-style" id="retro" value="retro" class="hidden peer">
+                            <label for="retro" class="block cursor-pointer">
+                                <img src="https://placehold.co/300x200" alt="1980s retro futuristic style with vibrant colors and geometric patterns" class="w-full h-32 object-cover rounded-lg border-2 border-transparent peer-checked:border-blue-500">
+                                <span class="block text-center mt-2 font-medium">80s Retro</span>
+                            </label>
+                        </div>
+                        
+                        <div class="style-option">
+                            <input type="radio" name="video-style" id="cyberpunk" value="cyberpunk" class="hidden peer">
+                            <label for="cyberpunk" class="block cursor-pointer">
+                                <img src="https://placehold.co/300x200" alt="Cyberpunk aesthetic with neon lights, rain effects, and futuristic cityscapes" class="w-full h-32 object-cover rounded-lg border-2 border-transparent peer-checked:border-blue-500">
+                                <span class="block text-center mt-2 font-medium">Cyberpunk</span>
+                            </label>
+                        </div>
+                        
+                        <div class="style-option">
+                            <input type="radio" name="video-style" id="realistic" value="realistic" class="hidden peer">
+                            <label for="realistic" class="block cursor-pointer">
+                                <img src="https://placehold.co/300x200" alt="Photorealistic video quality that looks like real footage from a professional camera" class="w-full h-32 object-cover rounded-lg border-2 border-transparent peer-checked:border-blue-500">
+                                <span class="block text-center mt-2 font-medium">Realistic</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <label for="video-length" class="block text-lg font-medium text-gray-700 mb-2">Video Length (seconds)</label>
+                    <input type="range" id="video-length" min="3" max="60" value="15" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    <div class="flex justify-between mt-1">
+                        <span class="text-sm text-gray-500">3s</span>
+                        <span id="length-value" class="text-sm font-medium text-blue-600">15s</span>
+                        <span class="text-sm text-gray-500">60s</span>
+                    </div>
+                </div>
+                
+                <button id="generate-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition flex items-center justify-center">
+                    Generate Video
+                    <svg id="spinner" class="hidden animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Right Column - Preview Section -->
+            <div class="bg-white rounded-2xl shadow-xl p-6 lg:p-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Video Preview</h2>
+                
+                <div class="video-preview aspect-video w-full rounded-xl mb-6 flex items-center justify-center relative overflow-hidden">
+                    <div id="video-placeholder" class="text-center p-6">
+                        <img src="https://placehold.co/600x400" alt="Blank video canvas with placeholder text" class="w-32 h-32 mx-auto mb-4 opacity-30">
+                        <p class="text-gray-500">Your generated video will appear here</p>
+                    </div>
+                    <video id="generated-video" controls class="absolute inset-0 w-full h-full hidden"></video>
+                </div>
+                
+                <div id="settings-used" class="bg-gray-50 rounded-lg p-4 mb-6 hidden">
+                    <h3 class="font-medium text-gray-700 mb-2">Settings used</h3>
+                    <p class="text-sm text-gray-600"><span class="font-medium">Prompt:</span> <span id="used-prompt"></span></p>
+                    <p class="text-sm text-gray-600"><span class="font-medium">Style:</span> <span id="used-style"></span></p>
+                    <p class="text-sm text-gray-600"><span class="font-medium">Length:</span> <span id="used-length"></span> seconds</p>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button id="download-btn" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition disabled:opacity-50 hidden">
+                        Download Video
+                    </button>
+                    <button id="regenerate-btn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 px-4 rounded-lg transition hidden">
+                        Regenerate
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Features Section -->
+        <div class="mt-16">
+            <h2 class="text-3xl font-semibold text-center text-gray-800 mb-10">Powerful Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">AI-Powered Generation</h3>
+                    <p class="text-gray-600">Our advanced AI transforms your text into high-quality videos with just a description of what you want to see.</p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Multiple Styles</h3>
+                    <p class="text-gray-600">Choose from various artistic styles to match your creative vision, from cinematic realism to animated cartoons.</p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Instant Preview</h3>
+                    <p class="text-gray-600">See your generated videos immediately after processing, with the ability to make changes and regenerate as needed.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update length display
+            const lengthSlider = document.getElementById('video-length');
+            const lengthValue = document.getElementById('length-value');
+            
+            lengthSlider.addEventListener('input', function() {
+                lengthValue.textContent = this.value + 's';
+            });
+            
+            // Generate button functionality
+            const generateBtn = document.getElementById('generate-btn');
+            const spinner = document.getElementById('spinner');
+            const videoPlaceholder = document.getElementById('video-placeholder');
+            const generatedVideo = document.getElementById('generated-video');
+            const downloadBtn = document.getElementById('download-btn');
+            const regenerateBtn = document.getElementById('regenerate-btn');
+            const settingsSection = document.getElementById('settings-used');
+            const usedPrompt = document.getElementById('used-prompt');
+            const usedStyle = document.getElementById('used-style');
+            const usedLength = document.getElementById('used-length');
+            
+            generateBtn.addEventListener('click', function() {
+                const prompt = document.getElementById('video-prompt').value.trim();
+                const style = document.querySelector('input[name="video-style"]:checked').value;
+                const length = lengthSlider.value;
+                
+                if (!prompt) {
+                    alert('Please enter a video description');
+                    return;
+                }
+                
+                // Show loading state
+                generateBtn.disabled = true;
+                spinner.classList.remove('hidden');
+                generateBtn.innerHTML = 'Generating<span class="generating"></span>';
+                
+                // Hide previous video if any
+                generatedVideo.classList.add('hidden');
+                videoPlaceholder.classList.remove('hidden');
+                downloadBtn.classList.add('hidden');
+                regenerateBtn.classList.add('hidden');
+                settingsSection.classList.add('hidden');
+                
+                // Simulate AI generation (in a real app, this would be an API call)
+                setTimeout(function() {
+                    // Reset button
+                    generateBtn.disabled = false;
+                    spinner.classList.add('hidden');
+                    generateBtn.textContent = 'Generate Video';
+                    
+                    // Show generated video (placeholder in this demo)
+                    videoPlaceholder.classList.add('hidden');
+                    
+                    // Set a placeholder video source
+                    generatedVideo.src = 'https://example.com/video-placeholder.mp4';
+                    generatedVideo.classList.remove('hidden');
+                    
+                    // Show download and regenerate buttons
+                    downloadBtn.classList.remove('hidden');
+                    regenerateBtn.classList.remove('hidden');
+                    
+                    // Show settings used
+                    usedPrompt.textContent = prompt;
+                    usedStyle.textContent = style.charAt(0).toUpperCase() + style.slice(1);
+                    usedLength.textContent = length;
+                    settingsSection.classList.remove('hidden');
+                    
+                }, 3000);
+            });
+            
+            // Download button functionality
+            downloadBtn.addEventListener('click', function() {
+                alert('In a real implementation, this would download the generated video');
+            });
+            
+            // Regenerate button functionality
+            regenerateBtn.addEventListener('click', function() {
+                generateBtn.click();
+            });
+        });
+    </script>
+</body>
+</html>
+

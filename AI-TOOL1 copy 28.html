@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Validator Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .input-group {
+            margin: 20px 0;
+        }
+        input[type="email"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            display: none;
+        }
+        .disclaimer {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 30px;
+            text-align: center;
+        }
+        .info-card {
+            background: white;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Professional Email Validator</h1>
+        <p>Check email format and public information (ethical use only)</p>
+        
+        <div class="input-group">
+            <input type="email" id="emailInput" placeholder="Enter email address to validate">
+        </div>
+        
+        <button id="checkBtn">Validate Email</button>
+        
+        <div class="result" id="result">
+            <h3>Validation Results</h3>
+            <div id="resultsContainer"></div>
+        </div>
+        
+        <div class="disclaimer">
+            <p>This tool only checks email format validity and returns simulated public information. 
+            We do not store or misuse any data. Ethical hacking practices only.</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('checkBtn').addEventListener('click', function() {
+            const email = document.getElementById('emailInput').value.trim();
+            const resultDiv = document.getElementById('result');
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            if (!email) {
+                alert('Please enter an email address');
+                return;
+            }
+            
+            // Basic email validation
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                resultsContainer.innerHTML = `
+                    <div class="info-card" style="border-color: #e74c3c;">
+                        <h4>Invalid Email Format</h4>
+                        <p>The email address you entered doesn't follow standard formatting rules.</p>
+                    </div>
+                `;
+                resultDiv.style.display = 'block';
+                return;
+            }
+            
+            // Simulate API call with timeout
+            this.disabled = true;
+            this.textContent = 'Checking...';
+            
+            setTimeout(() => {
+                // Mock results - in a real tool this would come from legitimate APIs
+                const domain = email.split('@')[1];
+                const mockData = {
+                    formatValid: true,
+                    domainInfo: {
+                        name: domain,
+                        created: "2005-08-23", // Mock date
+                        registrar: "Namecheap, Inc." // Mock data
+                    },
+                    breachInfo: {
+                        isBreached: Math.random() > 0.7,
+                        breaches: Math.random() > 0.7 ? ["Adobe (2013)", "LinkedIn (2016)"] : []
+                    }
+                };
+                
+                // Display results
+                let html = `
+                    <div class="info-card">
+                        <h4>Email Format</h4>
+                        <p>✓ Valid email format</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h4>Domain Information</h4>
+                        <p>Domain: ${mockData.domainInfo.name}</p>
+                        <p>Registered: ${mockData.domainInfo.created}</p>
+                        <p>Registrar: ${mockData.domainInfo.registrar}</p>
+                    </div>
+                `;
+                
+                if (mockData.breachInfo.isBreached) {
+                    html += `
+                        <div class="info-card" style="border-color: #e74c3c;">
+                            <h4>Security Alert</h4>
+                            <p>This email appears in ${mockData.breachInfo.breaches.length} known data breaches:</p>
+                            <ul>
+                                ${mockData.breachInfo.breaches.map(b => <li>${b}</li>).join('')}
+                            </ul>
+                            <p><small>This is simulated data for educational purposes</small></p>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="info-card" style="border-color: #2ecc71;">
+                            <h4>Security Status</h4>
+                            <p>No known breaches found (simulated result)</p>
+                        </div>
+                    `;
+                }
+                
+                resultsContainer.innerHTML = html;
+                resultDiv.style.display = 'block';
+                
+                this.disabled = false;
+                this.textContent = 'Validate Email';
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

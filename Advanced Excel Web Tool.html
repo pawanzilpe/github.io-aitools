@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Excel Web Tool</title>
+    <style>
+        :root {
+            --header-bg: #2c3e50;
+            --toolbar-bg: #ecf0f1;
+            --cell-bg: #ffffff;
+            --border-color: #bdc3c7;
+            --selected-cell: #d4e6f7;
+            --formula-bar-bg: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .header {
+            background-color: var(--header-bg);
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .toolbar {
+            background-color: var(--toolbar-bg);
+            padding: 8px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+        
+        .formula-bar {
+            background-color: var(--formula-bar-bg);
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .spreadsheet-container {
+            flex: 1;
+            overflow: auto;
+            position: relative;
+        }
+        
+        #spreadsheet {
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 4px;
+            min-width: 100px;
+            height: 24px;
+            position: relative;
+            box-sizing: border-box;
+            background-color: var(--cell-bg);
+        }
+        
+        th {
+            background-color: var(--toolbar-bg);
+            font-weight: bold;
+            text-align: center;
+            user-select: none;
+        }
+        
+        td.selected {
+            background-color: var(--selected-cell);
+        }
+        
+        td input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            outline: none;
+            padding: 0;
+            font-size: 14px;
+            background-color: transparent;
+        }
+        
+        .cell-reference {
+            min-width: 80px;
+            padding: 0 8px;
+            font-family: monospace;
+        }
+        
+        .formula-input {
+            flex: 1;
+            padding: 4px 8px;
+            font-family: monospace;
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+        }
+        
+        button, select {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            background-color: white;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .function-palette {
+            position: absolute;
+            right: 20px;
+            top: 120px;
+            width: 300px;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+            display: none;
+        }
+        
+        .function-categories {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .function-category {
+            padding: 8px;
+            cursor: pointer;
+        }
+        
+        .function-category.active {
+            background-color: var(--toolbar-bg);
+        }
+        
+        .function-list {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 8px;
+        }
+        
+        .function-item {
+            padding: 6px;
+            cursor: pointer;
+        }
+        
+        .function-item:hover {
+            background-color: var(--toolbar-bg);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            width: 400px;
+            max-width: 90%;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+        
+        .tab-button {
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+        
+        .tab-button.active {
+            background-color: var(--toolbar-bg);
+            border-bottom: 2px solid var(--header-bg);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Advanced Excel Web Tool</h1>
+            <div>
+                <button id="newBtn">New</button>
+                <button id="saveBtn">Save</button>
+                <button id="loadBtn">Load</button>
+            </div>
+        </div>
+        
+        <div class="toolbar">
+            <button id="boldBtn" title="Bold"><b>B</b></button>
+            <button id="italicBtn" title="Italic"><i>I</i></button>
+            <button id="underlineBtn" title="Underline"><u>U</u></button>
+            <select id="fontFamily">
+                <option value="Arial">Arial</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Verdana">Verdana</option>
+            </select>
+            <select id="fontSize">
+                <option value="10">10</option>
+                <option value="12">12</option>
+                <option value="14" selected>14</option>
+                <option value="16">16</option>
+                <option value="18">18</option>
+                <option value="20">20</option>
+            </select>
+            <select id="textColor">
+                <option value="">Text Color</option>
+                <option value="red">Red</option>
+                <option value="blue">Blue</option>
+                <option value="green">Green</option>
+                <option value="black">Black</option>
+            </select>
+            <select id="bgColor">
+                <option value="">Background</option>
+                <option value="#ffcccc">Light Red</option>
+                <option value="#ccffcc">Light Green</option>
+                <option value="#ccccff">Light Blue</option>
+                <option value="#ffffcc">Light Yellow</option>
+                <option value="#ffffff">White</option>
+            </select>
+            <button id="mergeBtn">Merge Cells</button>
+            <button id="formulaBtn">Insert Formula</button>
+            <button id="exportExcelBtn">Export Excel</button>
+            <button id="exportPDFBtn">Export PDF</button>
+            <button id="emailBtn">Email Sheet</button>
+        </div>
+        
+        <div class="formula-bar">
+            <div class="cell-reference" id="cellReference">A1</div>
+            <input type="text" class="formula-input" id="formulaInput" placeholder="Enter formula or value">
+        </div>
+        
+        <div class="spreadsheet-container">
+            <table id="spreadsheet"></table>
+        </div>
+    </div>
+    
+    <div class="function-palette" id="functionPalette">
+        <div class="function-categories">
+            <div class="function-category active" data-category="all">All</div>
+            <div class="function-category" data-category="math">Math</div>
+            <div class="function-category" data-category="statistical">Statistical</div>
+            <div class="function-category" data-category="text">Text</div>
+            <div class="function-category" data-category="date">Date</div>
+            <div class="function-category" data-category="logical">Logical</div>
+        </div>
+        <div class="function-list" id="functionList">
+            <!-- Functions will be populated by JavaScript -->
+        </div>
+    </div>
+    
+    <div class="modal" id="emailModal">
+        <div class="modal-content">
+            <h2>Email Spreadsheet</h2>
+            <div class="tab-buttons">
+                <div class="tab-button active" data-tab="send">Send Email</div>
+                <div class="tab-button" data-tab="share">Share Link</div>
+            </div>
+            
+            <div class="tab-content active" id="sendTab">
+                <div class="form-group">
+                    <label for="emailTo">To:</label>
+                    <input type="email" id="emailTo" multiple>
+                </div>
+                <div class="form-group">
+                    <label for="emailSubject">Subject:</label>
+                    <input type="text" id="emailSubject" value="Spreadsheet from Excel Web Tool">
+                </div>
+                <div class="form-group">
+                    <label for="emailBody">Message:</label>
+                    <textarea id="emailBody" rows="4">Please find attached the spreadsheet.</textarea>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="attachExcel" checked> Attach as Excel
+                    </label>
+                    <label>
+                        <input type="checkbox" id="attachPDF"> Attach as PDF
+                    </label>
+                </div>
+                <div class="modal-actions">
+                    <button id="cancelEmailBtn">Cancel</button>
+                    <button id="sendEmailBtn">Send</button>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="shareTab">
+                <div class="form-group">
+                    <label for="shareLink">Shareable Link:</label>
+                    <input type="text" id="shareLink" readonly>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="allowEditing"> Allow editing
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="passwordProtect"> Password protect
+                    </label>
+                    <input type="password" id="sharePassword" style="display: none; margin-top: 5px;">
+                </div>
+                <div class="modal-actions">
+                    <button id="copyLinkBtn">Copy Link</button>
+                    <button id="closeShareBtn">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="saveModal">
+        <div class="modal-content">
+            <h2>Save Spreadsheet</h2>
+            <div class="form-group">
+                <label for="fileName">File Name:</label>
+                <input type="text" id="fileName" value="spreadsheet">
+            </div>
+            <div class="form-group">
+                <label for="fileFormat">Format:</label>
+                <select id="fileFormat">
+                    <option value="xlsx">Excel Workbook (.xlsx)</option>
+                    <option value="csv">CSV (.csv)</option>
+                    <option value="json">JSON (.json)</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button id="cancelSaveBtn">Cancel</button>
+                <button id="confirmSaveBtn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    
+    <script>
+        // Main application
+        document.addEventListener('DOMContentLoaded', function() {
+            const { jsPDF } = window.jspdf;
+            
+            // DOM elements
+            const spreadsheet = document.getElementById('spreadsheet');
+            const cellReference = document.getElementById('cellReference');
+            const formulaInput = document.getElementById('formulaInput');
+            const functionPalette = document.getElementById('functionPalette');
+            const functionList = document.getElementById('functionList');
+            const emailModal = document.getElementById('emailModal');
+            const saveModal = document.getElementById('saveModal');
+            
+            // Spreadsheet state
+            let selectedCell = null;
+            let sheetData = {};
+            const rows = 100;
+            const cols = 26; // A-Z
+            
+            // Initialize spreadsheet
+            function initSpreadsheet() {
+                // Clear existing data
+                spreadsheet.innerHTML = '';
+                sheetData = {};
+                
+                // Create header row
+                const headerRow = document.createElement('tr');
+                const cornerHeader = document.createElement('th');
+                cornerHeader.className = 'corner-header';
+                headerRow.appendChild(cornerHeader);
+                
+                for (let i = 0; i < cols; i++) {
+                    const colHeader = document.createElement('th');
+                    colHeader.className = 'col-header';
+                    colHeader.textContent = String.fromCharCode(65 + i);
+                    headerRow.appendChild(colHeader);
+                }
+                
+                spreadsheet.appendChild(headerRow);
+                
+                // Create data rows
+                for (let i = 1; i <= rows; i++) {
+                    const row = document.createElement('tr');
+                    
+                    const rowHeader = document.createElement('th');
+                    rowHeader.className = 'row-header';
+                    rowHeader.textContent = i;
+                    row.appendChild(rowHeader);
+                    
+                    for (let j = 0; j < cols; j++) {
+                        const cell = document.createElement('td');
+                        const cellInput = document.createElement('input');
+                        cellInput.type = 'text';
+                        
+                        const cellId = `${String.fromCharCode(65 + j)}${i}`;
+                        cell.dataset.cell = cellId;
+                        
+                        // Initialize cell data
+                        if (!sheetData[cellId]) {
+                            sheetData[cellId] = {
+                                value: '',
+                                formula: '',
+                                computedValue: '',
+                                style: {}
+                            };
+                        }
+                        
+                        cellInput.addEventListener('focus', function() {
+                            if (selectedCell) {
+                                selectedCell.classList.remove('selected');
+                            }
+                            selectedCell = cell;
+                            cell.classList.add('selected');
+                            updateFormulaBar(cellId);
+                        });
+                        
+                        cellInput.addEventListener('blur', function() {
+                            updateCellValue(cellId, cellInput.value);
+                        });
+                        
+                        cellInput.addEventListener('keydown', function(e) {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                moveToAdjacentCell(1, 0); // Move down
+                            } else if (e.key === 'Tab') {
+                                e.preventDefault();
+                                moveToAdjacentCell(0, e.shiftKey ? -1 : 1); // Move left/right
+                            }
+                        });
+                        
+                        cell.appendChild(cellInput);
+                        row.appendChild(cell);
+                    }
+                    
+                    spreadsheet.appendChild(row);
+                }
+                
+                // Select first cell by default
+                const firstCell = spreadsheet.querySelector('td');
+                if (firstCell) {
+                    firstCell.querySelector('input').focus();
+                }
+            }
+            
+            // Update formula bar with cell info
+            function updateFormulaBar(cellId) {
+                cellReference.textContent = cellId;
+                const cellData = sheetData[cellId] || {};
+                formulaInput.value = cellData.formula ? '=' + cellData.formula : (cellData.value || '');
+            }
+            
+            // Update cell value in data model
+            function updateCellValue(cellId, value) {
+                if (!sheetData[cellId]) {
+                    sheetData[cellId] = { value: '', formula: '', computedValue: '', style: {} };
+                }
+                
+                if (value.startsWith('=')) {
+                    // It's a formula
+                    sheetData[cellId].formula = value.substring(1);
+                    sheetData[cellId].value = '';
+                    computeFormula(cellId);
+                } else {
+                    // It's a plain value
+                    sheetData[cellId].value = value;
+                    sheetData[cellId].formula = '';
+                    sheetData[cellId].computedValue = value;
+                    updateCellDisplay(cellId);
+                }
+            }
+            
+            // Compute formula for a cell
+            function computeFormula(cellId) {
+                const cellData = sheetData[cellId];
+                if (!cellData || !cellData.formula) return;
+                
+                try {
+                    // Simple formula evaluation (in a real app, you'd use a proper parser)
+                    const result = evalFormula(cellData.formula);
+                    cellData.computedValue = result;
+                    updateCellDisplay(cellId);
+                } catch (e) {
+                    cellData.computedValue = `#ERROR: ${e.message}`;
+                    updateCellDisplay(cellId);
+                }
+            }
+            
+            // Very basic formula evaluation
+            function evalFormula(formula) {
+                // Handle basic arithmetic
+                if (/^[\d+\-*/.() ]+$/.test(formula)) {
+                    return eval(formula);
+                }
+                
+                // Handle SUM function
+                const sumMatch = formula.match(/^SUM\(([A-Z]+\d+):([A-Z]+\d+)\)$/i);
+                if (sumMatch) {
+                    const start = sumMatch[1];
+                    const end = sumMatch[2];
+                    return sumRange(start, end);
+                }
+                
+                // Handle AVERAGE function
+                const avgMatch = formula.match(/^AVERAGE\(([A-Z]+\d+):([A-Z]+\d+)\)$/i);
+                if (avgMatch) {
+                    const start = avgMatch[1];
+                    const end = avgMatch[2];
+                    const sum = sumRange(start, end);
+                    const count = countCellsInRange(start, end);
+                    return sum / count;
+                }
+                
+                // Add more functions as needed...
+                
+                throw new Error('Unsupported formula');
+            }
+            
+            // Sum values in a range
+            function sumRange(start, end) {
+                const [startCol, startRow] = parseCellRef(start);
+                const [endCol, endRow] = parseCellRef(end);
+                let sum = 0;
+                
+                for (let row = startRow; row <= endRow; row++) {
+                    for (let col = startCol; col <= endCol; col++) {
+                        const cellId = `${String.fromCharCode(65 + col)}${row}`;
+                        const cellData = sheetData[cellId];
+                        if (cellData) {
+                            const num = parseFloat(cellData.computedValue);
+                            if (!isNaN(num)) {
+                                sum += num;
+                            }
+                        }
+                    }
+                }
+                
+                return sum;
+            }
+            
+            // Count cells in a range
+            function countCellsInRange(start, end) {
+                const [startCol, startRow] = parseCellRef(start);
+                const [endCol, endRow] = parseCellRef(end);
+                return (endRow - startRow + 1) * (endCol - startCol + 1);
+            }
+            
+            // Parse cell reference into column and row numbers
+            function parseCellRef(cellId) {
+                const colLetter = cellId.match(/^[A-Z]+/i)[0].toUpperCase();
+                const rowNum = parseInt(cellId.match(/\d+$/)[0]);
+                
+                let colNum = 0;
+                for (let i = 0; i < colLetter.length; i++) {
+                    colNum = colNum * 26 + (colLetter.charCodeAt(i) - 64);
+                }
+                
+                return [colNum - 1, rowNum];
+            }
+            
+            // Update cell display
+            function updateCellDisplay(cellId) {
+                const cellElement = `spreadsheet.querySelector(td[data-cell="${cellId}"])`;
+                if (!cellElement) return;
+                
+                const cellData = sheetData[cellId];
+                const input = cellElement.querySelector('input');
+                
+                if (input) {
+                    input.value = cellData.computedValue || '';
+                    
+                    // Apply styles
+                    for (const [prop, value] of Object.entries(cellData.style || {})) {
+                        input.style[prop] = value;
+                    }
+                }
+            }
+            
+            // Move to adjacent cell
+            function moveToAdjacentCell(rowDelta, colDelta) {
+                if (!selectedCell) return;
+                
+                const currentCellId = selectedCell.dataset.cell;
+                const [colLetter, rowNum] = currentCellId.match(/^([A-Z]+)(\d+)$/i).slice(1);
+                
+                const colNum = colLetterToNum(colLetter);
+                const newRow = parseInt(rowNum) + rowDelta;
+                const newCol = colNum + colDelta;
+                
+                if (newRow >= 1 && newRow <= rows && newCol >= 0 && newCol < cols) {
+                    const newColLetter = String.fromCharCode(65 + newCol);
+                    const newCellId = newColLetter + newRow;
+                    const newCell = spreadsheet.querySelector(`td[data-cell="${newCellId}"]`);
+                    
+                    if (newCell) {
+                        newCell.querySelector('input').focus();
+                    }
+                }
+            }
+            
+            // Convert column letter to number (A=0, B=1, ..., Z=25)
+            function colLetterToNum(letters) {
+                let num = 0;
+                for (let i = 0; i < letters.length; i++) {
+                    num = num * 26 + (letters.charCodeAt(i) - 65);
+                }
+                return num;
+            }
+            
+            // Initialize function palette
+            function initFunctionPalette() {
+                const functions = [
+                    { name: 'SUM', description: 'Adds all numbers in a range', category: 'math', syntax: 'SUM(A1:B10)' },
+                    { name: 'AVERAGE', description: 'Calculates average of numbers', category: 'statistical', syntax: 'AVERAGE(A1:B10)' },
+                    { name: 'MAX', description: 'Returns largest number', category: 'statistical', syntax: 'MAX(A1:B10)' },
+                    { name: 'MIN', description: 'Returns smallest number', category: 'statistical', syntax: 'MIN(A1:B10)' },
+                    { name: 'COUNT', description: 'Counts numbers in range', category: 'statistical', syntax: 'COUNT(A1:B10)' },
+                    { name: 'IF', description: 'Conditional logic', category: 'logical', syntax: 'IF(condition, true_value, false_value)' },
+                    { name: 'CONCAT', description: 'Combines text', category: 'text', syntax: 'CONCAT(A1, B1)' },
+                    { name: 'TODAY', description: 'Current date', category: 'date', syntax: 'TODAY()' },
+                    { name: 'NOW', description: 'Current date/time', category: 'date', syntax: 'NOW()' }
+                ];
+                
+                // Populate function list
+                functionList.innerHTML = '';
+                functions.forEach(func => {
+                    const item = document.createElement('div');
+                    item.className = 'function-item';
+                    item.dataset.name = func.name;
+                    item.dataset.syntax = func.syntax;
+                    item.dataset.category = func.category;
+                    
+                    item.innerHTML = `
+                        <strong>${func.name}</strong>
+                        <div style="font-size: 0.8em; color: #666;">${func.description}</div>
+                        <div style="font-family: monospace; font-size: 0.8em;">${func.syntax}</div>
+                    `;
+                    
+                    item.addEventListener('click', function() {
+                        if (selectedCell) {
+                            const input = selectedCell.querySelector('input');
+                            if (input) {
+                                input.value = '=' + func.syntax;
+                                input.focus();
+                                functionPalette.style.display = 'none';
+                            }
+                        }
+                    });
+                    
+                    functionList.appendChild(item);
+                });
+                
+                // Category filtering
+                document.querySelectorAll('.function-category').forEach(cat => {
+                    cat.addEventListener('click', function() {
+                        document.querySelectorAll('.function-category').forEach(c => c.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        const category = this.dataset.category;
+                        document.querySelectorAll('.function-item').forEach(item => {
+                            item.style.display = (category === 'all' || item.dataset.category === category) ? 'block' : 'none';
+                        });
+                    });
+                });
+            }
+            
+            // Export to Excel
+            function exportToExcel() {
+                const workbook = XLSX.utils.book_new();
+                const worksheetData = [];
+                
+                // Get all rows
+                const tableRows = spreadsheet.querySelectorAll('tr');
+                
+                for (const row of tableRows) {
+                    const rowData = [];
+                    const cells = row.querySelectorAll('td, th');
+                    
+                    for (const cell of cells) {
+                        if (cell.querySelector('input')) {
+                            const cellId = cell.dataset.cell;
+                            const cellData = sheetData[cellId] || {};
+                            rowData.push(cellData.computedValue || '');
+                        } else {
+                            rowData.push(cell.textContent);
+                        }
+                    }
+                    
+                    worksheetData.push(rowData);
+                }
+                
+                const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+                
+                const fileName = document.getElementById('fileName').value || 'spreadsheet';
+                XLSX.writeFile(workbook, fileName + ".xlsx");
+            }
+            
+            // Export to PDF
+            function exportToPDF() {
+                const doc = new jsPDF();
+                const tableData = [];
+                const headers = [];
+                
+                // Get headers
+                const headerRow = spreadsheet.querySelector('tr');
+                headerRow.querySelectorAll('th').forEach((th, index) => {
+                    if (index > 0) { // Skip corner header
+                        headers.push(th.textContent);
+                    }
+                });
+                
+                // Get data rows
+                spreadsheet.querySelectorAll('tr').forEach((row, rowIndex) => {
+                    if (rowIndex > 0) { // Skip header row
+                        const rowData = [];
+                        row.querySelectorAll('td').forEach(td => {
+                            const cellId = td.dataset.cell;
+                            const cellData = sheetData[cellId] || {};
+                            rowData.push(cellData.computedValue || '');
+                        });
+                        tableData.push(rowData);
+                    }
+                });
+                
+                // Add table to PDF
+                doc.autoTable({
+                    head: [headers],
+                    body: tableData,
+                    startY: 20
+                });
+                
+                const fileName = document.getElementById('fileName').value || 'spreadsheet';
+                doc.save(fileName + ".pdf");
+            }
+            
+            // Initialize the application
+            initSpreadsheet();
+            initFunctionPalette();
+            
+            // Event listeners
+            document.getElementById('formulaBtn').addEventListener('click', function() {
+                functionPalette.style.display = functionPalette.style.display === 'block' ? 'none' : 'block';
+            });
+            
+            document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
+            document.getElementById('exportPDFBtn').addEventListener('click', exportToPDF);
+            
+            document.getElementById('emailBtn').addEventListener('click', function() {
+                emailModal.style.display = 'flex';
+            });
+            
+            document.getElementById('cancelEmailBtn').addEventListener('click', function() {
+                emailModal.style.display = 'none';
+            });
+            
+            document.getElementById('sendEmailBtn').addEventListener('click', function() {
+                alert('In a real application, this would send the email with attachments');
+                emailModal.style.display = 'none';
+            });
+            
+            document.getElementById('newBtn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to create a new spreadsheet? All unsaved changes will be lost.')) {
+                    initSpreadsheet();
+                }
+            });
+            
+            document.getElementById('saveBtn').addEventListener('click', function() {
+                saveModal.style.display = 'flex';
+            });
+            
+            document.getElementById('cancelSaveBtn').addEventListener('click', function() {
+                saveModal.style.display = 'none';
+            });
+            
+            document.getElementById('confirmSaveBtn').addEventListener('click', function() {
+                const fileName = document.getElementById('fileName').value || 'spreadsheet';
+                const format = document.getElementById('fileFormat').value;
+                
+                if (format === 'xlsx') {
+                    exportToExcel();
+                } else if (format === 'csv') {
+                    // Similar to Excel export but with CSV format
+                    alert(`Would save as ${fileName}.csv in a real application`);
+                } else if (format === 'json') {
+                    // Save as JSON
+                    const jsonData = JSON.stringify(sheetData, null, 2);
+                    const blob = new Blob([jsonData], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileName + ".json";
+                    a.click();
+                }
+                
+                saveModal.style.display = 'none';
+            });
+            
+            // Tab switching in email modal
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabName = this.dataset.tab;
+                    
+                    // Update active tab button
+                    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update active tab content
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(tabName + 'Tab').classList.add('active');
+                });
+            });
+            
+            // Password protection toggle
+            document.getElementById('passwordProtect').addEventListener('change', function() {
+                document.getElementById('sharePassword').style.display = this.checked ? 'block' : 'none';
+            });
+            
+            // Copy share link
+            document.getElementById('copyLinkBtn').addEventListener('click', function() {
+                const linkInput = document.getElementById('shareLink');
+                linkInput.select();
+                document.execCommand('copy');
+                alert('Link copied to clipboard!');
+            });
+            
+            // Close share tab
+            document.getElementById('closeShareBtn').addEventListener('click', function() {
+                emailModal.style.display = 'none';
+            });
+            
+            // Formatting buttons
+            document.getElementById('boldBtn').addEventListener('click', function() {
+                if (selectedCell) {
+                    const cellId = selectedCell.dataset.cell;
+                    const input = selectedCell.querySelector('input');
+                    const isBold = input.style.fontWeight === 'bold';
+                    
+                    input.style.fontWeight = isBold ? 'normal' : 'bold';
+                    
+                    // Update cell data
+                    if (!sheetData[cellId].style) sheetData[cellId].style = {};
+                    sheetData[cellId].style.fontWeight = isBold ? 'normal' : 'bold';
+                }
+            });
+            
+            document.getElementById('italicBtn').addEventListener('click', function() {
+                if (selectedCell) {
+                    const cellId = selectedCell.dataset.cell;
+                    const input = selectedCell.querySelector('input');
+                    const isItalic = input.style.fontStyle === 'italic';
+                    
+                    input.style.fontStyle = isItalic ? 'normal' : 'italic';
+                    
+                    // Update cell data
+                    if (!sheetData[cellId].style) sheetData[cellId].style = {};
+                    sheetData[cellId].style.fontStyle = isItalic ? 'normal' : 'italic';
+                }
+            });
+            
+            document.getElementById('underlineBtn').addEventListener('click', function() {
+                if (selectedCell) {
+                    const cellId = selectedCell.dataset.cell;
+                    const input = selectedCell.querySelector('input');
+                    const isUnderlined = input.style.textDecoration === 'underline';
+                    
+                    input.style.textDecoration = isUnderlined ? 'none' : 'underline';
+                    
+                    // Update cell data
+                    if (!sheetData[cellId].style) sheetData[cellId].style = {};
+                    sheetData[cellId].style.textDecoration = isUnderlined ? 'none' : 'underline';
+                }
+            });
+            
+            document.getElementById('fontFamily').addEventListener('change', function() {
+                if (selectedCell) {
+                    const cellId = selectedCell.dataset.cell;
+                    const input = selectedCell.querySelector('input');
+                    input.style.fontFamily = this.value;
+                    
+                    // Update cell data
+                    if (!sheetData[cellId].style) sheetData[cellId].style = {};
+                    sheetData[cellId].style.fontFamily = this.value;
+                }
+            });
+            
+            document.getElementById('fontSize').addEventListener('change', function() {
+                if (selectedCell) {
+                    const cellId = selectedCell.dataset.cell;
+                    const input = selectedCell.querySelector('input');
+                    input.style.fontSize = `${this.value}px`;
+                    
+                    // Update cell data
+                    if (!sheetData[cellId].style) sheetData[cellId].style = {};
+                    sheetData[cellId].style.fontSize = `${this.value}px`;
+                }
+            });
+            
+            document.getElementById('textColor').addEventListener('change', function() {
+                if (selectedCell && this.value) {
+                    const cellId = selectedCell.dataset.cell;
+                    const input = selectedCell.querySelector('input');
+                    input.style.color = this.value;
+                    
+                    // Update cell data
+                    if (!sheetData[cellId].style) sheetData[cellId].style = {};
+                    sheetData[cellId].style.color = this.value;
+                }
+            });
+            
+            document.getElementById('bgColor').addEventListener('change', function() {
+                if (selectedCell && this.value) {
+                    const cellId = selectedCell.dataset.cell;
+                    const input = selectedCell.querySelector('input');
+                    input.style.backgroundColor = this.value;
+                    
+                    // Update cell data
+                    if (!sheetData[cellId].style) sheetData[cellId].style = {};
+                    sheetData[cellId].style.backgroundColor = this.value;
+                }
+            });
+            
+            document.getElementById('mergeBtn').addEventListener('click', function() {
+                alert('Cell merging functionality would be implemented here');
+            });
+            
+            // Close modals when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === emailModal) {
+                    emailModal.style.display = 'none';
+                }
+                if (event.target === saveModal) {
+                    saveModal.style.display = 'none';
+                }
+                if (event.target === functionPalette) {
+                    functionPalette.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

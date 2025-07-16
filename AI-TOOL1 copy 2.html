@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Public Information Lookup</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 600px; margin: auto; }
+        input, button { padding: 10px; margin: 5px 0; width: 100%; }
+        #results { margin-top: 20px; border: 1px solid #ddd; padding: 15px; }
+        .disclaimer { color: red; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Public Information Search</h2>
+        <input type="text" id="searchInput" placeholder="Enter Instagram username or name">
+        <button onclick="searchPublicData()">Search Public Data</button>
+        <p class="disclaimer">Note: Only shows publicly available information</p>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function searchPublicData() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) return alert("Please enter a username or name");
+            
+            document.getElementById('results').innerHTML = `
+                <h3>Public Search Results for "${query}"</h3>
+                <p>These are manual search links for public information:</p>
+                <ul>
+                    <li><a href="https://www.google.com/search?q=${query}" target="_blank">Google Search</a></li>
+                    <li><a href="https://www.instagram.com/${query}/" target="_blank">Instagram Profile</a></li>
+                    <li><a href="https://www.facebook.com/search/top/?q=${query}" target="_blank">Facebook Search</a></li>
+                    <li><a href="https://www.linkedin.com/search/results/all/?keywords=${query}" target="_blank">LinkedIn Profile</a></li>
+                </ul>
+                <p class="disclaimer">Private information cannot be accessed legally without consent.</p>
+            `;
+        }
+    </script>
+</body>
+</html>

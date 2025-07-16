@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BabyCare - Home</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="icon" href="../favicon.ico" type="image/x-icon" />
+  <style>
+    body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #fffaf9;
+  color: #333;
+}
+
+header {
+  background-color: #ffdde1;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  height: 50px;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: #444;
+  font-weight: bold;
+}
+
+.banner {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.banner-img {
+  max-width: 250px;
+  margin-top: 20px;
+}
+
+.daily-quote {
+  background-color: #fff0f5;
+  padding: 20px;
+  text-align: center;
+  font-style: italic;
+}
+
+footer {
+  background: #ffd9ec;
+  padding: 10px;
+  text-align: center;
+  font-size: 14px;
+}
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="../assets/images/logo.png" alt="BabyCare Logo" class="logo">
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="daily-tips.html">Tips</a></li>
+        <li><a href="milestones.html">Milestones</a></li>
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="profile.html">Profile</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="banner">
+    <h1>Welcome to BabyCare 💕</h1>
+    <p>Your trusted space for baby’s health, tips & milestones!</p>
+    <img src="../assets/images/baby.png" alt="Cute Baby" class="banner-img">
+  </section>
+
+  <section class="daily-quote">
+    <h2>Tip of the Day 👶</h2>
+    <p id="tip-text">Loading today's tip...</p>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 BabyCare. All rights reserved.</p>
+  </footer>
+
+  <script src="../assets/js/script.js">
+    document.addEventListener("DOMContentLoaded", () => {
+  const tips = [
+    "👶 Don't forget tummy time every day!",
+    "🍼 Always sterilize feeding bottles.",
+    "🌞 Let baby get morning sunlight for vitamin D.",
+    "🧸 Make sure toys are soft & safe.",
+    "💧 Keep baby hydrated, especially in hot weather.",
+    "🛁 Bath time = bonding time. Talk gently!",
+    "👂 Watch for early signs of teething.",
+    "❤️ Cuddle, sing, and smile often. Babies feel love!"
+  ];
+
+  const randomTip = tips[Math.floor(Math.random() * tips.length)];
+  document.getElementById("tip-text").innerText = randomTip;
+});
+
+  </script>
+</body>
+</html>

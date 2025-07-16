@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>पासवर्ड जनरेटर</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        #password {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>पासवर्ड जनरेटर</h1>
+        <div>
+            <label for="length">पासवर्ड की लंबाई:</label>
+            <input type="number" id="length" min="6" max="32" value="12">
+        </div>
+        <div>
+            <input type="checkbox" id="uppercase" checked>
+            <label for="uppercase">बड़े अक्षर (A-Z)</label>
+        </div>
+        <div>
+            <input type="checkbox" id="numbers" checked>
+            <label for="numbers">नंबर (0-9)</label>
+        </div>
+        <div>
+            <input type="checkbox" id="symbols" checked>
+            <label for="symbols">विशेष चिन्ह (!@#$%^&*)</label>
+        </div>
+        <button onclick="generatePassword()">पासवर्ड बनाएं</button>
+        <input type="text" id="password" readonly>
+        <button onclick="copyPassword()">पासवर्ड कॉपी करें</button>
+    </div>
+
+    <script>
+        function generatePassword() {
+            const length = document.getElementById('length').value;
+            const includeUppercase = document.getElementById('uppercase').checked;
+            const includeNumbers = document.getElementById('numbers').checked;
+            const includeSymbols = document.getElementById('symbols').checked;
+            
+            let charset = 'abcdefghijklmnopqrstuvwxyz';
+            if (includeUppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (includeNumbers) charset += '0123456789';
+            if (includeSymbols) charset += '!@#$%^&*()_+~`|}{[]:;?><,./-=';
+            
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * charset.length);
+                password += charset[randomIndex];
+            }
+            
+            document.getElementById('password').value = password;
+        }
+        
+        function copyPassword() {
+            const passwordField = document.getElementById('password');
+            passwordField.select();
+            document.execCommand('copy');
+            alert('पासवर्ड कॉपी हो गया!');
+        }
+    </script>
+</body>
+</html>

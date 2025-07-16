@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Magic Tools with Meme Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --dark-color: #2b2d42;
+            --light-color: #f8f9fa;
+            --success-color: #4cc9f0;
+            --warning-color: #f8961e;
+            --danger-color: #f94144;
+            --gray-color: #adb5bd;
+            --meme-color: #ff6b6b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-attachment: fixed;
+            color: var(--dark-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color), var(--meme-color));
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 1rem;
+        }
+
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--gray-color);
+            margin-bottom: 1rem;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #eee;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 0.8rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--gray-color);
+            position: relative;
+            transition: all 0.3s;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary-color);
+            background: rgba(67, 97, 238, 0.05);
+        }
+
+        .tab-btn.active {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .meme-tab-btn.active {
+            color: var(--meme-color);
+        }
+        
+        .meme-tab-btn.active::after {
+            background-color: var(--meme-color);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .input-section {
+            margin-bottom: 2rem;
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            resize: vertical;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+            background: white;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(72, 149, 239, 0.2);
+        }
+
+        .options {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        select {
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+            flex-grow: 1;
+            min-width: 150px;
+            background: white;
+        }
+
+        .generate-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-grow: 1;
+            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .meme-btn {
+            background-color: var(--meme-color);
+            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
+        }
+
+        .meme-btn:hover {
+            box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .result-container {
+            min-height: 300px;
+            border: 2px dashed #eee;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            position: relative;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.9);
+            z-index: 10;
+            border-radius: 10px;
+        }
+
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        .meme-spinner {
+            border-top: 5px solid var(--meme-color);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result {
+            width: 100%;
+            text-align: center;
+        }
+
+        #image-result img {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        #video-result video {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        #text-result {
+            white-space: pre-wrap;
+            text-align: left;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            max-height: 400px;
+            overflow: auto;
+        }
+
+        .error {
+            color: var(--danger-color);
+            padding: 1rem;
+            background-color: #fef2f2;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .download-btn {
+            margin-top: 1rem;
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .download-btn:hover {
+            background-color: #3fb0d8;
+            transform: translateY(-2px);
+        }
+
+        /* Meme generator specific styles */
+        .meme-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .meme-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .meme-input:focus {
+            outline: none;
+            border-color: var(--meme-color);
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+        }
+
+        #meme-result canvas {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .meme-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .meme-option {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meme-option label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        .meme-option input[type="color"] {
+            height: 40px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .meme-option input[type="range"] {
+            width: 100%;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--gray-color);
+            font-size: 0.9rem;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+                margin-top: 0;
+                border-radius: 10px;
+            }
+            
+            .options {
+                flex-direction: column;
+            }
+            
+            select, .generate-btn {
+                width: 100%;
+            }
+            
+            .meme-inputs {
+                grid-template-columns: 1fr;
+            }
+            
+            .meme-controls {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+                <h1>AI Magic Tools</h1>
+            </div>
+            <p class="subtitle">Generate images, text, videos, and memes with AI power</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="image-tab">Image</button>
+            <button class="tab-btn" data-tab="text-tab">Text</button>
+            <button class="tab-btn" data-tab="video-tab">Video</button>
+            <button class="tab-btn meme-tab-btn" data-tab="meme-tab">Meme Generator</button>
+        </div>
+
+        <!-- Image Generator Tab -->
+        <div class="tab-content active" id="image-tab">
+            <div class="input-section">
+                <textarea id="image-prompt" placeholder="Describe the image you want to generate (e.g., 'A cute cat wearing sunglasses on a beach')"></textarea>
+                <div class="options">
+                    <select id="image-size">
+                        <option value="256x256">Small (256x256)</option>
+                        <option value="512x512" selected>Medium (512x512)</option>
+                        <option value="1024x1024">Large (1024x1024)</option>
+                    </select>
+                    <select id="image-style">
+                        <option value="realistic">Realistic</option>
+                        <option value="cartoon">Cartoon</option>
+                        <option value="3d">3D Render</option>
+                        <option value="painting">Painting</option>
+                    </select>
+                    <button id="generate-image-btn" class="generate-btn">
+                        <i class="fas fa-magic"></i> Generate Image
+                    </button>
+                </div>
+            </div>
+            
+            <div class="result-container">
+                <div class="loading" id="image-loading">
+                    <div class="spinner"></div>
+                    <p>Creating your image...</p>
+                </div>
+                <div class="result" id="image-result"></div>
+                <div class="error" id="image-error"></div>
+            </div>
+        </div>
+
+        <!-- Text Generator Tab -->
+        <div class="tab-content" id="text-tab">
+            <div class="input-section">
+                <textarea id="text-prompt" placeholder="What text would you like to generate? (e.g., 'Write a poem about the ocean', 'Explain quantum physics simply')"></textarea>
+                <div class="options">
+                    <select id="text-style">
+                        <option value="creative">Creative</option>
+                        <option value="formal">Formal</option>
+                        <option value="simple">Simple</option>
+                        <option value="professional">Professional</option>
+                    </select>
+                    <select id="text-length">
+                        <option value="short">Short</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="long">Long</option>
+                    </select>
+                    <button id="generate-text-btn" class="generate-btn">
+                        <i class="fas fa-keyboard"></i> Generate Text
+                    </button>
+                </div>
+            </div>
+            
+            <div class="result-container">
+                <div class="loading" id="text-loading">
+                    <div class="spinner"></div>
+                    <p>Generating your text...</p>
+                </div>
+                <div class="result" id="text-result"></div>
+                <div class="error" id="text-error"></div>
+            </div>
+        </div>
+
+        <!-- Video Generator Tab -->
+        <div class="tab-content" id="video-tab">
+            <div class="input-section">
+                <textarea id="video-prompt" placeholder="Describe the video you want to generate (e.g., 'A drone flying over a tropical beach at sunset')"></textarea>
+                <div class="options">
+                    <select id="video-length">
+                        <option value="5">5 seconds</option>
+                        <option value="10" selected>10 seconds</option>
+                        <option value="15">15 seconds</option>
+                    </select>
+                    <select id="video-style">
+                        <option value="realistic">Realistic</option>
+                        <option value="animated">Animated</option>
+                        <option value="cartoon">Cartoon</option>
+                    </select>
+                    <button id="generate-video-btn" class="generate-btn">
+                        <i class="fas fa-video"></i> Generate Video
+                    </button>
+                </div>
+            </div>
+            
+            <div class="result-container">
+                <div class="loading" id="video-loading">
+                    <div class="spinner"></div>
+                    <p>Creating your video... This may take a minute</p>
+                </div>
+                <div class="result" id="video-result"></div>
+                <div class="error" id="video-error"></div>
+            </div>
+        </div>
+
+        <!-- Meme Generator Tab -->
+        <div class="tab-content" id="meme-tab">
+            <div class="input-section">
+                <div class="meme-inputs">
+                    <input type="text" id="top-text" class="meme-input" placeholder="Top text (e.g., 'WHEN YOU FINALLY FIX THE BUG')">
+                    <input type="text" id="bottom-text" class="meme-input" placeholder="Bottom text (e.g., 'BUT INTRODUCE THREE NEW ONES')">
+                </div>
+                
+                <div class="meme-controls">
+                    <div class="meme-option">
+                        <label for="meme-template">Meme Template</label>
+                        <select id="meme-template">
+                            <option value="distracted">Distracted Boyfriend</option>
+                            <option value="drake">Drake Hotline Bling</option>
+                            <option value="buttons">Two Buttons</option>
+                            <option value="balloon">Running Away Balloon</option>
+                            <option value="exit">Left Exit 12 Off Ramp</option>
+                        </select>
+                    </div>
+                    
+                    <div class="meme-option">
+                        <label for="text-color">Text Color</label>
+                        <input type="color" id="text-color" value="#ffffff">
+                    </div>
+                    
+                    <div class="meme-option">
+                        <label for="outline-color">Outline Color</label>
+                        <input type="color" id="outline-color" value="#000000">
+                    </div>
+                    
+                    <div class="meme-option">
+                        <label for="font-size">Font Size: <span id="font-size-value">36</span>px</label>
+                        <input type="range" id="font-size" min="24" max="72" value="36">
+                    </div>
+                </div>
+                
+                <button id="generate-meme-btn" class="generate-btn meme-btn">
+                    <i class="fas fa-grin-squint-tears"></i> Generate Meme
+                </button>
+            </div>
+            
+            <div class="result-container">
+                <div class="loading" id="meme-loading">
+                    <div class="spinner meme-spinner"></div>
+                    <p>Creating your meme...</p>
+                </div>
+                <div class="result" id="meme-result"></div>
+                <div class="error" id="meme-error"></div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Note: This is a demo interface. Actual AI generation requires API connections.</p>
+            <p>All meme templates are used for demonstration purposes only</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching functionality
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Remove active class from all buttons and contents
+                    tabBtns.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to clicked button and corresponding content
+                    this.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Image Generation
+            const imageGenerateBtn = document.getElementById('generate-image-btn');
+            imageGenerateBtn.addEventListener('click', generateImage);
+            
+            // Text Generation
+            const textGenerateBtn = document.getElementById('generate-text-btn');
+            textGenerateBtn.addEventListener('click', generateText);
+            
+            // Video Generation
+            const videoGenerateBtn = document.getElementById('generate-video-btn');
+            videoGenerateBtn.addEventListener('click', generateVideo);
+            
+            // Meme Generation
+            const memeGenerateBtn = document.getElementById('generate-meme-btn');
+            memeGenerateBtn.addEventListener('click', generateMeme);
+            
+            // Font size slider
+            const fontSizeSlider = document.getElementById('font-size');
+            const fontSizeValue = document.getElementById('font-size-value');
+            fontSizeSlider.addEventListener('input', function() {
+                fontSizeValue.textContent = this.value;
+            });
+            
+            // Meme templates
+            const memeTemplates = {
+                distracted: 'https://i.imgflip.com/1ur9b0.jpg',
+                drake: 'https://i.imgflip.com/30b1gx.jpg',
+                buttons: 'https://i.imgflip.com/1g8my4.jpg',
+                balloon: 'https://i.imgflip.com/261o3j.jpg',
+                exit: 'https://i.imgflip.com/22bdq6.jpg'
+            };
+            
+            // Demo functions (in a real app, these would call actual APIs)
+            function generateImage() {
+                const prompt = document.getElementById('image-prompt').value.trim();
+                const size = document.getElementById('image-size').value;
+                const style = document.getElementById('image-style').value;
+                
+                if (!prompt) {
+                    showError('image-error', 'Please enter a description for the image');
+                    return;
+                }
+                
+                showLoading('image-loading');
+                hideError('image-error');
+                clearResult('image-result');
+                
+                // Simulate API call with timeout
+                setTimeout(() => {
+                    hideLoading('image-loading');
+                    
+                    // In a real app, you would use actual API response here
+                    const demoImages = {
+                        'realistic': 'https://source.unsplash.com/random/800x600/?nature',
+                        'cartoon': 'https://source.unsplash.com/random/800x600/?cartoon',
+                        '3d': 'https://source.unsplash.com/random/800x600/?3d,render',
+                        'painting': 'https://source.unsplash.com/random/800x600/?painting,art'
+                    };
+                    
+                    const imgUrl = demoImages[style] || demoImages.realistic;
+                    
+                    document.getElementById('image-result').innerHTML = `
+                        <img src="${imgUrl}" alt="Generated image">
+                        <div class="download-btn-container">
+                            <button class="download-btn" onclick="downloadImage('${imgUrl}')">
+                                <i class="fas fa-download"></i> Download Image
+                            </button>
+                        </div>
+                    `;
+                }, 2000);
+            }
+            
+            function generateText() {
+                const prompt = document.getElementById('text-prompt').value.trim();
+                const style = document.getElementById('text-style').value;
+                const length = document.getElementById('text-length').value;
+                
+                if (!prompt) {
+                    showError('text-error', 'Please enter a prompt for text generation');
+                    return;
+                }
+                
+                showLoading('text-loading');
+                hideError('text-error');
+                clearResult('text-result');
+                
+                // Simulate API call with timeout
+                setTimeout(() => {
+                    hideLoading('text-loading');
+                    
+                    // Demo responses
+                    let demoText = "";
+                    const lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ";
+                    
+                    if (length === 'short') {
+                        demoText = lorem.repeat(1);
+                    } else if (length === 'medium') {
+                        demoText = lorem.repeat(3);
+                    } else {
+                        demoText = lorem.repeat(6);
+                    }
+                    
+                    let styledText = "";
+                    if (style === 'creative') {
+                        styledText = "✨ Creative Version ✨\n\n" + demoText;
+                    } else if (style === 'formal') {
+                        styledText = "Formal Version:\n\n" + demoText;
+                    } else if (style === 'professional') {
+                        styledText = `Professional Analysis:\n\n${demoText}`;
+                    } else {
+                        styledText = demoText;
+                    }
+                    
+                    document.getElementById('text-result').textContent = styledText;
+                }, 1500);
+            }
+            
+            function generateVideo() {
+                const prompt = document.getElementById('video-prompt').value.trim();
+                const length = document.getElementById('video-length').value;
+                const style = document.getElementById('video-style').value;
+                
+                if (!prompt) {
+                    showError('video-error', 'Please describe the video you want to generate');
+                    return;
+                }
+                
+                showLoading('video-loading');
+                hideError('video-error');
+                clearResult('video-result');
+                
+                // Simulate longer processing time for video
+                setTimeout(() => {
+                    hideLoading('video-loading');
+                    
+                    // Demo video URLs (in real app, use actual generated video URLs)
+                    const demoVideos = {
+                        'realistic': 'https://samplelib.com/lib/preview/mp4/sample-5s.mp4',
+                        'animated': 'https://samplelib.com/lib/preview/mp4/sample-10s.mp4',
+                        'cartoon': 'https://samplelib.com/lib/preview/mp4/sample-15s.mp4'
+                    };
+                    
+                    const videoUrl = demoVideos[style] || demoVideos.realistic;
+                    
+                    document.getElementById('video-result').innerHTML = `
+                        <video controls autoplay loop>
+                            <source src="${videoUrl}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="download-btn-container">
+                            <button class="download-btn" onclick="downloadVideo('${videoUrl}')">
+                                <i class="fas fa-download"></i> Download Video
+                            </button>
+                        </div>
+                    `;
+                }, 4000);
+            }
+            
+            function generateMeme() {
+                const topText = document.getElementById('top-text').value.trim();
+                const bottomText = document.getElementById('bottom-text').value.trim();
+                const template = document.getElementById('meme-template').value;
+                const textColor = document.getElementById('text-color').value;
+                const outlineColor = document.getElementById('outline-color').value;
+                const fontSize = parseInt(document.getElementById('font-size').value);
+                
+                if (!topText && !bottomText) {
+                    showError('meme-error', 'Please enter at least one meme text');
+                    return;
+                }
+                
+                showLoading('meme-loading');
+                hideError('meme-error');
+                clearResult('meme-result');
+                
+                // Simulate processing time
+                setTimeout(() => {
+                    hideLoading('meme-loading');
+                    
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const img = new Image();
+                    
+                    img.crossOrigin = "Anonymous";
+                    img.src = memeTemplates[template];
+                    
+                    img.onload = function() {
+                        // Set canvas dimensions
+                        const maxWidth = 500;
+                        const scale = maxWidth / img.width;
+                        canvas.width = maxWidth;
+                        canvas.height = img.height * scale;
+                        
+                        // Draw image
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        
+                        // Text style settings
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'top';
+                        
+                        // Font settings
+                        ctx.font = `bold ${fontSize}px Impact`;
+                        
+                        // Calculate positions
+                        const topTextY = 20;
+                        const bottomTextY = canvas.height - fontSize - 30;
+                        
+                        // Add top text with outline
+                        drawTextWithOutline(ctx, topText, canvas.width / 2, topTextY, textColor, outlineColor, 3);
+                        
+                        // Add bottom text with outline
+                        drawTextWithOutline(ctx, bottomText, canvas.width / 2, bottomTextY, textColor, outlineColor, 3);
+                        
+                        // Display canvas
+                        document.getElementById('meme-result').appendChild(canvas);
+                        
+                        // Add download button
+                        const downloadBtn = document.createElement('button');
+                        downloadBtn.className = 'download-btn';
+                        downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download Meme';
+                        downloadBtn.onclick = function() {
+                            downloadMeme(canvas);
+                        };
+                        document.getElementById('meme-result').appendChild(downloadBtn);
+                    };
+                    
+                    img.onerror = function() {
+                        showError('meme-error', 'Failed to load meme template');
+                    };
+                }, 1500);
+            }
+            
+            function drawTextWithOutline(ctx, text, x, y, fillColor, strokeColor, lineWidth) {
+                if (!text) return;
+                
+                ctx.strokeStyle = strokeColor;
+                ctx.lineWidth = lineWidth;
+                ctx.strokeText(text, x, y);
+                
+                ctx.fillStyle = fillColor;
+                ctx.fillText(text, x, y);
+            }
+            
+            // Helper functions
+            function showLoading(elementId) {
+                document.getElementById(elementId).style.display = 'flex';
+            }
+            
+            function hideLoading(elementId) {
+                document.getElementById(elementId).style.display = 'none';
+            }
+            
+            function showError(elementId, message) {
+                const errorElement = document.getElementById(elementId);
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+            
+            function hideError(elementId) {
+                document.getElementById(elementId).style.display = 'none';
+            }
+            
+            function clearResult(elementId) {
+                document.getElementById(elementId).innerHTML = '';
+            }
+        });
+
+        // These would be implemented in a real app with proper file download logic
+        function downloadImage(url) {
+            alert('In a real app, this would download the image from: ' + url);
+        }
+        
+        function downloadVideo(url) {
+            alert('In a real app, this would download the video from: ' + url);
+        }
+        
+        function downloadMeme(canvas) {
+            const link = document.createElement('a');
+            link.download = 'meme.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top AI Tool Ideas</title>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #00cec9;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --accent: #fd79a8;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 2px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--dark);
+            opacity: 0.8;
+        }
+        
+        .ai-tool {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .ai-tool:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tool-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .tool-title .emoji {
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+        
+        .tool-description {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+            padding-left: 10px;
+            border-left: 2px solid var(--secondary);
+        }
+        
+        h3 {
+            color: var(--secondary);
+            margin: 20px 0 10px;
+            font-size: 1.2rem;
+        }
+        
+        .features {
+            list-style-type: none;
+        }
+        
+        .feature {
+            background: var(--light);
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-start;
+            transition: all 0.3s ease;
+        }
+        
+        .feature:hover {
+            background: #e8f4f8;
+            transform: translateX(5px);
+        }
+        
+        .feature-icon {
+            color: var(--accent);
+            margin-right: 10px;
+            font-size: 1.1rem;
+            margin-top: 2px;
+        }
+        
+        .example {
+            font-style: italic;
+            background: rgba(108, 92, 231, 0.1);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 3px solid var(--primary);
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .ai-tool {
+                padding: 20px;
+            }
+            
+            .tool-title {
+                font-size: 1.3rem;
+            }
+        }
+        
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .ai-tool {
+            opacity: 0;
+            animation: fadeIn 0.6s forwards;
+        }
+        
+        .ai-tool:nth-child(1) { animation-delay: 0.1s; }
+        .ai-tool:nth-child(2) { animation-delay: 0.3s; }
+        .ai-tool:nth-child(3) { animation-delay: 0.5s; }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Top AI Tool Ideas</h1>
+            <p class="subtitle">Innovative AI concepts that haven't been perfected yet</p>
+        </header>
+        
+        <div class="ai-tool">
+            <h2 class="tool-title">
+                <span class="emoji">🧠</span>
+                Personal Memory AI
+            </h2>
+            <p class="tool-description">
+                ऐसा टूल जो आपकी लाइफ, बातें, डॉक्यूमेंट्स, कॉल्स, चैट्स याद रखे और आपकी ज़िंदगी से जुड़ी बातों में मदद करे
+            </p>
+            
+            <h3>Features:</h3>
+            <ul class="features">
+                <li class="feature">
+                    <i class="fas fa-check-circle feature-icon"></i>
+                    <span>आपकी बातें, meeting notes, पसंदीदा चीजें याद रखे</span>
+                </li>
+                <li class="feature">
+                    <i class="fas fa-check-circle feature-icon"></i>
+                    <span>सभी डिवाइसेस और प्लेटफॉर्म्स पर सिंक हो</span>
+                </li>
+                <li class="feature">
+                    <i class="fas fa-check-circle feature-icon"></i>
+                    <span>प्राइवेसी फर्स्ट approach - आपका डेटा सिर्फ आपके पास</span>
+                </li>
+            </ul>
+            
+            <div class="example">
+                <strong>Example queries:</strong><br>
+                "मुझे वो फोटो याद दिलाओ जो मैंने पिछले महीने भेजी थी"<br>
+                "पिछली बार पवन ने मुझे क्या मैसेज भेजा था?"
+            </div>
+        </div>
+        
+        <div class="ai-tool">
+            <h2 class="tool-title">
+                <span class="emoji">👨‍💼</span>
+                Virtual Career Coach AI
+            </h2>
+            <p class="tool-description">
+                An AI that analyzes your skills, experiences, and market trends to provide personalized career guidance
+            </p>
+            
+            <h3>Features:</h3>
+            <ul class="features">
+                <li class="feature">
+                    <i class="fas fa-check-circle feature-icon"></i>
+                    <span>Skill gap analysis based on your dream job</span>
+                </li>
+                <li class="feature">
+                    <i class="fas fa-check-circle feature-icon"></i>
+                    <span>Personalized learning roadmap</span>
+                </li>
+                <li class="feature">
+                    <i class="fas fa-check-circle feature-icon"></i>
+                    <span>Real-time job market insights</span>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="ai-tool">
+            <h2 class="tool-title">
+                <span class="emoji">🌱</span>
+                Sustainable Living AI
+            </h2>
+            <p class="tool-description">
+                AI that helps reduce your environmental footprint by analyzing your daily habits
+            </p>
+            
+            <h3>Features:</h3>
+            <ul class="features">
+                <li class="feature">
+                    <i class="fas fa-check-circle feature-icon"></i>
+                    <span>Carbon footprint tracking</span>
+                </li>
+                <li class="feature">
+                    <i class="fas fa-check-circle feature-icon"></i>
+                    <span>Personalized sustainability tips</span>
+                </li>
+                <li class="feature">
+                    <i class="fas fa-check-circle feature-icon"></i>
+                    <span>Eco-friendly product recommendations</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Add interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Make features more interactive
+            const features = document.querySelectorAll('.feature');
+            features.forEach(feature => {
+                feature.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                });
+            });
+            
+            // Add a simple animation when scrolling
+            const aiTools = document.querySelectorAll('.ai-tool');
+            
+            function checkScroll() {
+                aiTools.forEach(tool => {
+                    const toolTop = tool.getBoundingClientRect().top;
+                    const windowHeight = window.innerHeight;
+                    
+                    if (toolTop < windowHeight - 100) {
+                        tool.style.opacity = '1';
+                    }
+                });
+            }
+            
+            window.addEventListener('scroll', checkScroll);
+            checkScroll(); // Check on load
+        });
+    </script>
+</body>
+</html>

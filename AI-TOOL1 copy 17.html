@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberTool Suite | Ethical Hacking Toolkit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary: #4ade80;
+            --secondary: #60a5fa;
+            --accent: #f472b6;
+            --dark: #1e293b;
+            --darker: #0f172a;
+        }
+        
+        body {
+            background-color: var(--darker);
+            color: #e2e8f0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+        
+        .tool-card {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border: 1px solid #334155;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background-color: #334155;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.5s ease;
+        }
+        
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+        }
+        
+        .terminal {
+            background-color: rgba(15, 23, 42, 0.9);
+            border: 1px solid #334155;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .terminal-header {
+            background-color: #334155;
+        }
+        
+        .terminal-body {
+            height: 200px;
+            overflow-y: auto;
+        }
+        
+        .blinking-cursor {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        
+        .glow-text {
+            text-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
+        }
+        
+        .hexagon {
+            width: 100px;
+            height: 58px;
+            background-color: var(--primary);
+            position: relative;
+            margin: 29px 0;
+        }
+        
+        .hexagon:before,
+        .hexagon:after {
+            content: "";
+            position: absolute;
+            width: 0;
+            border-left: 50px solid transparent;
+            border-right: 50px solid transparent;
+        }
+        
+        .hexagon:before {
+            bottom: 100%;
+            border-bottom: 29px solid var(--primary);
+        }
+        
+        .hexagon:after {
+            top: 100%;
+            border-top: 29px solid var(--primary);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <header class="bg-gradient-to-r from-slate-900 to-slate-800 border-b border-slate-700 shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <div class="hexagon"></div>
+                    <h1 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">
+                        CyberTool Suite
+                    </h1>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <span class="status-badge rounded-full bg-emerald-900 text-emerald-400">
+                        <span class="relative flex h-2 w-2 mr-1">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        ACTIVE
+                    </span>
+                    <span class="text-slate-400">v3.2.1</span>
+                </div>
+            </div>
+            
+            <div class="mt-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-semibold">Ethical Hacking Toolkit</h2>
+                        <p class="text-slate-400 text-sm mt-1">Comprehensive suite for penetration testing and security analysis</p>
+                    </div>
+                    <div class="w-full md:w-96">
+                        <div class="relative">
+                            <input type="text" placeholder="Search tools..." 
+                                   class="w-full bg-slate-800 border border-slate-700 rounded-md py-2 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                            <button class="absolute right-3 top-2 text-slate-500 hover:text-green-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <!-- Sidebar -->
+            <div class="md:col-span-3">
+                <div class="bg-slate-800 rounded-lg border border-slate-700 p-4 shadow">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold">Categories</h3>
+                        <span class="text-xs bg-slate-700 px-2 py-1 rounded text-slate-400">17 tools</span>
+                    </div>
+                    
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="#" class="flex items-center space-x-2 px-2 py-1 rounded hover:bg-slate-700 text-sm font-medium text-green-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                </svg>
+                                <span>Vulnerability</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center space-x-2 px-2 py-1 rounded hover:bg-slate-700 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                                <span>Password Cracking</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center space-x-2 px-2 py-1 rounded hover:bg-slate-700 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                                </svg>
+                                <span>Network Tools</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center space-x-2 px-2 py-1 rounded hover:bg-slate-700 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                </svg>
+                                <span>Wireless</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center space-x-2 px-2 py-1 rounded hover:bg-slate-700 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />
+                                </svg>
+                                <span>Forensic</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center space-x-2 px-2 py-1 rounded hover:bg-slate-700 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <span>Reporting</span>
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <div class="mt-6 pt-4 border-t border-slate-700">
+                        <h3 class="font-semibold mb-2">Recent Activities</h3>
+                        <div class="space-y-3">
+                            <div class="text-xs text-slate-400">
+                                <div class="flex justify-between mb-1">
+                                    <span>Port Scan</span>
+                                    <span>2 min ago</span>
+                                </div>
+                                <div class="progress-bar rounded-full overflow-hidden">
+                                    <div class="progress-fill rounded-full" style="width: 85%;"></div>
+                                </div>
+                            </div>
+                            <div class="text-xs text-slate-400">
+                                <div class="flex justify-between mb-1">
+                                    <span>Brute Force</span>
+                                    <span>15 min ago</span>
+                                </div>
+                                <div class="progress-bar rounded-full overflow-hidden">
+                                    <div class="progress-fill rounded-full" style="width: 42%;"></div>
+                                </div>
+                            </div>
+                            <div class="text-xs text-slate-400">
+                                <div class="flex justify-between mb-1">
+                                    <span>Packet Capture</span>
+                                    <span>42 min ago</span>
+                                </div>
+                                <div class="progress-bar rounded-full overflow-hidden">
+                                    <div class="progress-fill rounded-full" style="width: 67%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main content -->
+            <div class="md:col-span-9">
+                <div class="bg-slate-800 rounded-lg border border-slate-700 p-4 shadow mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold">Dashboard</h3>
+                        <button class="text-xs bg-green-600 hover:bg-green-700 px-3 py-1 rounded flex items-center space-x-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            <span>New Session</span>
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                        <div class="tool-card rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="bg-slate-900 p-2 rounded-full">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                                    </svg>
+                                </div>
+                                <span class="status-badge rounded-full bg-slate-700 text-slate-400">Active</span>
+                            </div>
+                            <h4 class="font-medium">Network Mapper</h4>
+                            <p class="text-xs text-slate-400 mt-1">Scan and map network devices</p>
+                        </div>
+                        
+                        <div class="tool-card rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="bg-slate-900 p-2 rounded-full">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />
+                                    </svg>
+                                </div>
+                                <span class="status-badge rounded-full bg-slate-700 text-slate-400">Passive</span>
+                            </div>
+                            <h4 class="font-medium">Packet Analyzer</h4>
+                            <p class="text-xs text-slate-400 mt-1">Capture and analyze network traffic</p>
+                        </div>
+                        
+                        <div class="tool-card rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="bg-slate-900 p-2 rounded-full">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                </div>
+                                <span class="status-badge rounded-full bg-slate-700 text-slate-400">Ready</span>
+                            </div>
+                            <h4 class="font-medium">Credential Tester</h4>
+                            <p class="text-xs text-slate-400 mt-1">Test password strength</p>
+                        </div>
+                    </div>
+                    
+                    <div class="terminal rounded-lg overflow-hidden">
+                        <div class="terminal-header px-4 py-2 flex items-center space-x-2">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            <span class="text-xs text-slate-400 ml-2">output.log</span>
+                        </div>
+                        <div class="terminal-body p-4 text-xs font-mono text-green-400 whitespace-pre">
+<span class="text-blue-400">$</span> cybertool --scan 192.168.1.0/24
+<span class="text-blue-400">></span> Starting network scan...
+<span class="text-green-400">[+]</span> Found 8 active hosts
+<span class="text-blue-400">></span> Running port scan...
+<span class="text-green-400">[+]</span> 192.168.1.1:22/tcp   OPEN   SSH
+<span class="text-green-400">[+]</span> 192.168.1.1:80/tcp   OPEN   HTTP
+<span class="text-green-400">[+]</span> 192.168.1.1:443/tcp  OPEN   HTTPS
+<span class="text-blue-400">></span> Starting vulnerability assessment...
+<span class="text-green-400">[+]</span> Analyzing 192.168.1.1
+<span class="text-green-400">[+]</span> Completed scan in 42.3s
+<span class="text-white">root@cybertool:~# <span class="blinking-cursor">_</span></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-slate-800 rounded-lg border border-slate-700 p-4 shadow">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold">Available Tools</h3>
+                        <div class="flex space-x-2">
+                            <button class="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded flex items-center space-x-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                </svg>
+                                <span>Filter</span>
+                            </button>
+                            <button class="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded flex items-center space-x-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                                </svg>
+                                <span>Sort</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Tool 1 -->
+                        <div class="tool-card rounded-lg p-4 flex flex-col">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="bg-gradient-to-br from-green-600 to-green-800 p-2 rounded-lg">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                                    </svg>
+                                </div>
+                                <span class="status-badge rounded-full bg-emerald-900 text-emerald-400">Verified</span>
+                            </div>
+                            <h4 class="font-medium mb-1">Nmap Scanner</h4>
+                            <p class="text-xs text-slate-400 mb-3 flex-grow">Network discovery and security auditing tool</p>
+                            <div class="flex justify-between items-center mt-auto">
+                                <div class="text-xs text-slate-400">v7.92</div>
+                                <button class="text-xs bg-slate-700 hover:bg-green-600 px-3 py-1 rounded">
+                                    Run
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Tool 2 -->
+                        <div class="tool-card rounded-lg p-4 flex flex-col">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="bg-gradient-to-br from-blue-600 to-blue-800 p-2 rounded-lg">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />
+                                    </svg>
+                                </div>
+                                <span class="status-badge rounded-full bg-emerald-900 text-emerald-400">Verified</span>
+                            </div>
+                            <h4 class="font-medium mb-1">Wireshark</h4>
+                            <p class="text-xs text-slate-400 mb-3 flex-grow">Network protocol analyzer</p>
+                            <div class="flex justify-between items-center mt-auto">
+                                <div class="text-xs text-slate-400">v3.6.5</div>
+                                <button class="text-xs bg-slate-700 hover:bg-blue-600 px-3 py-1 rounded">
+                                    Run
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Tool 3 -->
+                        <div class="tool-card rounded-lg p-4 flex flex-col">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="bg-gradient-to-br from-purple-600 to-purple-800 p-2 rounded-lg">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                </div>
+                                <span class="status-badge rounded-full bg-emerald-900 text-emerald-400">Verified</span>
+                            </div>
+                            <h4 class="font-medium mb-1">John the Ripper</h4>
+                            <p class="text-xs text-slate-400 mb-3 flex-grow">Password cracking tool</p>
+                            <div class="flex justify-between items-center mt-auto">
+                                <div class="text-xs text-slate-400">v1.9.0</div>
+                                <button class="text-xs bg-slate-700 hover:bg-purple-600 px-3 py-1 rounded">
+                                    Run
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Tool 4 -->
+                        <div class="tool-card rounded-lg p-4 flex flex-col">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="bg-gradient-to-br from-red-600 to-red-800 p-2 rounded-lg">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                    </svg>
+                                </div>
+                                <span class="status-badge rounded-full bg-slate-700 text-slate-400">Beta</span>
+                            </div>
+                            <h4 class="font-medium mb-1">Aircrack-ng</h4>
+                            <p class="text-xs text-slate-400 mb-3 flex-grow">WiFi security auditing tool</p>
+                            <div class="flex justify-between items-center mt-auto">
+                                <div class="text-xs text-slate-400">v1.6.4</div>
+                                <button class="text-xs bg-slate-700 hover:bg-red-600 px-3 py-1 rounded">
+                                    Run
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Tool 5 -->
+                        <div class="tool-card rounded-lg p-4 flex flex-col">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="bg-gradient-to-br from-yellow-600 to-yellow-800 p-2 rounded-lg">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <span class="status-badge rounded-full bg-emerald-900 text-emerald-400">Verified</span>
+                            </div>
+                            <h4 class="font-medium mb-1">Metasploit</h4>
+                            <p class="text-xs text-slate-400 mb-3 flex-grow">Penetration testing framework</p>
+                            <div class="flex justify-between items-center mt-auto">
+                                <div class="text-xs text-slate-400">v6.1.0</div>
+                                <button class="text-xs bg-slate-700 hover:bg-yellow-600 px-3 py-1 rounded">
+                                    Run
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Tool 6 -->
+                        <div class="tool-card rounded-lg p-4 flex flex-col">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="bg-gradient-to-br from-pink-600 to-pink-800 p-2 rounded-lg">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                </div>
+                                <span class="status-badge rounded-full bg-slate-700 text-slate-400">Beta</span>
+                            </div>
+                            <h4 class="font-medium mb-1">Burp Suite</h4>
+                            <p class="text-xs text-slate-400 mb-3 flex-grow">Web application security testing</p>
+                            <div class="flex justify-between items-center mt-auto">
+                                <div class="text-xs text-slate-400">v2022.3</div>
+                                <button class="text-xs bg-slate-700 hover:bg-pink-600 px-3 py-1 rounded">
+                                    Run
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 flex justify-center">
+                        <button class="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 px-4 py-2 rounded-lg flex items-center space-x-1">
+                            <span>Load More Tools</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-900 mt-12 border-t border-slate-800">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                    <div class="hexagon"></div>
+                    <span class="text-sm font-medium">CyberTool Suite</span>
+                </div>
+                <div class="text-xs text-slate-400 text-center md:text-right">
+                    <p>Educational purpose only. Always obtain proper authorization before conducting any security testing.</p>
+                    <p class="mt-1">© 2023 CyberTool Solutions. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Interactive terminal - would be connected to backend in real implementation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Terminal simulation
+            const terminal = document.querySelector('.terminal-body');
+            
+            // Animation for blinking cursor
+            setInterval(() => {
+                const cursor = document.querySelector('.blinking-cursor');
+                cursor.style.opacity = cursor.style.opacity === '0' ? '1' : '0';
+            }, 500);
+            
+            // Tool card hover effects
+            const toolCards = document.querySelectorAll('.tool-card');
+            toolCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    const statusBadge = this.querySelector('.status-badge');
+                    if (statusBadge.textContent.includes('Active') || 
+                        statusBadge.textContent.includes('Verified')) {
+                        statusBadge.classList.add('glow-text');
+                    }
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    const statusBadge = this.querySelector('.status-badge');
+                    statusBadge.classList.remove('glow-text');
+                });
+            });
+            
+            // Run button animations
+            const runButtons = document.querySelectorAll('button:contains("Run")');
+            runButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.textContent = 'Running...';
+                    setTimeout(() => {
+                        this.textContent = 'Run';
+                    }, 2000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

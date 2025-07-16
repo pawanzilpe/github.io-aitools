@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pawan Zilpe - Portfolio</title>
+    <style>
+        :root {
+            --primary: #4a6bff;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --accent: #ff6b6b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+        
+        h1 {
+            color: var(--dark);
+            margin-bottom: 20px;
+            font-size: 2.2rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background-color: var(--primary);
+        }
+        
+        .section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 8px;
+        }
+        
+        .name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .skill {
+            background-color: var(--light);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--dark);
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .skill:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .location {
+            display: flex;
+            align-items: center;
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        .location i {
+            margin-right: 8px;
+            color: var(--accent);
+        }
+        
+        .divider {
+            height: 1px;
+            background-color: #eee;
+            margin: 25px 0;
+        }
+        
+        .signature {
+            font-weight: 700;
+            font-style: italic;
+            color: var(--dark);
+            text-align: right;
+            margin-top: 10px;
+        }
+        
+        .youtube-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .youtube-link:hover {
+            color: var(--accent);
+        }
+        
+        .youtube-link i {
+            margin-right: 8px;
+            color: red;
+            font-size: 1.2rem;
+        }
+        
+        @media (max-width: 600px) {
+            .card {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .name {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="card">
+        <h1>MY SELF</h1>
+        
+        <div class="section">
+            <div class="section-title">
+                <i class="fas fa-user"></i> I'M:
+            </div>
+            <div class="name">PAWAN ZILPE</div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                <i class="fas fa-code"></i> MY SKILLS:
+            </div>
+            <div class="skills-list">
+                <div class="skill">WEB DEVELOPER</div>
+                <div class="skill">FULLSTACK DEVELOPER</div>
+                <div class="skill">ETHICAL HACKER</div>
+                <div class="skill">INSTAGRAM MARKETING</div>
+                <div class="skill">FIGMA DESIGNER</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                <i class="fas fa-map-marker-alt"></i> I FROM:
+            </div>
+            <div class="location">
+                <i class="fas fa-city"></i> WARDHA MAHARASHTRA
+            </div>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="signature">MR. PAWAN ZILPE</div>
+        
+        <a href="https://www.youtube.com/watch?v=goutuber" class="youtube-link" target="_blank">
+            <i class="fab fa-youtube"></i> Visit My YouTube Channel
+        </a>
+    </div>
+
+    <script>
+        // Add animation to skills on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const skills = document.querySelectorAll('.skill');
+            skills.forEach((skill, index) => {
+                setTimeout(() => {
+                    skill.style.opacity = '1';
+                    skill.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+            
+            // Make the card appear with a fade-in effect
+            const card = document.querySelector('.card');
+            setTimeout(() => {
+                card.style.opacity = '1';
+            }, 50);
+        });
+    </script>
+</body>
+</html>

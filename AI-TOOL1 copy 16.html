@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Password Cracker</title>
+    <style>
+        body { font-family: Courier; background: #000; color: #0f0; }
+        #output { height: 300px; overflow-y: scroll; }
+    </style>
+</head>
+<body>
+    <h1>Password Cracker (Demo)</h1>
+    <input type="text" id="targetPass" placeholder="Enter 4 char max password">
+    <button onclick="crack()">Start Crack</button>
+    <div id="output"></div>
+    <script>
+        function crack() {
+            const target = document.getElementById("targetPass").value;
+            const output = document.getElementById("output");
+            output.innerHTML = "";
+            
+            const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+            let found = false;
+            
+            function bruteForce(current) {
+                if(found) return;
+                output.innerHTML += `Trying: ${current}<br>`;
+                
+                if(current === target) {
+                    output.innerHTML += `<strong style="color:red">PASSWORD FOUND: ${current}</strong>`;
+                    found = true;
+                    return;
+                }
+                
+                if(current.length < 4) {
+                    for(let c of chars) {
+                        setTimeout(() => bruteForce(current + c), 100);
+                    }
+                }
+            }
+            
+            bruteForce("");
+        }
+    </script>
+</body>
+</html>

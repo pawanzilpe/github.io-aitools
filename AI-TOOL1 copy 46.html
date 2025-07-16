@@ -1,0 +1,1769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI.EK - Social Learning Platform with Memes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: #4a00e0;
+            color: white;
+            padding: 15px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+        }
+
+        .auth-buttons button {
+            padding: 8px 20px;
+            margin-left: 10px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn {
+            background-color: transparent;
+            color: white;
+            border: 1px solid white !important;
+        }
+
+        .register-btn {
+            background-color: #8e2de2;
+            color: white;
+        }
+
+        .auth-buttons button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-top: 80px;
+            padding: 20px 0;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #4a00e0, #8e2de2);
+            color: white;
+            padding: 60px 40px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .hero-section h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .hero-section p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Features Section */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .feature-card {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            color: #4a00e0;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #777;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .submit-btn {
+            background-color: #4a00e0;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #8e2de2;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .form-footer a {
+            color: #4a00e0;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* App Pages (hidden by default) */
+        .app-page {
+            display: none;
+        }
+
+        /* Navigation */
+        .app-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            text-align: center;
+            cursor: pointer;
+            color: #777;
+        }
+
+        .nav-item.active {
+            color: #4a00e0;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        /* Home Page Content */
+        .trending-videos {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .video-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            height: 150px;
+            background-color: #ddd;
+            position: relative;
+        }
+
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-info {
+            padding: 15px;
+        }
+
+        .video-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .video-stats {
+            display: flex;
+            justify-content: space-between;
+            color: #777;
+            font-size: 14px;
+        }
+
+        /* Videos Page */
+        .upload-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-btn {
+            background-color: #4a00e0;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Courses Page */
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .course-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .course-image {
+            width: 100%;
+            height: 150px;
+            background-color: #ddd;
+        }
+
+        .course-details {
+            padding: 15px;
+        }
+
+        .course-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+
+        .course-instructor {
+            color: #777;
+            margin-bottom: 10px;
+        }
+
+        .course-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #777;
+            font-size: 14px;
+        }
+
+        /* Exercise Page */
+        .exercise-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .category-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        .category-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            color: #4a00e0;
+        }
+
+        /* Messages Page */
+        .message-list {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .message-item:last-child {
+            border-bottom: none;
+        }
+
+        .message-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #ddd;
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-sender {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .message-preview {
+            color: #777;
+            font-size: 14px;
+        }
+
+        /* Profile Page */
+        .profile-header {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #ddd;
+            position: relative;
+        }
+
+        .profile-edit {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background-color: #4a00e0;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .profile-info h2 {
+            margin-bottom: 5px;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .profile-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        .profile-sidebar {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-section {
+            margin-bottom: 20px;
+        }
+
+        .sidebar-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .edit-btn {
+            background-color: #f0f0f0;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .profile-posts {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .post-form {
+            margin-bottom: 20px;
+        }
+
+        .post-input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            resize: none;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .post-action-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #777;
+        }
+
+        .post-submit {
+            background-color: #4a00e0;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        /* AI Chatbot */
+        .chatbot-container {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 350px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+            z-index: 2000;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, #4a00e0, #8e2de2);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-close {
+            cursor: pointer;
+        }
+
+        .chatbot-messages {
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 80%;
+        }
+
+        .user-message {
+            background-color: #e0e0e0;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+
+        .bot-message {
+            background-color: #f0f0f0;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+        }
+
+        .chatbot-input {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .chatbot-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            margin-right: 10px;
+        }
+
+        .chatbot-send {
+            background-color: #4a00e0;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chatbot-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #4a00e0, #8e2de2);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 2000;
+        }
+
+        /* MEMES SECTION - NEW STYLES */
+        .memes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .meme-card {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .meme-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .meme-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-bottom: 1px solid #eee;
+        }
+
+        .meme-info {
+            padding: 15px;
+        }
+
+        .meme-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .meme-author {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .author-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin-right: 10px;
+        }
+
+        .author-name {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .meme-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        .meme-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .meme-action {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .meme-action:hover {
+            color: #4a00e0;
+        }
+
+        .meme-action.liked {
+            color: #ff4081;
+        }
+
+        .meme-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .meme-tag {
+            background-color: #f0f0f0;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #555;
+        }
+
+        .meme-upload-container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover {
+            border-color: #8e2de2;
+            background-color: #f9f5ff;
+        }
+
+        .upload-area i {
+            font-size: 3rem;
+            color: #8e2de2;
+            margin-bottom: 15px;
+        }
+
+        .upload-area p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .form-row {
+            margin-bottom: 20px;
+        }
+
+        .form-row label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .form-row input, .form-row textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-row textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .tag-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .tag-option {
+            background-color: #f0f0f0;
+            padding: 6px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .tag-option:hover, .tag-option.selected {
+            background-color: #8e2de2;
+            color: white;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .profile-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-section p {
+                font-size: 1rem;
+            }
+            
+            .feature-card {
+                padding: 15px;
+            }
+            
+            .memes-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+            }
+            
+            .meme-image {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+                <span>AI.EK</span>
+            </div>
+            <div class="auth-buttons">
+                <button class="login-btn" id="loginBtn">Login</button>
+                <button class="register-btn" id="registerBtn">Register</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container main-content" id="landingPage">
+        <section class="hero-section">
+            <h1>Welcome to AI.EK Learning Platform</h1>
+            <p>Join our community to learn, share memes, and grow with AI-powered tools and courses. Connect with like-minded people and enhance your skills.</p>
+            <button class="register-btn" style="padding: 12px 30px; font-size: 1.1rem;">Get Started</button>
+        </section>
+
+        <section class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-video"></i>
+                </div>
+                <h3>Video Learning</h3>
+                <p>Watch and upload educational videos on various topics from our community.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3>Courses</h3>
+                <p>Access new courses and learning materials to enhance your skills.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-grin-squint-tears"></i>
+                </div>
+                <h3>Memes</h3>
+                <p>Share and enjoy educational memes with our learning community.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h3>Community</h3>
+                <p>Connect with others, share ideas, and get feedback on your work.</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- App Pages (Initially Hidden) -->
+    <div id="appPages" style="display: none;">
+        <!-- Home Page -->
+        <div class="container main-content app-page" id="homePage">
+            <div class="trending-videos">
+                <h2 class="section-title">Trending Videos</h2>
+                <div class="video-grid">
+                    <div class="video-card">
+                        <div class="video-thumbnail">
+                            <img src="https://via.placeholder.com/300x150" alt="Video Thumbnail">
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Introduction to AI Programming</div>
+                            <div class="video-stats">
+                                <span>125K views</span>
+                                <span>2 days ago</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="video-card">
+                        <div class="video-thumbnail">
+                            <img src="https://via.placeholder.com/300x150" alt="Video Thumbnail">
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Machine Learning Basics</div>
+                            <div class="video-stats">
+                                <span>89K views</span>
+                                <span>1 week ago</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="video-card">
+                        <div class="video-thumbnail">
+                            <img src="https://via.placeholder.com/300x150" alt="Video Thumbnail">
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Python for Beginners</div>
+                            <div class="video-stats">
+                                <span>210K views</span>
+                                <span>3 weeks ago</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="video-card">
+                        <div class="video-thumbnail">
+                            <img src="https://via.placeholder.com/300x150" alt="Video Thumbnail">
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">Data Science Fundamentals</div>
+                            <div class="video-stats">
+                                <span>156K views</span>
+                                <span>1 month ago</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Videos Page -->
+        <div class="container main-content app-page" id="videosPage">
+            <div class="upload-section">
+                <button class="upload-btn">
+                    <i class="fas fa-upload"></i> Upload Video
+                </button>
+            </div>
+            <h2 class="section-title">Your Videos</h2>
+            <div class="video-grid">
+                <div class="video-card">
+                    <div class="video-thumbnail">
+                        <img src="https://via.placeholder.com/300x150" alt="Video Thumbnail">
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">My First Tutorial</div>
+                        <div class="video-stats">
+                            <span>1.2K views</span>
+                            <span>3 days ago</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="video-card">
+                    <div class="video-thumbnail">
+                        <img src="https://via.placeholder.com/300x150" alt="Video Thumbnail">
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">Web Development Tips</div>
+                        <div class="video-stats">
+                            <span>5.7K views</span>
+                            <span>2 weeks ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Courses Page -->
+        <div class="container main-content app-page" id="coursesPage">
+            <h2 class="section-title">New Courses</h2>
+            <div class="courses-grid">
+                <div class="course-card">
+                    <div class="course-image"></div>
+                    <div class="course-details">
+                        <div class="course-title">AI Fundamentals</div>
+                        <div class="course-instructor">By Dr. Smith</div>
+                        <div class="course-meta">
+                            <span>12 Lessons</span>
+                            <span>Beginner</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="course-card">
+                    <div class="course-image"></div>
+                    <div class="course-details">
+                        <div class="course-title">Python Programming</div>
+                        <div class="course-instructor">By Jane Doe</div>
+                        <div class="course-meta">
+                            <span>24 Lessons</span>
+                            <span>Intermediate</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="course-card">
+                    <div class="course-image"></div>
+                    <div class="course-details">
+                        <div class="course-title">Data Visualization</div>
+                        <div class="course-instructor">By John Smith</div>
+                        <div class="course-meta">
+                            <span>8 Lessons</span>
+                            <span>Advanced</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="course-card">
+                    <div class="course-image"></div>
+                    <div class="course-details">
+                        <div class="course-title">Web Development</div>
+                        <div class="course-instructor">By Sarah Johnson</div>
+                        <div class="course-meta">
+                            <span>30 Lessons</span>
+                            <span>Beginner</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exercise Page -->
+        <div class="container main-content app-page" id="exercisePage">
+            <h2 class="section-title">Exercise Categories</h2>
+            <div class="exercise-categories">
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3>Coding</h3>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>Logic</h3>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Data</h3>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <h3>Projects</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Memes Page - NEW SECTION -->
+        <div class="container main-content app-page" id="memesPage">
+            <div class="upload-section">
+                <button class="upload-btn" id="uploadMemeBtn">
+                    <i class="fas fa-plus"></i> Create Meme
+                </button>
+            </div>
+            <h2 class="section-title">Trending Memes</h2>
+            <div class="memes-grid">
+                <div class="meme-card">
+                    <img src="https://images.unsplash.com/photo-1616469829479-1d3b76bcaa1e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Programming Meme" class="meme-image">
+                    <div class="meme-info">
+                        <div class="meme-title">When you finally fix the bug at 3 AM</div>
+                        <div class="meme-author">
+                            <div class="author-avatar"></div>
+                            <div class="author-name">CodingMaster</div>
+                        </div>
+                        <div class="meme-stats">
+                            <div class="meme-actions">
+                                <div class="meme-action" onclick="toggleLike(this)">
+                                    <i class="fas fa-heart"></i>
+                                    <span>248</span>
+                                </div>
+                                <div class="meme-action">
+                                    <i class="fas fa-comment"></i>
+                                    <span>42</span>
+                                </div>
+                                <div class="meme-action">
+                                    <i class="fas fa-share"></i>
+                                </div>
+                            </div>
+                            <div class="meme-date">2 hours ago</div>
+                        </div>
+                        <div class="meme-tags">
+                            <span class="meme-tag">#Programming</span>
+                            <span class="meme-tag">#Humor</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="meme-card">
+                    <img src="https://images.unsplash.com/photo-1558494942-25e96a2c5e0c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="AI Meme" class="meme-image">
+                    <div class="meme-info">
+                        <div class="meme-title">AI taking over the world</div>
+                        <div class="meme-author">
+                            <div class="author-avatar"></div>
+                            <div class="author-name">AIEnthusiast</div>
+                        </div>
+                        <div class="meme-stats">
+                            <div class="meme-actions">
+                                <div class="meme-action liked" onclick="toggleLike(this)">
+                                    <i class="fas fa-heart"></i>
+                                    <span>512</span>
+                                </div>
+                                <div class="meme-action">
+                                    <i class="fas fa-comment"></i>
+                                    <span>87</span>
+                                </div>
+                                <div class="meme-action">
+                                    <i class="fas fa-share"></i>
+                                </div>
+                            </div>
+                            <div class="meme-date">5 hours ago</div>
+                        </div>
+                        <div class="meme-tags">
+                            <span class="meme-tag">#AI</span>
+                            <span class="meme-tag">#Future</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="meme-card">
+                    <img src="https://images.unsplash.com/photo-1558346490-a72e53ae2d4f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Math Meme" class="meme-image">
+                    <div class="meme-info">
+                        <div class="meme-title">Math exams be like</div>
+                        <div class="meme-author">
+                            <div class="author-avatar"></div>
+                            <div class="author-name">MathWizard</div>
+                        </div>
+                        <div class="meme-stats">
+                            <div class="meme-actions">
+                                <div class="meme-action" onclick="toggleLike(this)">
+                                    <i class="fas fa-heart"></i>
+                                    <span>324</span>
+                                </div>
+                                <div class="meme-action">
+                                    <i class="fas fa-comment"></i>
+                                    <span>56</span>
+                                </div>
+                                <div class="meme-action">
+                                    <i class="fas fa-share"></i>
+                                </div>
+                            </div>
+                            <div class="meme-date">1 day ago</div>
+                        </div>
+                        <div class="meme-tags">
+                            <span class="meme-tag">#Math</span>
+                            <span class="meme-tag">#Exams</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="meme-card">
+                    <img src="https://images.unsplash.com/photo-1558346490-07d9e18a8c08?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Coding Meme" class="meme-image">
+                    <div class="meme-info">
+                        <div class="meme-title">Debugging in production</div>
+                        <div class="meme-author">
+                            <div class="author-avatar"></div>
+                            <div class="author-name">DevPro</div>
+                        </div>
+                        <div class="meme-stats">
+                            <div class="meme-actions">
+                                <div class="meme-action liked" onclick="toggleLike(this)">
+                                    <i class="fas fa-heart"></i>
+                                    <span>421</span>
+                                </div>
+                                <div class="meme-action">
+                                    <i class="fas fa-comment"></i>
+                                    <span>63</span>
+                                </div>
+                                <div class="meme-action">
+                                    <i class="fas fa-share"></i>
+                                </div>
+                            </div>
+                            <div class="meme-date">2 days ago</div>
+                        </div>
+                        <div class="meme-tags">
+                            <span class="meme-tag">#Coding</span>
+                            <span class="meme-tag">#Debugging</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages Page -->
+        <div class="container main-content app-page" id="messagesPage">
+            <h2 class="section-title">Messages</h2>
+            <div class="message-list">
+                <div class="message-item">
+                    <div class="message-avatar"></div>
+                    <div class="message-content">
+                        <div class="message-sender">John Doe</div>
+                        <div class="message-preview">Hey, how's the project going?</div>
+                    </div>
+                </div>
+                <div class="message-item">
+                    <div class="message-avatar"></div>
+                    <div class="message-content">
+                        <div class="message-sender">Course Support</div>
+                        <div class="message-preview">Your assignment has been reviewed</div>
+                    </div>
+                </div>
+                <div class="message-item">
+                    <div class="message-avatar"></div>
+                    <div class="message-content">
+                        <div class="message-sender">Sarah Johnson</div>
+                        <div class="message-preview">Let's collaborate on the AI project</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div class="container main-content app-page" id="profilePage">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <div class="profile-edit">
+                        <i class="fas fa-pencil-alt"></i>
+                    </div>
+                </div>
+                <div class="profile-info">
+                    <h2>User Name</h2>
+                    <p>AI Enthusiast | Web Developer</p>
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">125</div>
+                            <div class="stat-label">Posts</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">1.2K</div>
+                            <div class="stat-label">Followers</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">350</div>
+                            <div class="stat-label">Following</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-content">
+                <div class="profile-sidebar">
+                    <div class="sidebar-section">
+                        <div class="sidebar-title">About Me</div>
+                        <p>I'm passionate about AI and web development. Love to learn and share knowledge with others.</p>
+                        <button class="edit-btn">
+                            <i class="fas fa-pencil-alt"></i> Edit
+                        </button>
+                    </div>
+                    <div class="sidebar-section">
+                        <div class="sidebar-title">Education</div>
+                        <p>Computer Science Degree</p>
+                        <p>AI Certification</p>
+                        <button class="edit-btn">
+                            <i class="fas fa-pencil-alt"></i> Edit
+                        </button>
+                    </div>
+                    <div class="sidebar-section">
+                        <div class="sidebar-title">Links</div>
+                        <p><i class="fas fa-globe"></i> mywebsite.com</p>
+                        <p><i class="fab fa-github"></i> github.com/username</p>
+                        <button class="edit-btn">
+                            <i class="fas fa-pencil-alt"></i> Edit
+                        </button>
+                    </div>
+                </div>
+
+                <div class="profile-posts">
+                    <div class="post-form">
+                        <textarea class="post-input" placeholder="What's on your mind?"></textarea>
+                        <div class="post-actions">
+                            <div>
+                                <button class="post-action-btn">
+                                    <i class="fas fa-image"></i> Photo
+                                </button>
+                                <button class="post-action-btn">
+                                    <i class="fas fa-video"></i> Video
+                                </button>
+                            </div>
+                            <button class="post-submit">Post</button>
+                        </div>
+                    </div>
+
+                    <div class="post">
+                        <div class="post-header">
+                            <div class="post-author">You</div>
+                            <div class="post-time">2 hours ago</div>
+                        </div>
+                        <div class="post-content">
+                            Just completed the AI Fundamentals course! Highly recommend it to anyone starting with AI.
+                        </div>
+                        <div class="post-stats">
+                            <span>24 Likes</span>
+                            <span>5 Comments</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation (Initially Hidden) -->
+    <div class="app-nav" id="appNav" style="display: none;">
+        <div class="nav-item active" data-page="homePage">
+            <div class="nav-icon">
+                <i class="fas fa-home"></i>
+            </div>
+            <div class="nav-label">Home</div>
+        </div>
+        <div class="nav-item" data-page="videosPage">
+            <div class="nav-icon">
+                <i class="fas fa-video"></i>
+            </div>
+            <div class="nav-label">Videos</div>
+        </div>
+        <div class="nav-item" data-page="coursesPage">
+            <div class="nav-icon">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div class="nav-label">Courses</div>
+        </div>
+        <div class="nav-item" data-page="exercisePage">
+            <div class="nav-icon">
+                <i class="fas fa-dumbbell"></i>
+            </div>
+            <div class="nav-label">Exercises</div>
+        </div>
+        <div class="nav-item" data-page="memesPage">
+            <div class="nav-icon">
+                <i class="fas fa-grin-squint-tears"></i>
+            </div>
+            <div class="nav-label">Memes</div>
+        </div>
+        <div class="nav-item" data-page="messagesPage">
+            <div class="nav-icon">
+                <i class="fas fa-comments"></i>
+            </div>
+            <div class="nav-label">Messages</div>
+        </div>
+        <div class="nav-item" data-page="profilePage">
+            <div class="nav-icon">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="nav-label">Profile</div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeLogin">&times;</span>
+            <h2>Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="submit-btn">Login</button>
+            </form>
+            <div class="form-footer">
+                Don't have an account? <a href="#" id="showRegister">Register</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeRegister">&times;</span>
+            <h2>Register</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="registerName">Full Name</label>
+                    <input type="text" id="registerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="registerPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerConfirm">Confirm Password</label>
+                    <input type="password" id="registerConfirm" required>
+                </div>
+                <button type="submit" class="submit-btn">Register</button>
+            </form>
+            <div class="form-footer">
+                Already have an account? <a href="#" id="showLogin">Login</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Meme Upload Modal - NEW MODAL -->
+    <div class="modal" id="memeUploadModal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeMemeUpload">&times;</span>
+            <h2>Create a Meme</h2>
+            <div class="meme-upload-container">
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Drag & drop your meme image here</p>
+                    <p>or</p>
+                    <button class="upload-btn">
+                        <i class="fas fa-folder-open"></i> Browse Files
+                    </button>
+                </div>
+                
+                <div class="form-row">
+                    <label for="memeTitle">Meme Title</label>
+                    <input type="text" id="memeTitle" placeholder="Add a catchy title...">
+                </div>
+                
+                <div class="form-row">
+                    <label for="memeDescription">Description (Optional)</label>
+                    <textarea id="memeDescription" placeholder="Add context or description..."></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <label>Tags</label>
+                    <div class="tag-selector">
+                        <div class="tag-option">#Programming</div>
+                        <div class="tag-option">#AI</div>
+                        <div class="tag-option">#Math</div>
+                        <div class="tag-option">#Exams</div>
+                        <div class="tag-option">#Humor</div>
+                        <div class="tag-option">#Study</div>
+                    </div>
+                </div>
+                
+                <button class="submit-btn" style="margin-top: 20px;">
+                    <i class="fas fa-paper-plane"></i> Publish Meme
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Chatbot -->
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chatbot-header">
+            <h3>AI Assistant</h3>
+            <div class="chatbot-close" id="chatbotClose">
+                <i class="fas fa-times"></i>
+            </div>
+        </div>
+        <div class="chatbot-messages" id="chatbotMessages">
+            <div class="message bot-message">
+                Hello! I'm your AI assistant. How can I help you today?
+            </div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="chatbotInput" placeholder="Type your question...">
+            <button class="chatbot-send" id="chatbotSend">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+    <div class="chatbot-toggle" id="chatbotToggle">
+        <i class="fas fa-robot"></i>
+    </div>
+
+    <script>
+        // DOM Elements
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const loginModal = document.getElementById('loginModal');
+        const registerModal = document.getElementById('registerModal');
+        const closeLogin = document.getElementById('closeLogin');
+        const closeRegister = document.getElementById('closeRegister');
+        const showRegister = document.getElementById('showRegister');
+        const showLogin = document.getElementById('showLogin');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const landingPage = document.getElementById('landingPage');
+        const appPages = document.getElementById('appPages');
+        const appNav = document.getElementById('appNav');
+        const navItems = document.querySelectorAll('.nav-item');
+        const appPageElements = document.querySelectorAll('.app-page');
+        
+        // Meme elements
+        const memeUploadBtn = document.getElementById('uploadMemeBtn');
+        const memeUploadModal = document.getElementById('memeUploadModal');
+        const closeMemeUpload = document.getElementById('closeMemeUpload');
+        const uploadArea = document.getElementById('uploadArea');
+        const tagOptions = document.querySelectorAll('.tag-option');
+        
+        // Chatbot Elements
+        const chatbotToggle = document.getElementById('chatbotToggle');
+        const chatbotContainer = document.getElementById('chatbotContainer');
+        const chatbotClose = document.getElementById('chatbotClose');
+        const chatbotSend = document.getElementById('chatbotSend');
+        const chatbotInput = document.getElementById('chatbotInput');
+        const chatbotMessages = document.getElementById('chatbotMessages');
+                   
+        // Show Login Modal
+        loginBtn.addEventListener('click', () => {
+            loginModal.style.display = 'flex';
+        });
+
+        // Show Register Modal
+        registerBtn.addEventListener('click', () => {
+            registerModal.style.display = 'flex';
+        });
+
+        // Close Modals
+        closeLogin.addEventListener('click', () => {
+            loginModal.style.display = 'none';
+        });
+
+        closeRegister.addEventListener('click', () => {
+            registerModal.style.display = 'none';
+        });
+
+        // Switch between Login and Register
+        showRegister.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginModal.style.display = 'none';
+            registerModal.style.display = 'flex';
+        });
+
+        showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerModal.style.display = 'none';
+            loginModal.style.display = 'flex';
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.style.display = 'none';
+            }
+            if (e.target === registerModal) {
+                registerModal.style.display = 'none';
+            }
+            if (e.target === memeUploadModal) {
+                memeUploadModal.style.display = 'none';
+            }
+        });
+
+        // Login Form Submission
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Here you would typically validate and send to server
+            // For demo, we'll just show the app
+            loginModal.style.display = 'none';
+            landingPage.style.display = 'none';
+            appPages.style.display = 'block';
+            appNav.style.display = 'flex';
+            showPage('homePage');
+        });
+
+        // Register Form Submission
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Here you would typically validate and send to server
+            // For demo, we'll just show the app
+            registerModal.style.display = 'none';
+            landingPage.style.display = 'none';
+            appPages.style.display = 'block';
+            appNav.style.display = 'flex';
+            showPage('homePage');
+        });
+
+        // Navigation
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove active class from all items
+                navItems.forEach(navItem => {
+                    navItem.classList.remove('active');
+                });
+                
+                // Add active class to clicked item
+                item.classList.add('active');
+                
+                // Show the corresponding page
+                const pageId = item.getAttribute('data-page');
+                showPage(pageId);
+            });
+        });
+
+        function showPage(pageId) {
+            // Hide all pages
+            appPageElements.forEach(page => {
+                page.style.display = 'none';
+            });
+            
+            // Show the selected page
+            document.getElementById(pageId).style.display = 'block';
+        }
+
+        // Meme Upload Functionality
+        memeUploadBtn.addEventListener('click', () => {
+            memeUploadModal.style.display = 'flex';
+        });
+
+        closeMemeUpload.addEventListener('click', () => {
+            memeUploadModal.style.display = 'none';
+        });
+
+        // Tag selection for memes
+        tagOptions.forEach(tag => {
+            tag.addEventListener('click', () => {
+                tag.classList.toggle('selected');
+            });
+        });
+
+        // Drag and drop for meme upload
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#8e2de2';
+            uploadArea.style.backgroundColor = '#f9f5ff';
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#ddd';
+            uploadArea.style.backgroundColor = 'transparent';
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#ddd';
+            uploadArea.style.backgroundColor = 'transparent';
+            
+            // Here you would handle the dropped file
+            // For demo, we'll just show a success message
+            uploadArea.innerHTML = '<i class="fas fa-check-circle"></i><p>File uploaded successfully!</p>';
+        });
+
+        // Chatbot Toggle
+        chatbotToggle.addEventListener('click', () => {
+            chatbotContainer.style.display = chatbotContainer.style.display === 'flex' ? 'none' : 'flex';
+        });
+
+        chatbotClose.addEventListener('click', () => {
+            chatbotContainer.style.display = 'none';
+        });
+
+        // Chatbot Send Message
+        chatbotSend.addEventListener('click', sendMessage);
+        chatbotInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        function sendMessage() {
+            const message = chatbotInput.value.trim();
+            if (message) {
+                // Add user message
+                addMessage(message, 'user-message');
+                chatbotInput.value = '';
+                
+                // Simulate bot response
+                setTimeout(() => {
+                    const botResponse = getBotResponse(message);
+                    addMessage(botResponse, 'bot-message');
+                }, 1000);
+            }
+        }
+
+        function addMessage(text, className) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', className);
+            messageDiv.textContent = text;
+            chatbotMessages.appendChild(messageDiv);
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        }
+
+        function getBotResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
+                return "Hello there! How can I assist you today?";
+            } else if (lowerMessage.includes('course') || lowerMessage.includes('learn')) {
+                return "We have many courses available. Check the Courses section to explore them!";
+            } else if (lowerMessage.includes('video') || lowerMessage.includes('upload')) {
+                return "You can upload videos in the Videos section of the app.";
+            } else if (lowerMessage.includes('meme') || lowerMessage.includes('funny')) {
+                return "Check out the Memes section for educational humor! You can also upload your own memes.";
+            } else if (lowerMessage.includes('help')) {
+                return "I can help you navigate the platform, find courses, or answer questions about AI and programming.";
+            } else {
+                return "I'm an AI assistant here to help you with the platform. You can ask me about courses, videos, memes, or anything else!";
+            }
+        }
+        
+        // Toggle like for memes
+        function toggleLike(element) {
+            element.classList.toggle('liked');
+            const heartIcon = element.querySelector('i');
+            const countSpan = element.querySelector('span');
+            
+            if (element.classList.contains('liked')) {
+                heartIcon.className = 'fas fa-heart';
+                countSpan.textContent = parseInt(countSpan.textContent) + 1;
+            } else {
+                heartIcon.className = 'fas fa-heart';
+                countSpan.textContent = parseInt(countSpan.textContent) - 1;
+            }
+        }
+    </script>
+</body>
+</html>

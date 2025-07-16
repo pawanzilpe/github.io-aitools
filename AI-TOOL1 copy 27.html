@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fishing Tool Simulator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #e0f7fa;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #00796b;
+        }
+        
+        .fishing-pond {
+            width: 100%;
+            height: 300px;
+            background-color: #4fc3f7;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            margin: 20px 0;
+            border: 3px solid #0288d1;
+        }
+        
+        .fish {
+            position: absolute;
+            width: 50px;
+            height: 30px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 60"><path d="M90,30 Q70,10 50,30 Q30,50 10,30 Q30,55 50,30 Q70,5 90,30" fill="%23ff9800"/><circle cx="75" cy="25" r="3" fill="black"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            transition: transform 0.3s;
+        }
+        
+        .hook {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M10,0 L10,10 Q10,15 5,15 Q0,15 0,20" stroke="black" fill="none" stroke-width="2"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 10;
+        }
+        
+        .line {
+            position: absolute;
+            width: 2px;
+            background-color: black;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+        }
+        
+        .controls {
+            margin: 20px 0;
+        }
+        
+        button {
+            background-color: #00796b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 10px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #00695c;
+        }
+        
+        button:disabled {
+            background-color: #b2dfdb;
+            cursor: not-allowed;
+        }
+        
+        .stats {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        
+        .bubble {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: float-up 3s infinite;
+        }
+        
+        @keyframes float-up {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100px); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Fishing Tool Simulator</h1>
+        
+        <div class="stats">
+            Fish Caught: <span id="fishCount">0</span> |
+            Current Depth: <span id="depth">0</span>m
+        </div>
+        
+        <div class="fishing-pond">
+            <div class="line" id="fishingLine"></div>
+            <div class="hook" id="fishingHook"></div>
+            <!-- Fish will be added by JavaScript -->
+        </div>
+        
+        <div class="controls">
+            <button id="castBtn">Cast Line</button>
+            <button id="reelBtn" disabled>Reel In</button>
+            <button id="resetBtn">Reset</button>
+        </div>
+        
+        <div id="message"></div>
+    </div>
+
+    <script>
+        const pond = document.querySelector('.fishing-pond');
+        const fishingLine = document.getElementById('fishingLine');
+        const fishingHook = document.getElementById('fishingHook');
+        const castBtn = document.getElementById('castBtn');
+        const reelBtn = document.getElementById('reelBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const fishCountDisplay = document.getElementById('fishCount');
+        const depthDisplay = document.getElementById('depth');
+        const messageDisplay = document.getElementById('message');
+        
+        let fishCount = 0;
+        let currentDepth = 0;
+        let maxDepth = 0;
+        let isCasting = false;
+        let isReeling = false;
+        let castInterval;
+        let fishInterval;
+        let bubblesInterval;
+        let caughtFish = null;
+        
+        // Create initial fish
+        function createFish() {
+            const fish = document.createElement('div');
+            fish.className = 'fish';
+            
+            // Random position
+            const pondWidth = pond.offsetWidth;
+            const pondHeight = pond.offsetHeight;
+            const left = Math.random() * (pondWidth - 50);
+            const top = Math.random() * (pondHeight - 30);
+            
+            fish.style.left = `${left}px`;
+            fish.style.top = `${top}px`;
+            
+            // Random size variation
+            const size = 0.7 + Math.random() * 0.6;
+            fish.style.transform = scale(`${size}`);
+            
+            // Random swim animation
+            fish.swimDirection = Math.random() > 0.5 ? 1 : -1;
+            fish.swimSpeed = 1 + Math.random() * 2;
+            
+            pond.appendChild(fish);
+            return fish;
+        }
+        
+        // Create bubbles
+        function createBubble() {
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            
+            const size = 5 + Math.random() * 15;
+            const left = Math.random() * pond.offsetWidth;
+            
+            bubble.style.width = `${size}px`;
+            bubble.style.height =` ${size}px`;
+            bubble.style.left = `${left}px`;
+            bubble.style.bottom = '0';
+            bubble.style.animationDuration =` ${2 + Math.random() * 3}s`;
+            bubble.style.animationDelay = `${Math.random() * 2}s`;
+            
+            pond.appendChild(bubble);
+            
+            // Remove bubble after animation
+            setTimeout(() => {
+                bubble.remove();
+            }, 3000);
+        }
+        
+        // Move fish around
+        function moveFish(fish) {
+            if (caughtFish === fish) return;
+            
+            const rect = fish.getBoundingClientRect();
+            const pondRect = pond.getBoundingClientRect();
+            
+            let newLeft = parseFloat(fish.style.left) + fish.swimDirection * fish.swimSpeed;
+            
+            // Reverse direction if hitting pond edges
+            if (newLeft <= 0 || newLeft >= pondRect.width - rect.width) {
+                fish.swimDirection *= -1;
+                newLeft = parseFloat(fish.style.left) + fish.swimDirection * fish.swimSpeed;
+            }
+            
+            fish.style.left =` ${newLeft}px`;
+            
+            // Random vertical movement
+            if (Math.random() < 0.02) {
+                const currentTop = parseFloat(fish.style.top);
+                const newTop = currentTop + (Math.random() * 4 - 2);
+                
+                if (newTop >= 0 && newTop <= pondRect.height - rect.height) {
+                    fish.style.top = `${newTop}px`;
+                }
+            }
+            
+            // Check if fish is near hook
+            if (!isReeling && isCasting) {
+                const hookRect = fishingHook.getBoundingClientRect();
+                const distance = Math.sqrt(
+                    Math.pow(rect.left + rect.width/2 - (hookRect.left + hookRect.width/2), 2) +
+                    Math.pow(rect.top + rect.height/2 - (hookRect.top + hookRect.height/2), 2)
+                );
+                
+                // Fish gets caught if close enough to hook
+                if (distance < 30 && Math.random() < 0.005) {
+                    caughtFish = fish;
+                    fish.style.transition = 'transform 0.5s';
+                    fish.style.transform = 'rotate(-30deg)';
+                    messageDisplay.textContent = 'Fish hooked! Reel it in!';
+                    reelBtn.disabled = false;
+                }
+            }
+        }
+        
+        // Cast fishing line
+        function castLine() {
+            if (isCasting) return;
+            
+            isCasting = true;
+            castBtn.disabled = true;
+            currentDepth = 0;
+            maxDepth = 100 + Math.random() * 100;
+            
+            fishingLine.style.height = '0';
+            fishingLine.style.top = '0';
+            fishingHook.style.top = '0';
+            
+            castInterval = setInterval(() => {
+                currentDepth += 2;
+                depthDisplay.textContent = Math.floor(currentDepth);
+                
+                fishingLine.style.height = `${currentDepth}px`;
+                fishingHook.style.top = `${currentDepth}px`;
+                
+                // Stop at max depth
+                if (currentDepth >= maxDepth) {
+                    clearInterval(castInterval);
+                    messageDisplay.textContent = 'Waiting for fish to bite...';
+                    
+                    // Small chance to instantly catch a fish
+                    if (Math.random() < 0.1) {
+                        const fish = document.querySelector('.fish');
+                        if (fish) {
+                            caughtFish = fish;
+                            fish.style.transition = 'transform 0.5s';
+                            fish.style.transform = 'rotate(-30deg)';
+                            messageDisplay.textContent = 'Fish hooked! Reel it in!';
+                            reelBtn.disabled = false;
+                        }
+                    }
+                }
+            }, 50);
+        }
+        
+        // Reel in fishing line
+        function reelIn() {
+            if (isReeling || !isCasting) return;
+            
+            isReeling = true;
+            clearInterval(castInterval);
+            reelBtn.disabled = true;
+            
+            castInterval = setInterval(() => {
+                currentDepth -= 3;
+                depthDisplay.textContent = Math.floor(currentDepth);
+                
+                fishingLine.style.height = `${currentDepth}px`;
+                fishingHook.style.top = `${currentDepth}px`;
+                
+                // Bring caught fish up with the hook
+                if (caughtFish) {
+                    caughtFish.style.top = `${currentDepth - 20}px`;
+                    caughtFish.style.left = calc(`50% - 25px`);
+                }
+                
+                // When back at surface
+                if (currentDepth <= 0) {
+                    clearInterval(castInterval);
+                    isCasting = false;
+                    isReeling = false;
+                    castBtn.disabled = false;
+                    
+                    if (caughtFish) {
+                        fishCount++;
+                        fishCountDisplay.textContent = fishCount;
+                        caughtFish.remove();
+                        caughtFish = null;
+                        messageDisplay.textContent = 'You caught a fish!';
+                    } else {
+                        messageDisplay.textContent = 'No fish this time. Try again!';
+                    }
+                }
+            }, 50);
+        }
+        
+        // Reset the game
+        function resetGame() {
+            clearInterval(castInterval);
+            clearInterval(fishInterval);
+            clearInterval(bubblesInterval);
+            
+            // Remove all fish
+            document.querySelectorAll('.fish').forEach(fish => fish.remove());
+            
+            // Reset variables
+            isCasting = false;
+            isReeling = false;
+            caughtFish = null;
+            currentDepth = 0;
+            
+            // Reset displays
+            fishingLine.style.height = '0';
+            fishingHook.style.top = '0';
+            depthDisplay.textContent = '0';
+            messageDisplay.textContent = '';
+            
+            // Reset buttons
+            castBtn.disabled = false;
+            reelBtn.disabled = true;
+            
+            // Create new fish
+            for (let i = 0; i < 5; i++) {
+                createFish();
+            }
+            
+            // Start fish movement
+            fishInterval = setInterval(() => {
+                document.querySelectorAll('.fish').forEach(moveFish);
+            }, 50);
+            
+            // Create bubbles
+            bubblesInterval = setInterval(createBubble, 500);
+        }
+        
+        // Event listeners
+        castBtn.addEventListener('click', castLine);
+        reelBtn.addEventListener('click', reelIn);
+        resetBtn.addEventListener('click', resetGame);
+        
+        // Initialize game
+        resetGame();
+    </script>
+</body>
+</html>

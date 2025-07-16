@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Management App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f0f5f9;
+            color: #2d3748;
+        }
+        .page {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        .active-page {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .form-input {
+            transition: all 0.3s;
+            border: 1px solid #e2e8f0;
+        }
+        .form-input:focus {
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+        }
+        .btn-primary {
+            background-color: #4299e1;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #3182ce;
+        }
+        .post-card {
+            transition: all 0.3s;
+            border: 1px solid #e2e8f0;
+        }
+        .post-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Registration Page -->
+    <div id="registration" class="page active-page p-6">
+        <h2 class="text-2xl font-bold text-center mb-6">Create Your Account</h2>
+        <form id="register-form" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <input type="text" class="form-input w-full p-2 rounded-lg" placeholder="Enter your full name" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" class="form-input w-full p-2 rounded-lg" placeholder="Enter your email" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input type="password" class="form-input w-full p-2 rounded-lg" placeholder="Create a password" required minlength="6">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                <input type="password" class="form-input w-full p-2 rounded-lg" placeholder="Confirm your password" required minlength="6">
+            </div>
+            <button type="submit" class="btn-primary w-full py-2 rounded-lg">Register</button>
+            <p class="text-center mt-4">Already have an account? <button onclick="showPage('login')" class="text-blue-600 font-medium">Login</button></p>
+        </form>
+    </div>
+
+    <!-- Login Page -->
+    <div id="login" class="page p-6">
+        <h2 class="text-2xl font-bold text-center mb-6">Login to Your Account</h2>
+        <form id="login-form" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" class="form-input w-full p-2 rounded-lg" placeholder="Enter your email" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input type="password" class="form-input w-full p-2 rounded-lg" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn-primary w-full py-2 rounded-lg">Login</button>
+            <p class="text-center mt-4">Don't have an account? <button onclick="showPage('registration')" class="text-blue-600 font-medium">Register</button></p>
+        </form>
+    </div>
+
+    <!-- Profile Page -->
+    <div id="profile" class="page p-6">
+        <h2 class="text-2xl font-bold mb-4">Your Profile</h2>
+        <button onclick="openEditProfileModal()" class="btn-primary mb-4">Edit Profile</button>
+        <div class="bg-white rounded-xl shadow-md p-4 mb-4">
+            <h3 class="font-bold">Profile Information</h3>
+            <p id="profile-name">Name: John Doe</p>
+            <p id="profile-email">Email: johndoe@example.com</p>
+        </div>
+        <h3 class="font-bold mb-2">Your Posts</h3>
+        <div id="user-posts" class="space-y-4">
+            <!-- User posts will be dynamically added here -->
+        </div>
+        <button onclick="openPostModal()" class="btn-primary mt-4">Create Post</button>
+    </div>
+
+    <!-- Courses Page -->
+    <div id="courses" class="page p-6">
+        <h2 class="text-2xl font-bold mb-4">Your Courses</h2>
+        <div id="user-courses" class="space-y-4">
+            <!-- User courses will be dynamically added here -->
+        </div>
+        <button onclick="openCourseModal()" class="btn-primary mt-4">Upload Course</button>
+    </div>
+
+    <!-- Post Modal -->
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            <span onclick="closePostModal()" class="close">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">Create a Post</h2>
+            <form id="post-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Post Content</label>
+                    <textarea class="form-input w-full p-2 rounded-lg" placeholder="What's on your mind?" required></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Upload Media</label>
+                    <input type="file" accept="image/,video/" class="form-input w-full p-2 rounded-lg" id="media-upload">
+                </div>
+                <button type="submit" class="btn-primary w-full py-2 rounded-lg">Post</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="modal">
+        <div class="modal-content">
+            <span onclick="closeEditProfileModal()" class="close">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">Edit Profile</h2>
+            <form id="edit-profile-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                    <input type="text" class="form-input w-full p-2 rounded-lg" id="edit-name" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" class="form-input w-full p-2 rounded-lg" id="edit-email" required>
+                </div>
+                <button type="submit" class="btn-primary w-full py-2 rounded-lg">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Course Modal -->
+    <div id="courseModal" class="modal">
+        <div class="modal-content">
+            <span onclick="closeCourseModal()" class="close">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">Upload Course</h2>
+            <form id="course-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Course Title</label>
+                    <input type="text" class="form-input w-full p-2 rounded-lg" id="course-title" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Upload Video</label>
+                    <input type="file" accept="video/*" class="form-input w-full p-2 rounded-lg" id="course-video" required>
+                </div>
+                <button type="submit" class="btn-primary w-full py-2 rounded-lg">Upload Course</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let userPosts = [];
+        let userCourses = [];
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active-page');
+            });
+            document.getElementById(pageId).classList.add('active-page');
+        }
+
+        document.getElementById('register-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const name = form[0].value;
+            const email = form[1].value;
+            const password = form[2].value;
+            const confirmPassword = form[3].value;
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            // Simulate user registration
+            alert('Registration successful! You can now login.');
+            showPage('login');
+        });
+
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Simulate user login
+            alert('Login successful!');
+            showPage('profile');
+        });
+
+        document.getElementById('post-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const content = e.target[0].value;
+            const media = document.getElementById('media-upload').files[0];
+
+            const post = {
+                content: content,
+                media: media ? URL.createObjectURL(media) : null,
+            };
+            userPosts.push(post);
+            displayUserPosts();
+            closePostModal();
+        });
+
+        function displayUserPosts() {
+            const postsContainer = document.getElementById('user-posts');
+            postsContainer.innerHTML = '';
+            userPosts.forEach(post => {
+                const postCard = document.createElement('div');
+                postCard.className = 'post-card p-4 rounded-lg';
+                postCard.innerHTML = `
+                    <p>${post.content}</p>
+                    ${post.media ? `<img src="${post.media}" class="w-full mt-2" />` : ''}
+                `;
+                postsContainer.appendChild(postCard);
+            });
+        }
+
+        function openPostModal() {
+            document.getElementById('postModal').style.display = 'block';
+        }
+
+        function closePostModal() {
+            document.getElementById('postModal').style.display = 'none';
+        }
+
+        function openEditProfileModal() {
+            document.getElementById('editProfileModal').style.display = 'block';
+        }
+
+        function closeEditProfileModal() {
+            document.getElementById('editProfileModal').style.display = 'none';
+        }
+
+        document.getElementById('edit-profile-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('edit-name').value;
+            const email = document.getElementById('edit-email').value;
+            document.getElementById('profile-name').innerText = "Name: " + name;
+            document.getElementById('profile-email').innerText = "Email: " + email;
+            closeEditProfileModal();
+        });
+
+        document.getElementById('course-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('course-title').value;
+            const video = document.getElementById('course-video').files[0];
+
+            const course = {
+                title: title,
+                video: video ? URL.createObjectURL(video) : null,
+            };
+            userCourses.push(course);
+            displayUserCourses();
+            closeCourseModal();
+        });
+
+        function displayUserCourses() {
+            const coursesContainer = document.getElementById('user-courses');
+            coursesContainer.innerHTML = '';
+            userCourses.forEach(course => {
+                const courseCard = document.createElement('div');
+                courseCard.className = 'post-card p-4 rounded-lg';
+                courseCard.innerHTML = `
+                    <h4>${course.title}</h4>
+                    ${course.video ? `<video controls class="w-full mt-2"><source src="${course.video}" type="video/mp4">Your browser does not support the video tag.</video>` : ''}
+                `;
+                coursesContainer.appendChild(courseCard);
+            });
+        }
+
+        function openCourseModal() {
+            document.getElementById('courseModal').style.display = 'block';
+        }
+
+        function closeCourseModal() {
+            document.getElementById('courseModal').style.display = 'none';
+        }
+
+        // Initialize showing registration page
+        showPage('registration');
+    </script>
+</body>
+</html>

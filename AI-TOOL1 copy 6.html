@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Answer Tool - Q&A + Translation + Web Search</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4895ef;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .tagline {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .input-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        #questionInput {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .btn {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .btn-secondary {
+            background: #f1f1f1;
+            color: #333;
+        }
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            border-bottom: 3px solid var(--primary);
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .answer-box {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            min-height: 100px;
+        }
+        .translation-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .translation-area {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            min-height: 100px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .search-results {
+            margin-top: 20px;
+        }
+        .result-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #eee;
+        }
+        .result-title {
+            color: var(--primary);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .result-snippet {
+            color: #666;
+            font-size: 14px;
+        }
+        .result-link {
+            color: #666;
+            font-size: 12px;
+            text-decoration: none;
+        }
+        .language-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .language-option {
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            background: #f1f1f1;
+            transition: all 0.2s;
+        }
+        .language-option.active {
+            background: var(--primary);
+            color: white;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .copy-btn {
+            background: #4CAF50;
+        }
+        .clear-btn {
+            background: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Universal Answer Tool</h1>
+        <p class="tagline">Get answers • Translate • Search the web</p>
+        
+        <div class="input-section">
+            <input type="text" id="questionInput" placeholder="Ask any question or enter text to translate...">
+            <button class="btn" id="submitBtn">Submit</button>
+        </div>
+        
+        <div class="tab-container">
+            <div class="tab active" data-tab="answer">Answer</div>
+            <div class="tab" data-tab="translate">Translate</div>
+            <div class="tab" data-tab="search">Web Search</div>
+        </div>
+        
+        <div class="tab-content active" id="answer-tab">
+            <div class="answer-box" id="answerBox">
+                <p>Your answer will appear here...</p>
+            </div>
+            <div class="action-buttons" id="answerActions" style="display: none;">
+                <button class="btn copy-btn" id="copyAnswerBtn">Copy Answer</button>
+                <button class="btn clear-btn" id="clearAnswerBtn">Clear</button>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="translate-tab">
+            <div class="language-selector">
+                <div class="language-option active" data-lang="en-hi">English → Hindi</div>
+                <div class="language-option" data-lang="hi-en">Hindi → English</div>
+            </div>
+            <div class="translation-box">
+                <div class="translation-area" id="sourceText" contenteditable="true" placeholder="Enter text here..."></div>
+                <div class="translation-area" id="translatedText" placeholder="Translation will appear here..."></div>
+            </div>
+            <div class="action-buttons">
+                <button class="btn" id="translateBtn">Translate</button>
+                <button class="btn copy-btn" id="copyTransBtn">Copy Translation</button>
+                <button class="btn clear-btn" id="clearTransBtn">Clear All</button>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="search-tab">
+            <div class="answer-box" id="searchResults">
+                <p>Web search results will appear here...</p>
+            </div>
+            <div class="action-buttons">
+                <button class="btn" id="searchBtn">Search Web</button>
+                <button class="btn clear-btn" id="clearSearchBtn">Clear Results</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const questionInput = document.getElementById('questionInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const answerBox = document.getElementById('answerBox');
+        const answerActions = document.getElementById('answerActions');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const languageOptions = document.querySelectorAll('.language-option');
+        const sourceText = document.getElementById('sourceText');
+        const translatedText = document.getElementById('translatedText');
+        const translateBtn = document.getElementById('translateBtn');
+        const searchResults = document.getElementById('searchResults');
+        const searchBtn = document.getElementById('searchBtn');
+        const copyAnswerBtn = document.getElementById('copyAnswerBtn');
+        const clearAnswerBtn = document.getElementById('clearAnswerBtn');
+        const copyTransBtn = document.getElementById('copyTransBtn');
+        const clearTransBtn = document.getElementById('clearTransBtn');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+        
+        // Variables
+        let currentLanguage = 'en-hi';
+        
+        // Initialize
+        setupEventListeners();
+        setupPlaceholders();
+        
+        function setupEventListeners() {
+            // Tabs
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+                });
+            });
+            
+            // Language options
+            languageOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    languageOptions.forEach(o => o.classList.remove('active'));
+                    option.classList.add('active');
+                    currentLanguage = option.dataset.lang;
+                });
+            });
+            
+            // Submit question
+            submitBtn.addEventListener('click', processQuestion);
+            questionInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') processQuestion();
+            });
+            
+            // Translate button
+            translateBtn.addEventListener('click', translateText);
+            
+            // Search button
+            searchBtn.addEventListener('click', searchWeb);
+            
+            // Copy buttons
+            copyAnswerBtn.addEventListener('click', () => copyToClipboard(answerBox));
+            copyTransBtn.addEventListener('click', () => copyToClipboard(translatedText));
+            
+            // Clear buttons
+            clearAnswerBtn.addEventListener('click', () => {
+                answerBox.innerHTML = '<p>Your answer will appear here...</p>';
+                answerActions.style.display = 'none';
+            });
+            clearTransBtn.addEventListener('click', () => {
+                sourceText.textContent = '';
+                translatedText.textContent = '';
+            });
+            clearSearchBtn.addEventListener('click', () => {
+                searchResults.innerHTML = '<p>Web search results will appear here...</p>';
+            });
+        }
+        
+        function setupPlaceholders() {
+            // Set up placeholder behavior for contenteditable divs
+            function handlePlaceholder(element, placeholder) {
+                element.addEventListener('focus', () => {
+                    if (element.textContent === placeholder) {
+                        element.textContent = '';
+                    }
+                });
+                
+                element.addEventListener('blur', () => {
+                    if (element.textContent === '') {
+                        element.textContent = placeholder;
+                    }
+                });
+            }
+            
+            handlePlaceholder(sourceText, 'Enter text here...');
+            handlePlaceholder(translatedText, 'Translation will appear here...');
+        }
+        
+        function processQuestion() {
+            const question = questionInput.value.trim();
+            if (!question) return alert("Please enter a question");
+            
+            // Show loading state
+            submitBtn.innerHTML = '<span class="loading"></span> Processing...';
+            submitBtn.disabled = true;
+            
+            answerBox.innerHTML = "<p>Searching for answers...</p>";
+            answerActions.style.display = 'none';
+            
+            // Simulate API call
+            setTimeout(() => {
+                const answers = {
+                    "hello": "Hello! How can I help you today?",
+                    "what is your name": "I'm an AI assistant here to help answer your questions.",
+                    "how are you": "I'm just a program, so I don't have feelings, but I'm ready to help you!",
+                    "hi": "Hi there! What would you like to know?",
+                    "क्या हाल है": "मैं एक AI सहायक हूँ, आपकी क्या मदद कर सकता हूँ?",
+                    "तुम्हारा नाम क्या है": "मैं एक AI सहायक हूँ जो आपके प्रश्नों का उत्तर देने के लिए यहां हूँ।",
+                    "what is the capital of india": "The capital of India is New Delhi.",
+                    "भारत की राजधानी क्या है": "भारत की राजधानी नई दिल्ली है।",
+                    "current time": `The current time is ${new Date().toLocaleTimeString()}.`,
+                    "today's date": `Today's date is ${new Date().toLocaleDateString()}.`
+                };
+                
+                const lowerQuestion = question.toLowerCase();
+                if (answers[lowerQuestion]) {
+                    answerBox.innerHTML = `<p>${answers[lowerQuestion]}</p>`;
+                } else {
+                    answerBox.innerHTML = `
+                        <p>I don't have a specific answer for that question. Here are some suggestions:</p>
+                        <ul>
+                            <li>Try rephrasing your question</li>
+                            <li>Check the spelling</li>
+                            <li>Use the translation tab if your question is in another language</li>
+                            <li>Search the web using the Web Search tab</li>
+                        </ul>
+                    `;
+                }
+                
+                answerActions.style.display = 'flex';
+                submitBtn.innerHTML = 'Submit';
+                submitBtn.disabled = false;
+            }, 1500);
+        }
+        
+        function translateText() {
+            const text = sourceText.textContent.trim();
+            if (!text || text === "Enter text here...") {
+                return alert("Please enter some text to translate");
+            }
+            
+            // Show loading state
+            translateBtn.innerHTML = '<span class="loading"></span> Translating...';
+            translateBtn.disabled = true;
+            
+            translatedText.textContent = "Translating...";
+            
+            // Simulate translation API call
+            setTimeout(() => {
+                const translations = {
+                    "en-hi": {
+                        "hello": "नमस्ते",
+                        "how are you": "आप कैसे हैं",
+                        "what is your name": "तुम्हारा नाम क्या है",
+                        "thank you": "धन्यवाद",
+                        "good morning": "शुभ प्रभात",
+                        "good night": "शुभ रात्रि",
+                        "i love you": "मैं तुमसे प्यार करता हूँ",
+                        "what is this": "यह क्या है",
+                        "where are you": "तुम कहाँ हो",
+                        "how much is this": "यह कितने का है"
+                    },
+                    "hi-en": {
+                        "नमस्ते": "Hello",
+                        "आप कैसे हैं": "How are you",
+                        "तुम्हारा नाम क्या है": "What is your name",
+                        "धन्यवाद": "Thank you",
+                        "शुभ प्रभात": "Good morning",
+                        "शुभ रात्रि": "Good night",
+                        "मैं तुमसे प्यार करता हूँ": "I love you",
+                        "यह क्या है": "What is this",
+                        "तुम कहाँ हो": "Where are you",
+                        "यह कितने का है": "How much is this"
+                    }
+                };
+                
+                const lowerText = text.toLowerCase();
+                if (translations[currentLanguage][lowerText]) {
+                    translatedText.textContent = translations[currentLanguage][lowerText];
+                } else {
+                    translatedText.textContent = currentLanguage === 'en-hi' 
+                        ? "इस टेक्स्ट का हिंदी अनुवाद उपलब्ध नहीं है" 
+                        : "Hindi to English translation not available";
+                }
+                
+                translateBtn.innerHTML = 'Translate';
+                translateBtn.disabled = false;
+            }, 1200);
+        }
+        
+        function searchWeb() {
+            const query = questionInput.value.trim();
+            if (!query) return alert("Please enter something to search");
+            
+            // Show loading state
+            searchBtn.innerHTML = '<span class="loading"></span> Searching...';
+            searchBtn.disabled = true;
+            
+            searchResults.innerHTML = "<p>Searching the web for information...</p>";
+            
+            // Simulate web search API call
+            setTimeout(() => {
+                const searchData = {
+                    "capital of india": {
+                        title: "Capital of India - Wikipedia",
+                        snippet: "New Delhi is the capital of India and a part of the National Capital Territory of Delhi.",
+                        link: "https://en.wikipedia.org/wiki/New_Delhi"
+                    },
+                    "current president of india": {
+                        title: "President of India - Official Website",
+                        snippet: "The current President of India is Droupadi Murmu, serving since 25 July 2022.",
+                        link: "https://presidentofindia.nic.in/"
+                    },
+                    "weather today": {
+                        title: "Weather Forecast - IMD",
+                        snippet: "Get the latest weather forecast for your location from the India Meteorological Department.",
+                        link: "https://mausam.imd.gov.in/"
+                    }
+                };
+                
+                const lowerQuery = query.toLowerCase();
+                if (searchData[lowerQuery]) {
+                    const result = searchData[lowerQuery];
+                    searchResults.innerHTML = `
+                        <div class="result-item">
+                            <div class="result-title">${result.title}</div>
+                            <div class="result-snippet">${result.snippet}</div>
+                            <a href="${result.link}" class="result-link" target="_blank">${result.link}</a>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-title">More results for: ${query}</div>
+                            <div class="result-snippet">In a real implementation, this would show actual search results from Google or another search engine API.</div>
+                        </div>
+                    `;
+                } else {
+                    searchResults.innerHTML = `
+                        <div class="result-item">
+                            <div class="result-title">Search results for: ${query}</div>
+                            <div class="result-snippet">This is a simulated search result. In a real application, this would show actual web search results from Google or another search engine API.</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-title">How to implement web search in JavaScript</div>
+                            <div class="result-snippet">In a real implementation, you would need to use a search API like Google Custom Search API to get actual web results.</div>
+                        </div>
+                    `;
+                }
+                
+                searchBtn.innerHTML = 'Search Web';
+                searchBtn.disabled = false;
+            }, 1800);
+        }
+        
+        function copyToClipboard(element) {
+            const range = document.createRange();
+            range.selectNode(element);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            document.execCommand('copy');
+            window.getSelection().removeAllRanges();
+            
+            // Show copied feedback
+            const originalText = element === translatedText ? copyTransBtn.textContent : copyAnswerBtn.textContent;
+            if (element === translatedText) {
+                copyTransBtn.textContent = 'Copied!';
+                setTimeout(() => copyTransBtn.textContent = originalText, 2000);
+            } else {
+                copyAnswerBtn.textContent = 'Copied!';
+                setTimeout(() => copyAnswerBtn.textContent = originalText, 2000);
+            }
+        }
+    </script>
+</body>
+</html>

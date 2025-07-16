@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Application - Injection Attack Protection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .security-badge {
+            position: relative;
+            overflow: hidden;
+        }
+        .security-badge::after {
+            content: "SECURE";
+            position: absolute;
+            top: -10px;
+            right: -30px;
+            background: #10B981;
+            color: white;
+            font-weight: bold;
+            padding: 5px 40px;
+            transform: rotate(45deg);
+            font-size: 0.8rem;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        .attack-simulation {
+            transition: all 0.3s ease;
+        }
+        .attack-simulation:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="mb-8 text-center">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Website Builder Tool</h1>
+            <p class="text-lg text-gray-600">Create professional websites instantly with our generator</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Website Template Section -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center mb-4">
+                    <div class="bg-purple-100 p-3 rounded-full mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-semibold text-gray-800">Website Templates</h2>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="border rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition" onclick="selectTemplate('business')">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/4b1bc0ff-11d8-4dd9-b317-b7123150a34b.png" class="w-full" alt="Professional business template">
+                        <div class="p-2 text-center">Business</div>
+                    </div>
+                    <div class="border rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition" onclick="selectTemplate('portfolio')">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/dab4c022-5a73-4138-8dd8-5a869aa4e081.png" class="w-full" alt="Creative portfolio template">
+                        <div class="p-2 text-center">Portfolio</div>
+                    </div>
+                    <div class="border rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition" onclick="selectTemplate('ecommerce')">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/4bc1ffdc-9779-43ba-8915-b68bd814dfc1.png" class="w-full" alt="Online store template">
+                        <div class="p-2 text-center">E-commerce</div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Website Title:</label>
+                    <input type="text" id="websiteTitle" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="My Awesome Website">
+                </div>
+                
+                <button onclick="generateWebsite()" class="w-full px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold">Generate Website</button>
+            </div>
+
+            <!-- Website Preview Section -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center mb-4">
+                    <div class="bg-blue-100 p-3 rounded-full mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-semibold text-gray-800">Website Preview</h2>
+                </div>
+                
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 h-96 overflow-auto">
+                    <div id="websitePreview" class="min-h-full flex items-center justify-center text-gray-500">
+                        <p>Select a template and click Generate to see preview</p>
+                    </div>
+                </div>
+                
+                <div class="mt-4 flex justify-between">
+                    <button onclick="downloadHTML()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Download HTML</button>
+                    <button onclick="copyToClipboard()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">Copy Code</button>
+                </div>
+            </div>
+
+            <!-- Attack Simulation Section -->
+            <div class="md:col-span-2 bg-white rounded-lg shadow-md p-6 attack-simulation">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Attack Simulation</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="border rounded-lg p-4">
+                        <h3 class="font-semibold mb-2 text-red-600">Vulnerable Version</h3>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 mb-2">Enter malicious input:</label>
+                            <input type="text" id="maliciousInput" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" placeholder="Try XSS or SQL injection">
+                            <button onclick="simulateAttack(true)" class="mt-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">Attack</button>
+                        </div>
+                        <div id="vulnerableResult" class="bg-red-50 p-3 rounded border border-red-200"></div>
+                    </div>
+                    
+                    <div class="border rounded-lg p-4">
+                        <h3 class="font-semibold mb-2 text-green-600">Secure Version</h3>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 mb-2">Same malicious input:</label>
+                            <input type="text" id="secureInput" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Same input as left">
+                            <button onclick="simulateAttack(false)" class="mt-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">Protect</button>
+                        </div>
+                        <div id="secureResult" class="bg-green-50 p-3 rounded border border-green-200"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Best Practices -->
+            <div class="md:col-span-2 bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Security Best Practices</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="border-l-4 border-blue-500 pl-4 py-2">
+                        <h3 class="font-semibold text-lg mb-2">Input Validation</h3>
+                        <p class="text-gray-600">Always validate and sanitize user inputs on both client and server sides.</p>
+                    </div>
+                    <div class="border-l-4 border-purple-500 pl-4 py-2">
+                        <h3 class="font-semibold text-lg mb-2">Output Encoding</h3>
+                        <p class="text-gray-600">Encode data before rendering it in HTML, JavaScript, or other contexts.</p>
+                    </div>
+                    <div class="border-l-4 border-green-500 pl-4 py-2">
+                        <h3 class="font-semibold text-lg mb-2">Least Privilege</h3>
+                        <p class="text-gray-600">Database accounts should have the minimum permissions needed.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // XSS Protection Demo
+        function testXSS() {
+            const userInput = document.getElementById('xssInput').value;
+            const safeOutput = document.getElementById('safeOutput');
+            
+            // Vulnerable version (comment out to see the difference)
+            // safeOutput.innerHTML = userInput;
+            
+            // Secure version - using textContent instead of innerHTML
+            safeOutput.textContent = userInput;
+            
+            // Alternative secure method - HTML entity encoding
+            // safeOutput.innerHTML = encodeHTML(userInput);
+        }
+        
+        // HTML Entity Encoding
+        function encodeHTML(str) {
+            return str.replace(/[\u00A0-\u9999<>&]/gim, function(i) {
+                return '&#' + i.charCodeAt(0) + ';';
+            });
+        }
+        
+        // SQL Injection Protection Demo
+        function testSQLInjection() {
+            const userInput = document.getElementById('sqlInput').value;
+            const safeQuery = document.getElementById('safeQuery');
+            
+            // Vulnerable version
+            // const vulnerableQuery = SELECT * FROM users WHERE username = '${userInput}' AND password = '...';
+            
+            // Secure version - using parameterized query
+            const secureQuery =` SELECT * FROM users WHERE username = ? AND password = ?`;
+            
+            safeQuery.textContent =` Parameterized Query: ${secureQuery}\n`;
+            safeQuery.textContent += `Parameters: ['${userInput}', '...']`;
+            
+            // Additional protection - input validation
+            if (userInput.includes("'") || userInput.includes("--") || userInput.includes(";")) {
+                safeQuery.textContent += "\n\nWarning: Suspicious characters detected!";
+            }
+        }
+        
+        // Attack Simulation
+        function simulateAttack(isVulnerable) {
+            const input = isVulnerable 
+                ? document.getElementById('maliciousInput').value 
+                : document.getElementById('secureInput').value;
+            
+            const resultDiv = isVulnerable 
+                ? document.getElementById('vulnerableResult') 
+                : document.getElementById('secureResult');
+            
+            if (isVulnerable) {
+                // Vulnerable version - directly using innerHTML
+                resultDiv.innerHTML = `Vulnerable output: ${input}`;
+            } else {
+                // Secure version - using textContent
+                resultDiv.textContent = `Safe output: ${input}`;
+                
+                // Additional security measures
+                if (input.includes('<script>') || input.includes('alert(')) {
+                    resultDiv.textContent += '\n\nSecurity Alert: Potentially malicious script detected and neutralized!';
+                }
+            }
+        }
+        
+        // Content Security Policy (CSP) - This would typically be set in HTTP headers
+        // For demo purposes, we're showing what a CSP might look like
+        function showCSP() {
+            alert("Example CSP Header:\n\n" +
+                "Content-Security-Policy: " +
+                "default-src 'self'; " +
+                "script-src 'self' https://trusted.cdn.com; " +
+                "style-src 'self' 'unsafe-inline'; " +
+                "img-src 'self' data:; " +
+                "object-src 'none'");
+        }
+    </script>
+</body>
+</html>

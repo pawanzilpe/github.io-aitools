@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Face Scan Analysis</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            width: 90%;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        
+        .scan-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 640px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        #video {
+            width: 100%;
+            display: block;
+            background-color: #000;
+        }
+        
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            max-width: 640px;
+        }
+        
+        #canvas {
+            width: 100%;
+            display: block;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        button {
+            padding: 12px 25px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        #stopBtn {
+            background-color: #f44336;
+        }
+        
+        #stopBtn:hover {
+            background-color: #d32f2f;
+        }
+        
+        .results {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .results h2 {
+            margin-top: 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 10px;
+        }
+        
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .analysis-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .analysis-card h3 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .spinner {
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top: 5px solid #4CAF50;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .face-points {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        .face-point {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: red;
+            border-radius: 50%;
+            transform: translate(-3px, -3px);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .analysis-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Face Scan Analysis</h1>
+        
+        <div class="scan-section">
+            <div class="video-container">
+                <video id="video" autoplay playsinline></video>
+                <div class="face-points" id="facePoints"></div>
+            </div>
+            
+            <div class="canvas-container">
+                <canvas id="canvas"></canvas>
+            </div>
+            
+            <div class="controls">
+                <button id="startBtn">Start Camera</button>
+                <button id="stopBtn" disabled>Stop Camera</button>
+                <button id="captureBtn" disabled>Scan Face</button>
+                <button id="resetBtn" disabled>Reset</button>
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Analyzing facial features...</p>
+        </div>
+        
+        <div class="results" id="results">
+            <h2>Face Analysis Results</h2>
+            <div class="analysis-grid" id="analysisResults">
+                <!-- Results will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const facePoints = document.getElementById('facePoints');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const captureBtn = document.getElementById('captureBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+        const analysisResults = document.getElementById('analysisResults');
+        
+        // Face detection variables
+        let stream = null;
+        let faceDetector = null;
+        let animationId = null;
+        
+        // Initialize face detector (using a polyfill for demonstration)
+        async function initFaceDetector() {
+            // In a real app, you would use the Face Detection API or a library like face-api.js
+            // For this demo, we'll simulate face detection
+            return {
+                detect: async (img) => {
+                    // Simulate face detection with random delay
+                    await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 700));
+                    
+                    // Return mock face data
+                    const width = img.width || video.videoWidth;
+                    const height = img.height || video.videoHeight;
+                    
+                    return [{
+                        boundingBox: {
+                            x: width * 0.25,
+                            y: height * 0.25,
+                            width: width * 0.5,
+                            height: width * 0.5,
+                            top: height * 0.25,
+                            right: width * 0.75,
+                            bottom: height * 0.75,
+                            left: width * 0.25
+                        },
+                        landmarks: Array(68).fill(0).map((_, i) => {
+                            return {
+                                x: width * 0.25 + Math.sin(i/10) * width * 0.2 + width * 0.1,
+                                y: height * 0.25 + Math.cos(i/10) * width * 0.2 + width * 0.1
+                            };
+                        })
+                    }];
+                }
+            };
+        }
+        
+        // Start camera
+        startBtn.addEventListener('click', async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: 'user' 
+                    },
+                    audio: false 
+                });
+                
+                video.srcObject = stream;
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                captureBtn.disabled = false;
+                
+                // Initialize face detector when camera starts
+                faceDetector = await initFaceDetector();
+                
+                // Start face detection
+                detectFaces();
+            } catch (err) {
+                console.error("Error accessing camera:", err);
+                alert("Could not access the camera. Please ensure you've granted camera permissions.");
+            }
+        });
+        
+        // Stop camera
+        stopBtn.addEventListener('click', () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+                stream = null;
+                
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+                
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+                captureBtn.disabled = true;
+                resetBtn.disabled = true;
+                
+                facePoints.innerHTML = '';
+            }
+        });
+        
+        // Capture and analyze face
+        captureBtn.addEventListener('click', async () => {
+            if (!stream) return;
+            
+            // Show loading
+            loading.style.display = 'block';
+            results.style.display = 'none';
+            
+            // Capture current frame
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Simulate face analysis (in a real app, this would call your AI model)
+            setTimeout(() => {
+                analyzeFace(canvas);
+                loading.style.display = 'none';
+                results.style.display = 'block';
+                resetBtn.disabled = false;
+            }, 2000);
+        });
+        
+        // Reset analysis
+        resetBtn.addEventListener('click', () => {
+            results.style.display = 'none';
+            analysisResults.innerHTML = '';
+            resetBtn.disabled = true;
+        });
+        
+        // Face detection function
+        async function detectFaces() {
+            if (!faceDetector || !video.videoWidth) {
+                animationId = requestAnimationFrame(detectFaces);
+                return;
+            }
+            
+            try {
+                const faces = await faceDetector.detect(video);
+                renderFacePoints(faces);
+            } catch (err) {
+                console.error("Face detection error:", err);
+            }
+            
+            animationId = requestAnimationFrame(detectFaces);
+        }
+        
+        // Render face landmarks
+        function renderFacePoints(faces) {
+            facePoints.innerHTML = '';
+            
+            if (faces.length === 0) return;
+            
+            const face = faces[0];
+            const videoRect = video.getBoundingClientRect();
+            const scaleX = video.videoWidth / videoRect.width;
+            const scaleY = video.videoHeight / videoRect.height;
+            
+            // Draw landmarks
+            face.landmarks.forEach(point => {
+                const dot = document.createElement('div');
+                dot.className = 'face-point';
+                dot.style.left = `${point.x / scaleX}px`;
+                dot.style.top = `${point.y / scaleY}px`;
+                facePoints.appendChild(dot);
+            });
+        }
+        
+        // Analyze face features
+        function analyzeFace(image) {
+            // In a real app, this would use a proper face analysis AI model
+            // Here we'll generate mock analysis results
+            
+            analysisResults.innerHTML = `
+                <div class="analysis-card">
+                    <h3>Basic Information</h3>
+                    <p><strong>Gender:</strong> ${Math.random() > 0.5 ? 'Male' : 'Female'}</p>
+                    <p><strong>Approximate Age:</strong> ${Math.floor(18 + Math.random() * 40)} years</p>
+                    <p><strong>Ethnicity:</strong> ${['Asian', 'Caucasian', 'African', 'Hispanic', 'Indian'][Math.floor(Math.random() * 5)]}</p>
+                </div>
+                
+                <div class="analysis-card">
+                    <h3>Facial Features</h3>
+                    <p><strong>Eye Color:</strong> ${['Brown', 'Blue', 'Green', 'Hazel'][Math.floor(Math.random() * 4)]}</p>
+                    <p><strong>Face Shape:</strong> ${['Oval', 'Round', 'Square', 'Heart'][Math.floor(Math.random() * 4)]}</p>
+                    <p><strong>Facial Symmetry:</strong> ${(80 + Math.random() * 20).toFixed(1)}%</p>
+                </div>
+                
+                <div class="analysis-card">
+                    <h3>Emotion Analysis</h3>
+                    <p><strong>Primary Emotion:</strong> ${['Happy', 'Neutral', 'Surprised', 'Angry'][Math.floor(Math.random() * 4)]}</p>
+                    <p><strong>Smile Intensity:</strong> ${(Math.random() * 100).toFixed(1)}%</p>
+                    <p><strong>Confidence Level:</strong> ${(80 + Math.random() * 20).toFixed(1)}%</p>
+                </div>
+                
+                <div class="analysis-card">
+                    <h3>Additional Metrics</h3>
+                    <p><strong>Skin Tone:</strong> ${['Fair', 'Light', 'Medium', 'Olive', 'Dark'][Math.floor(Math.random() * 5)]}</p>
+                    <p><strong>Face Width/Height Ratio:</strong> ${(0.6 + Math.random() * 0.3).toFixed(2)}</p>
+                    <p><strong>Eye Distance Ratio:</strong> ${(0.3 + Math.random() * 0.2).toFixed(2)}</p>
+                </div>
+            `;
+        }
+        
+        // Clean up on page unload
+        window.addEventListener('beforeunload', () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+        });
+    </script>
+</body>
+</html>

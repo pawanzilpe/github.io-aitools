@@ -1,0 +1,2006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeLearn - Programming Education Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Auth Pages */
+        .auth-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .auth-left {
+            flex: 1;
+            background: linear-gradient(135deg, #4a00e0, #8e2de2);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .auth-left h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .auth-left p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .auth-right {
+            flex: 1;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .auth-form {
+            max-width: 400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .auth-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #777;
+        }
+
+        .auth-tab.active {
+            color: #4a00e0;
+            border-bottom: 2px solid #4a00e0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #4a00e0;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #777;
+        }
+
+        .auth-footer a {
+            color: #4a00e0;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* App Layout */
+        .app-header {
+            background-color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4a00e0;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 20px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin-left: 15px;
+            cursor: pointer;
+        }
+
+        /* Main App Content */
+        .app-main {
+            display: flex;
+            margin-top: 70px;
+        }
+
+        .app-sidebar {
+            width: 250px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-right: 20px;
+            position: fixed;
+            height: calc(100vh - 90px);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .menu-item {
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .menu-item.active {
+            background-color: #f0f0ff;
+            color: #4a00e0;
+            font-weight: 600;
+        }
+
+        .menu-item:hover:not(.active) {
+            background-color: #f9f9f9;
+        }
+
+        .app-content {
+            flex: 1;
+            margin-left: 270px;
+        }
+
+        /* Home Page */
+        .welcome-banner {
+            background: linear-gradient(135deg, #4a00e0, #8e2de2);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .welcome-banner h2 {
+            margin-bottom: 10px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .see-all {
+            font-size: 14px;
+            color: #4a00e0;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .course-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .course-image {
+            height: 160px;
+            background-color: #eee;
+            position: relative;
+        }
+
+        .course-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #4a00e0;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .course-details {
+            padding: 15px;
+        }
+
+        .course-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .course-instructor {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .course-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .special-offer {
+            background-color: #fff8e6;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            border-radius: 0 6px 6px 0;
+            margin-bottom: 30px;
+        }
+
+        .special-offer h3 {
+            color: #ff9800;
+            margin-bottom: 10px;
+        }
+
+        /* Courses Page */
+        .course-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .category-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-icon {
+            font-size: 30px;
+            color: #4a00e0;
+            margin-bottom: 10px;
+        }
+
+        .category-title {
+            font-weight: 600;
+        }
+
+        .language-courses {
+            margin-top: 40px;
+        }
+
+        /* Videos Page */
+        .video-filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .filter-btn.active {
+            background-color: #4a00e0;
+            color: white;
+            border-color: #4a00e0;
+        }
+
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .video-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .video-thumbnail {
+            height: 180px;
+            background-color: #eee;
+            position: relative;
+        }
+
+        .video-duration {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .video-info {
+            padding: 15px;
+        }
+
+        .video-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .video-author {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .author-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin-right: 10px;
+        }
+
+        .video-stats {
+            display: flex;
+            justify-content: space-between;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .upload-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #4a00e0;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .upload-btn i {
+            margin-right: 8px;
+        }
+
+        /* Activity Page */
+        .activity-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .activity-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #777;
+        }
+
+        .activity-tab.active {
+            color: #4a00e0;
+            border-bottom: 2px solid #4a00e0;
+        }
+
+        .activity-list {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .activity-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-user {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .activity-text {
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .activity-time {
+            font-size: 12px;
+            color: #777;
+        }
+
+        /* Profile Page */
+        .profile-header {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin-right: 30px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .edit-avatar {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background-color: #4a00e0;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .profile-info h2 {
+            margin-bottom: 5px;
+        }
+
+        .profile-bio {
+            color: #555;
+            margin-bottom: 15px;
+            max-width: 600px;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .edit-profile-btn {
+            background-color: #f0f0f0;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .edit-profile-btn i {
+            margin-right: 8px;
+        }
+
+        .profile-content {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 20px;
+        }
+
+        .profile-sidebar {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+        }
+
+        .sidebar-section {
+            margin-bottom: 25px;
+        }
+
+        .sidebar-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            color: #555;
+            text-decoration: none;
+        }
+
+        .sidebar-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-link:hover {
+            color: #4a00e0;
+        }
+
+        .profile-posts {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .post-form {
+            margin-bottom: 30px;
+        }
+
+        .post-input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            resize: none;
+            font-size: 16px;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .post-action-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #777;
+            padding: 8px 15px;
+            border-radius: 6px;
+        }
+
+        .post-action-btn:hover {
+            background-color: #f5f5f5;
+        }
+
+        .post-submit {
+            background-color: #4a00e0;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .user-posts {
+            margin-top: 30px;
+        }
+
+        .post {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .post:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin-right: 10px;
+        }
+
+        .post-user {
+            font-weight: 600;
+        }
+
+        .post-time {
+            font-size: 13px;
+            color: #777;
+            margin-top: 2px;
+        }
+
+        .post-content {
+            margin-bottom: 15px;
+        }
+
+        .post-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .post-video {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .post-stats {
+            display: flex;
+            justify-content: space-between;
+            color: #777;
+            margin-bottom: 10px;
+        }
+
+        .post-actions {
+            display: flex;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            padding: 8px 0;
+            margin-bottom: 15px;
+        }
+
+        .post-action {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .post-action:hover {
+            background-color: #f5f5f5;
+        }
+
+        .post-action i {
+            margin-right: 8px;
+        }
+
+        /* Course Detail Page */
+        .course-header {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .course-title {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .course-meta {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            color: #777;
+        }
+
+        .course-instructor {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+
+        .instructor-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin-right: 10px;
+        }
+
+        .course-rating {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+
+        .course-rating i {
+            color: #ffc107;
+            margin-right: 5px;
+        }
+
+        .course-enroll-btn {
+            background-color: #4a00e0;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .course-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .course-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #777;
+        }
+
+        .course-tab.active {
+            color: #4a00e0;
+            border-bottom: 2px solid #4a00e0;
+        }
+
+        .course-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .course-description {
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .syllabus-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .syllabus-item:last-child {
+            border-bottom: none;
+        }
+
+        .syllabus-title {
+            font-weight: 600;
+        }
+
+        .syllabus-duration {
+            color: #777;
+            font-size: 14px;
+        }
+
+        /* Code Editor */
+        .code-editor {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .editor-header {
+            background-color: #f5f5f5;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .editor-title {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .editor-actions button {
+            background-color: #4a00e0;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        .editor-content {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: auto;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .app-sidebar {
+                width: 200px;
+            }
+            .app-content {
+                margin-left: 220px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .auth-container {
+                flex-direction: column;
+            }
+            .auth-left {
+                padding: 30px 20px;
+            }
+            .app-sidebar {
+                display: none;
+            }
+            .app-content {
+                margin-left: 0;
+            }
+            .profile-content {
+                grid-template-columns: 1fr;
+            }
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .profile-avatar {
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+            .profile-stats {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .search-bar {
+                margin: 15px 0;
+                width: 100%;
+            }
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+            .videos-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Auth Pages -->
+    <div id="authPages">
+        <div class="auth-container">
+            <div class="auth-left">
+                <h1>Welcome to CodeLearn</h1>
+                <p>Master programming languages with our interactive courses, video tutorials, and coding exercises. Join our community of learners and developers today.</p>
+            </div>
+            <div class="auth-right">
+                <div class="auth-form">
+                    <div class="auth-tabs">
+                        <div class="auth-tab active" id="loginTab">Login</div>
+                        <div class="auth-tab" id="registerTab">Register</div>
+                    </div>
+                    
+                    <!-- Login Form -->
+                    <form id="loginForm" style="display: block;">
+                        <div class="form-group">
+                            <label for="loginEmail">Email</label>
+                            <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                        </div>
+                        <button type="submit" class="auth-btn">Login</button>
+                        <div class="auth-footer">
+                            Forgot password? <a href="#">Reset here</a>
+                        </div>
+                    </form>
+                    
+                    <!-- Register Form -->
+                    <form id="registerForm" style="display: none;">
+                        <div class="form-group">
+                            <label for="registerName">Full Name</label>
+                            <input type="text" id="registerName" placeholder="Enter your full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerEmail">Email</label>
+                            <input type="email" id="registerEmail" placeholder="Enter your email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerUsername">Username</label>
+                            <input type="text" id="registerUsername" placeholder="Choose a username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerPassword">Password</label>
+                            <input type="password" id="registerPassword" placeholder="Create a password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerConfirm">Confirm Password</label>
+                            <input type="password" id="registerConfirm" placeholder="Confirm your password" required>
+                        </div>
+                        <button type="submit" class="auth-btn">Register</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Layout (Initially Hidden) -->
+    <div id="appLayout" style="display: none;">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="container header-container">
+                <div class="logo">
+                    <i class="fas fa-code"></i>
+                    <span>CodeLearn</span>
+                </div>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search courses, videos, tutorials...">
+                </div>
+                <div class="user-menu">
+                    <i class="fas fa-bell" style="font-size: 20px; color: #555; cursor: pointer;"></i>
+                    <div class="user-avatar" id="userAvatar"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="container app-main">
+            <!-- Sidebar -->
+            <div class="app-sidebar">
+                <ul class="sidebar-menu">
+                    <li class="menu-item active" data-page="homePage">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                    </li>
+                    <li class="menu-item" data-page="coursesPage">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Courses</span>
+                    </li>
+                    <li class="menu-item" data-page="videosPage">
+                        <i class="fas fa-video"></i>
+                        <span>Videos</span>
+                    </li>
+                    <li class="menu-item" data-page="activityPage">
+                        <i class="fas fa-heart"></i>
+                        <span>Activity</span>
+                    </li>
+                    <li class="menu-item" data-page="profilePage">
+                        <i class="fas fa-user"></i>
+                        <span>Profile</span>
+                    </li>
+                    <li class="menu-item">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </li>
+                    <li class="menu-item">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Help</span>
+                    </li>
+                    <li class="menu-item" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Content Area -->
+            <div class="app-content">
+                <!-- Home Page -->
+                <div class="app-page" id="homePage" style="display: block;">
+                    <div class="welcome-banner">
+                        <h2>Welcome back, User!</h2>
+                        <p>Continue your learning journey with our latest courses and tutorials.</p>
+                    </div>
+
+                    <div class="special-offer">
+                        <h3>Special Offer!</h3>
+                        <p>Get 50% off on all annual subscriptions. Limited time offer!</p>
+                    </div>
+
+                    <h2 class="section-title">
+                        Recommended Courses
+                        <a href="#" class="see-all">See all</a>
+                    </h2>
+                    <div class="courses-grid">
+                        <div class="course-card">
+                            <div class="course-image">
+                                <div class="course-badge">New</div>
+                            </div>
+                            <div class="course-details">
+                                <div class="course-title">Python for Beginners</div>
+                                <div class="course-instructor">By John Smith</div>
+                                <div class="course-meta">
+                                    <span>12 Lessons</span>
+                                    <span>4.8 ★</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="course-card">
+                            <div class="course-image"></div>
+                            <div class="course-details">
+                                <div class="course-title">JavaScript Fundamentals</div>
+                                <div class="course-instructor">By Sarah Johnson</div>
+                                <div class="course-meta">
+                                    <span>18 Lessons</span>
+                                    <span>4.7 ★</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="course-card">
+                            <div class="course-image"></div>
+                            <div class="course-details">
+                                <div class="course-title">Web Development Bootcamp</div>
+                                <div class="course-instructor">By Mike Davis</div>
+                                <div class="course-meta">
+                                    <span>30 Lessons</span>
+                                    <span>4.9 ★</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2 class="section-title">
+                        Trending Videos
+                        <a href="#" class="see-all">See all</a>
+                    </h2>
+                    <div class="videos-grid">
+                        <div class="video-card">
+                            <div class="video-thumbnail">
+                                <div class="video-duration">12:45</div>
+                            </div>
+                            <div class="video-info">
+                                <div class="video-title">Python Functions Explained</div>
+                                <div class="video-author">
+                                    <div class="author-avatar"></div>
+                                    <span>John Smith</span>
+                                </div>
+                                <div class="video-stats">
+                                    <span>15K views</span>
+                                    <span>2 days ago</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="video-card">
+                            <div class="video-thumbnail">
+                                <div class="video-duration">18:30</div>
+                            </div>
+                            <div class="video-info">
+                                <div class="video-title">React Hooks Tutorial</div>
+                                <div class="video-author">
+                                    <div class="author-avatar"></div>
+                                    <span>Sarah Johnson</span>
+                                </div>
+                                <div class="video-stats">
+                                    <span>28K views</span>
+                                    <span>1 week ago</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="video-card">
+                            <div class="video-thumbnail">
+                                <div class="video-duration">22:15</div>
+                            </div>
+                            <div class="video-info">
+                                <div class="video-title">CSS Grid Layout</div>
+                                <div class="video-author">
+                                    <div class="author-avatar"></div>
+                                    <span>Mike Davis</span>
+                                </div>
+                                <div class="video-stats">
+                                    <span>42K views</span>
+                                    <span>3 weeks ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Courses Page -->
+                <div class="app-page" id="coursesPage">
+                    <h2 class="section-title">Browse Categories</h2>
+                    <div class="course-categories">
+                        <div class="category-card">
+                            <div class="category-icon">
+                                <i class="fab fa-python"></i>
+                            </div>
+                            <div class="category-title">Python</div>
+                        </div>
+                        <div class="category-card">
+                            <div class="category-icon">
+                                <i class="fab fa-js"></i>
+                            </div>
+                            <div class="category-title">JavaScript</div>
+                        </div>
+                        <div class="category-card">
+                            <div class="category-icon">
+                                <i class="fab fa-java"></i>
+                            </div>
+                            <div class="category-title">Java</div>
+                        </div>
+                        <div class="category-card">
+                            <div class="category-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div class="category-title">SQL</div>
+                        </div>
+                        <div class="category-card">
+                            <div class="category-icon">
+                                <i class="fab fa-html5"></i>
+                            </div>
+                            <div class="category-title">Web Dev</div>
+                        </div>
+                        <div class="category-card">
+                            <div class="category-icon">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <div class="category-title">Mobile</div>
+                        </div>
+                    </div>
+
+                    <div class="language-courses">
+                        <h2 class="section-title">
+                            Python Courses
+                            <a href="#" class="see-all">See all</a>
+                        </h2>
+                        <div class="courses-grid">
+                            <div class="course-card" data-course="pythonBeginner">
+                                <div class="course-image"></div>
+                                <div class="course-details">
+                                    <div class="course-title">Python for Beginners</div>
+                                    <div class="course-instructor">By John Smith</div>
+                                    <div class="course-meta">
+                                        <span>12 Lessons</span>
+                                        <span>4.8 ★</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="course-card">
+                                <div class="course-image"></div>
+                                <div class="course-details">
+                                    <div class="course-title">Python Data Science</div>
+                                    <div class="course-instructor">By Sarah Johnson</div>
+                                    <div class="course-meta">
+                                        <span>16 Lessons</span>
+                                        <span>4.7 ★</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="course-card">
+                                <div class="course-image"></div>
+                                <div class="course-details">
+                                    <div class="course-title">Django Web Framework</div>
+                                    <div class="course-instructor">By Mike Davis</div>
+                                    <div class="course-meta">
+                                        <span>20 Lessons</span>
+                                        <span>4.9 ★</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="language-courses">
+                        <h2 class="section-title">
+                            JavaScript Courses
+                            <a href="#" class="see-all">See all</a>
+                        </h2>
+                        <div class="courses-grid">
+                            <div class="course-card">
+                                <div class="course-image"></div>
+                                <div class="course-details">
+                                    <div class="course-title">JavaScript Fundamentals</div>
+                                    <div class="course-instructor">By Sarah Johnson</div>
+                                    <div class="course-meta">
+                                        <span>18 Lessons</span>
+                                        <span>4.7 ★</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="course-card">
+                                <div class="course-image"></div>
+                                <div class="course-details">
+                                    <div class="course-title">React Masterclass</div>
+                                    <div class="course-instructor">By John Smith</div>
+                                    <div class="course-meta">
+                                        <span>24 Lessons</span>
+                                        <span>4.8 ★</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="course-card">
+                                <div class="course-image"></div>
+                                <div class="course-details">
+                                    <div class="course-title">Node.js Backend</div>
+                                    <div class="course-instructor">By Mike Davis</div>
+                                    <div class="course-meta">
+                                        <span>15 Lessons</span>
+                                        <span>4.6 ★</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Videos Page -->
+                <div class="app-page" id="videosPage">
+                    <button class="upload-btn">
+                        <i class="fas fa-upload"></i> Upload Video
+                    </button>
+
+                    <div class="video-filters">
+                        <button class="filter-btn active">All</button>
+                        <button class="filter-btn">Python</button>
+                        <button class="filter-btn">JavaScript</button>
+                        <button class="filter-btn">Web Dev</button>
+                        <button class="filter-btn">Mobile</button>
+                    </div>
+
+                    <h2 class="section-title">
+                        Popular Videos
+                        <a href="#" class="see-all">See all</a>
+                    </h2>
+                    <div class="videos-grid">
+                        <div class="video-card">
+                            <div class="video-thumbnail">
+                                <div class="video-duration">12:45</div>
+                            </div>
+                            <div class="video-info">
+                                <div class="video-title">Python Functions Explained</div>
+                                <div class="video-author">
+                                    <div class="author-avatar"></div>
+                                    <span>John Smith</span>
+                                </div>
+                                <div class="video-stats">
+                                    <span>15K views</span>
+                                    <span>2 days ago</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="video-card">
+                            <div class="video-thumbnail">
+                                <div class="video-duration">18:30</div>
+                            </div>
+                            <div class="video-info">
+                                <div class="video-title">React Hooks Tutorial</div>
+                                <div class="video-author">
+                                    <div class="author-avatar"></div>
+                                    <span>Sarah Johnson</span>
+                                </div>
+                                <div class="video-stats">
+                                    <span>28K views</span>
+                                    <span>1 week ago</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="video-card">
+                            <div class="video-thumbnail">
+                                <div class="video-duration">22:15</div>
+                            </div>
+                            <div class="video-info">
+                                <div class="video-title">CSS Grid Layout</div>
+                                <div class="video-author">
+                                    <div class="author-avatar"></div>
+                                    <span>Mike Davis</span>
+                                </div>
+                                <div class="video-stats">
+                                    <span>42K views</span>
+                                    <span>3 weeks ago</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="video-card">
+                            <div class="video-thumbnail">
+                                <div class="video-duration">15:20</div>
+                            </div>
+                            <div class="video-info">
+                                <div class="video-title">Python OOP Concepts</div>
+                                <div class="video-author">
+                                    <div class="author-avatar"></div>
+                                    <span>John Smith</span>
+                                </div>
+                                <div class="video-stats">
+                                    <span>35K views</span>
+                                    <span>1 month ago</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="video-card">
+                            <div class="video-thumbnail">
+                                <div class="video-duration">25:10</div>
+                            </div>
+                            <div class="video-info">
+                                <div class="video-title">JavaScript ES6 Features</div>
+                                <div class="video-author">
+                                    <div class="author-avatar"></div>
+                                    <span>Sarah Johnson</span>
+                                </div>
+                                <div class="video-stats">
+                                    <span>50K views</span>
+                                    <span>2 months ago</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="video-card">
+                            <div class="video-thumbnail">
+                                <div class="video-duration">10:45</div>
+                            </div>
+                            <div class="video-info">
+                                <div class="video-title">Flask Web Framework</div>
+                                <div class="video-author">
+                                    <div class="author-avatar"></div>
+                                    <span>Mike Davis</span>
+                                </div>
+                                <div class="video-stats">
+                                    <span>18K views</span>
+                                    <span>3 months ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Page -->
+                <div class="app-page" id="activityPage">
+                    <div class="activity-tabs">
+                        <div class="activity-tab active">Likes</div>
+                        <div class="activity-tab">Comments</div>
+                        <div class="activity-tab">Follows</div>
+                    </div>
+
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <div class="activity-avatar"></div>
+                            <div class="activity-content">
+                                <div class="activity-user">Sarah Johnson</div>
+                                <div class="activity-text">Liked your post "Python Tips and Tricks"</div>
+                                <div class="activity-time">2 hours ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-avatar"></div>
+                            <div class="activity-content">
+                                <div class="activity-user">Mike Davis</div>
+                                <div class="activity-text">Commented on your video: "Great explanation!"</div>
+                                <div class="activity-time">5 hours ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-avatar"></div>
+                            <div class="activity-content">
+                                <div class="activity-user">John Smith</div>
+                                <div class="activity-text">Started following you</div>
+                                <div class="activity-time">1 day ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-avatar"></div>
+                            <div class="activity-content">
+                                <div class="activity-user">CodeLearn Team</div>
+                                <div class="activity-text">Liked your comment on "JavaScript Course"</div>
+                                <div class="activity-time">2 days ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-avatar"></div>
+                            <div class="activity-content">
+                                <div class="activity-user">Anna Williams</div>
+                                <div class="activity-text">Replied to your question in the forum</div>
+                                <div class="activity-time">3 days ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Page -->
+                <div class="app-page" id="profilePage">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <div class="edit-avatar">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                        </div>
+                        <div class="profile-info">
+                            <h2>John Doe</h2>
+                            <p class="profile-bio">Python Developer | Web Enthusiast | Learning JavaScript and React</p>
+                            <div class="profile-stats">
+                                <div class="stat-item">
+                                    <div class="stat-value">125</div>
+                                    <div class="stat-label">Posts</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">1.2K</div>
+                                    <div class="stat-label">Followers</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">350</div>
+                                    <div class="stat-label">Following</div>
+                                </div>
+                            </div>
+                            <button class="edit-profile-btn">
+                                <i class="fas fa-pencil-alt"></i> Edit Profile
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="profile-content">
+                        <div class="profile-sidebar">
+                            <div class="sidebar-section">
+                                <div class="sidebar-title">About</div>
+                                <p style="margin-bottom: 15px;">I'm a passionate developer with 3 years of experience in Python and web development.</p>
+                                <a href="#" class="sidebar-link">
+                                    <i class="fas fa-globe"></i> johndoe.dev
+                                </a>
+                                <a href="#" class="sidebar-link">
+                                    <i class="fab fa-github"></i> github.com/johndoe
+                                </a>
+                                <a href="#" class="sidebar-link">
+                                    <i class="fab fa-twitter"></i> @johndoe
+                                </a>
+                            </div>
+                            <div class="sidebar-section">
+                                <div class="sidebar-title">Skills</div>
+                                <a href="#" class="sidebar-link">
+                                    <i class="fab fa-python"></i> Python
+                                </a>
+                                <a href="#" class="sidebar-link">
+                                    <i class="fab fa-js"></i> JavaScript
+                                </a>
+                                <a href="#" class="sidebar-link">
+                                    <i class="fab fa-html5"></i> HTML/CSS
+                                </a>
+                                <a href="#" class="sidebar-link">
+                                    <i class="fas fa-database"></i> SQL
+                                </a>
+                            </div>
+                            <div class="sidebar-section">
+                                <div class="sidebar-title">Courses</div>
+                                <a href="#" class="sidebar-link">
+                                    <i class="fas fa-book"></i> Python Mastery
+                                </a>
+                                <a href="#" class="sidebar-link">
+                                    <i class="fas fa-book"></i> Web Development
+                                </a>
+                                <a href="#" class="sidebar-link">
+                                    <i class="fas fa-book"></i> Data Science
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="profile-posts">
+                            <div class="post-form">
+                                <textarea class="post-input" placeholder="Share your thoughts, code, or questions..."></textarea>
+                                <div class="post-actions">
+                                    <div>
+                                        <button class="post-action-btn">
+                                            <i class="fas fa-image"></i> Photo
+                                        </button>
+                                        <button class="post-action-btn">
+                                            <i class="fas fa-video"></i> Video
+                                        </button>
+                                        <button class="post-action-btn">
+                                            <i class="fas fa-code"></i> Code
+                                        </button>
+                                    </div>
+                                    <button class="post-submit">Post</button>
+                                </div>
+                            </div>
+
+                            <div class="user-posts">
+                                <div class="post">
+                                    <div class="post-header">
+                                        <div class="post-avatar"></div>
+                                        <div>
+                                            <div class="post-user">John Doe</div>
+                                            <div class="post-time">2 hours ago</div>
+                                        </div>
+                                    </div>
+                                    <div class="post-content">
+                                        Just completed the Python Data Structures course! Highly recommend it to anyone starting with Python.
+                                    </div>
+                                    <div class="post-stats">
+                                        <span>24 Likes</span>
+                                        <span>5 Comments</span>
+                                        <span>1.2K Views</span>
+                                    </div>
+                                    <div class="post-actions">
+                                        <div class="post-action">
+                                            <i class="far fa-thumbs-up"></i> Like
+                                        </div>
+                                        <div class="post-action">
+                                            <i class="far fa-comment"></i> Comment
+                                        </div>
+                                        <div class="post-action">
+                                            <i class="fas fa-share"></i> Share
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="post">
+                                    <div class="post-header">
+                                        <div class="post-avatar"></div>
+                                        <div>
+                                            <div class="post-user">John Doe</div>
+                                            <div class="post-time">1 day ago</div>
+                                        </div>
+                                    </div>
+                                    <div class="post-content">
+                                        Here's a quick Python snippet I found useful for data cleaning:
+                                    </div>
+                                    <div class="code-editor">
+                                        <div class="editor-header">
+                                            <div class="editor-title">python_code.py</div>
+                                            <div class="editor-actions">
+                                                <button>Copy</button>
+                                            </div>
+                                        </div>
+                                        <div class="editor-content">
+                                            <pre>import pandas as pd
+
+def clean_data(df):
+    # Fill missing values
+    df.fillna(method='ffill', inplace=True)
+    
+    # Remove duplicates
+    df.drop_duplicates(inplace=True)
+    
+    # Convert to proper data types
+    df['date'] = pd.to_datetime(df['date'])
+    df['price'] = pd.to_numeric(df['price'])
+    
+    return df</pre>
+                                        </div>
+                                    </div>
+                                    <div class="post-stats">
+                                        <span>42 Likes</span>
+                                        <span>8 Comments</span>
+                                        <span>2.5K Views</span>
+                                    </div>
+                                    <div class="post-actions">
+                                        <div class="post-action">
+                                            <i class="far fa-thumbs-up"></i> Like
+                                        </div>
+                                        <div class="post-action">
+                                            <i class="far fa-comment"></i> Comment
+                                        </div>
+                                        <div class="post-action">
+                                            <i class="fas fa-share"></i> Share
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="post">
+                                    <div class="post-header">
+                                        <div class="post-avatar"></div>
+                                        <div>
+                                            <div class="post-user">John Doe</div>
+                                            <div class="post-time">3 days ago</div>
+                                        </div>
+                                    </div>
+                                    <div class="post-content">
+                                        Check out my new tutorial video on Python decorators!
+                                    </div>
+                                    <video controls class="post-video">
+                                        <source src="#" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="post-stats">
+                                        <span>56 Likes</span>
+                                        <span>12 Comments</span>
+                                        <span>5.7K Views</span>
+                                    </div>
+                                    <div class="post-actions">
+                                        <div class="post-action">
+                                            <i class="far fa-thumbs-up"></i> Like
+                                        </div>
+                                        <div class="post-action">
+                                            <i class="far fa-comment"></i> Comment
+                                        </div>
+                                        <div class="post-action">
+                                            <i class="fas fa-share"></i> Share
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course Detail Page -->
+                <div class="app-page" id="courseDetailPage">
+                    <div class="course-header">
+                        <h1 class="course-title">Python for Beginners</h1>
+                        <div class="course-meta">
+                            <div class="course-instructor">
+                                <div class="instructor-avatar"></div>
+                                <span>John Smith</span>
+                            </div>
+                            <div class="course-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                                <span>4.8 (1,245 ratings)</span>
+                            </div>
+                            <div class="course-students">
+                                <i class="fas fa-users"></i>
+                                <span>15,678 students</span>
+                            </div>
+                        </div>
+                        <button class="course-enroll-btn">Enroll Now</button>
+                    </div>
+
+                    <div class="course-tabs">
+                        <div class="course-tab active">Overview</div>
+                        <div class="course-tab">Curriculum</div>
+                        <div class="course-tab">Reviews</div>
+                    </div>
+
+                    <div class="course-content">
+                        <div class="course-description">
+                            <h3>Description</h3>
+                            <p>This Python for Beginners course is designed to take you from zero to hero in Python programming. Whether you want to:</p>
+                            <ul style="margin: 15px 0 15px 20px;">
+                                <li>Build the skills you need to get your first Python programming job</li>
+                                <li>Move to a more senior software developer position</li>
+                                <li>Get started with Machine Learning, Data Science, Django or other hot areas that Python specializes in</li>
+                                <li>Or just learn Python to be able to create your own Python apps quickly</li>
+                            </ul>
+                            <p>...then you need a solid foundation in Python programming. And this course is designed to give you those core skills, fast.</p>
+                        </div>
+
+                        <h3 style="margin: 30px 0 15px;">What you'll learn</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px;">
+                            <div style="display: flex; align-items: flex-start;">
+                                <i class="fas fa-check" style="color: #4a00e0; margin-right: 10px; margin-top: 3px;"></i>
+                                <span>Python syntax and basics</span>
+                            </div>
+                            <div style="display: flex; align-items: flex-start;">
+                                <i class="fas fa-check" style="color: #4a00e0; margin-right: 10px; margin-top: 3px;"></i>
+                                <span>Variables and data types</span>
+                            </div>
+                            <div style="display: flex; align-items: flex-start;">
+                                <i class="fas fa-check" style="color: #4a00e0; margin-right: 10px; margin-top: 3px;"></i>
+                                <span>Conditionals and loops</span>
+                            </div>
+                            <div style="display: flex; align-items: flex-start;">
+                                <i class="fas fa-check" style="color: #4a00e0; margin-right: 10px; margin-top: 3px;"></i>
+                                <span>Functions and modules</span>
+                            </div>
+                            <div style="display: flex; align-items: flex-start;">
+                                <i class="fas fa-check" style="color: #4a00e0; margin-right: 10px; margin-top: 3px;"></i>
+                                <span>File handling</span>
+                            </div>
+                            <div style="display: flex; align-items: flex-start;">
+                                <i class="fas fa-check" style="color: #4a00e0; margin-right: 10px; margin-top: 3px;"></i>
+                                <span>Object-oriented programming</span>
+                            </div>
+                        </div>
+
+                        <h3 style="margin: 30px 0 15px;">Course Content</h3>
+                        <div style="background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);">
+                            <div class="syllabus-item">
+                                <div class="syllabus-title">1. Introduction to Python</div>
+                                <div class="syllabus-duration">45 min</div>
+                            </div>
+                            <div class="syllabus-item">
+                                <div class="syllabus-title">2. Variables and Data Types</div>
+                                <div class="syllabus-duration">1 hour</div>
+                            </div>
+                            <div class="syllabus-item">
+                                <div class="syllabus-title">3. Operators and Expressions</div>
+                                <div class="syllabus-duration">50 min</div>
+                            </div>
+                            <div class="syllabus-item">
+                                <div class="syllabus-title">4. Control Flow</div>
+                                <div class="syllabus-duration">1.5 hours</div>
+                            </div>
+                            <div class="syllabus-item">
+                                <div class="syllabus-title">5. Functions</div>
+                                <div class="syllabus-duration">1.2 hours</div>
+                            </div>
+                            <div class="syllabus-item">
+                                <div class="syllabus-title">6. Data Structures</div>
+                                <div class="syllabus-duration">2 hours</div>
+                            </div>
+                            <div class="syllabus-item">
+                                <div class="syllabus-title">7. Object-Oriented Programming</div>
+                                <div class="syllabus-duration">2.5 hours</div>
+                            </div>
+                            <div class="syllabus-item">
+                                <div class="syllabus-title">8. File Handling</div>
+                                <div class="syllabus-duration">1 hour</div>
+                            </div>
+                            <div class="syllabus-item">
+                                <div class="syllabus-title">9. Error Handling</div>
+                                <div class="syllabus-duration">45 min</div>
+                            </div>
+                            <div class="syllabus-item">
+                                <div class="syllabus-title">10. Final Project</div>
+                                <div class="syllabus-duration">3 hours</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const authPages = document.getElementById('authPages');
+        const appLayout = document.getElementById('appLayout');
+        const loginTab = document.getElementById('loginTab');
+        const registerTab = document.getElementById('registerTab');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const menuItems = document.querySelectorAll('.menu-item');
+        const appPages = document.querySelectorAll('.app-page');
+        const courseCards = document.querySelectorAll('.course-card');
+        const userAvatar = document.getElementById('userAvatar');
+
+        // Switch between Login and Register tabs
+        loginTab.addEventListener('click', () => {
+            loginTab.classList.add('active');
+            registerTab.classList.remove('active');
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+        });
+
+        registerTab.addEventListener('click', () => {
+            registerTab.classList.add('active');
+            loginTab.classList.remove('active');
+            registerForm.style.display = 'block';
+            loginForm.style.display = 'none';
+        });
+
+        // Login Form Submission
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Here you would typically validate and send to server
+            // For demo, we'll just show the app
+            authPages.style.display = 'none';
+            appLayout.style.display = 'block';
+        });
+
+        // Register Form Submission
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Here you would typically validate and send to server
+            // For demo, we'll just show the app
+            authPages.style.display = 'none';
+            appLayout.style.display = 'block';
+        });
+
+        // Logout
+        logoutBtn.addEventListener('click', () => {
+            appLayout.style.display = 'none';
+            authPages.style.display = 'block';
+            // Reset to login tab
+            loginTab.classList.add('active');
+            registerTab.classList.remove('active');
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+        });
+
+        // Navigation
+        menuItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove active class from all items
+                menuItems.forEach(menuItem => {
+                    menuItem.classList.remove('active');
+                });
+                
+                // Add active class to clicked item
+                item.classList.add('active');
+                
+                // Show the corresponding page
+                const pageId = item.getAttribute('data-page');
+                if (pageId) {
+                    showPage(pageId);
+                }
+            });
+        });
+
+        // Show specific page
+        function showPage(pageId) {
+            // Hide all pages
+            appPages.forEach(page => {
+                page.style.display = 'none';
+            });
+            
+            // Show the selected page
+            document.getElementById(pageId).style.display = 'block';
+        }
+
+        // Course card click
+        courseCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const courseId = card.getAttribute('data-course');
+                if (courseId) {
+                    // Hide all pages
+                    appPages.forEach(page => {
+                        page.style.display = 'none';
+                    });
+                    
+                    // Show course detail page
+                    document.getElementById('courseDetailPage').style.display = 'block';
+                    
+                    // Update menu active state
+                    menuItems.forEach(menuItem => {
+                        menuItem.classList.remove('active');
+                    });
+                }
+            });
+        });
+
+        // Profile avatar click
+        userAvatar.addEventListener('click', () => {
+            // Hide all pages
+            appPages.forEach(page => {
+                page.style.display = 'none';
+            });
+            
+            // Show profile page
+            document.getElementById('profilePage').style.display = 'block';
+            
+            // Update menu active state
+            menuItems.forEach(menuItem => {
+                menuItem.classList.remove('active');
+            });
+            document.querySelector('.menu-item[data-page="profilePage"]').classList.add('active');
+        });
+
+        // Initialize with home page
+        if (appLayout.style.display === 'block') {
+            showPage('homePage');
+        }
+    </script>
+</body>
+</html>

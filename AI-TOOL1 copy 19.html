@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Clone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        :root {
+            --whatsapp-green: #075E54;
+            --whatsapp-light-green: #128C7E;
+            --whatsapp-teal: #25D366;
+            --whatsapp-chat-green: #DCF8C6;
+            --whatsapp-gray: #ECE5DD;
+            --whatsapp-dark-gray: #808080;
+            --whatsapp-light-gray: #F5F5F5;
+        }
+
+        body {
+            background-color: var(--whatsapp-gray);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 30%;
+            min-width: 300px;
+            background-color: white;
+            border-right: 1px solid var(--whatsapp-dark-gray);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background-color: var(--whatsapp-green);
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-bar {
+            padding: 10px;
+            background-color: var(--whatsapp-light-green);
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 20px;
+            border: none;
+            outline: none;
+            background-color: white;
+        }
+
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .chat-item {
+            display: flex;
+            padding: 12px;
+            border-bottom: 1px solid var(--whatsapp-gray);
+            cursor: pointer;
+        }
+
+        .chat-item:hover {
+            background-color: var(--whatsapp-light-gray);
+        }
+
+        .chat-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 10px;
+            overflow: hidden;
+        }
+
+        .chat-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .chat-info h3 {
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .chat-info p {
+            font-size: 14px;
+            color: var(--whatsapp-dark-gray);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-time {
+            font-size: 12px;
+            color: var(--whatsapp-dark-gray);
+        }
+
+        /* Chat Area Styles */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--whatsapp-gray);
+            background-image: url('data:image/svg+xml,%3Csvg width="800" height="600" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath fill="rgba(128, 128, 128, 0.02)" d="M0 0h800v600H0z"/%3E%3Cpath fill="none" stroke="rgba(128, 128, 128, 0.1)" stroke-width="8" d="M0 300h800M400 0v600"/%3E%3C/svg%3E');
+        }
+
+        .chat-header {
+            background-color: var(--whatsapp-green);
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .message-area {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .message {
+            max-width: 70%;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            word-wrap: break-word;
+            position: relative;
+        }
+
+        .received {
+            background-color: white;
+            align-self: flex-start;
+            margin-right: auto;
+        }
+
+        .sent {
+            background-color: var(--whatsapp-chat-green);
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: var(--whatsapp-dark-gray);
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .typing-area {
+            display: flex;
+            padding: 10px;
+            background-color: white;
+            align-items: center;
+        }
+
+        .typing-area input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 20px;
+            border: none;
+            outline: none;
+            margin: 0 10px;
+        }
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--whatsapp-dark-gray);
+            font-size: 20px;
+            transition: background-color 0.2s;
+        }
+
+        .action-btn:hover {
+            background-color: var(--whatsapp-light-gray);
+        }
+
+        .send-btn {
+            background-color: var(--whatsapp-teal);
+            color: white;
+        }
+
+        .send-btn:hover {
+            background-color: var(--whatsapp-light-green);
+        }
+
+        .notification-badge {
+            background-color: var(--whatsapp-teal);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+            }
+            
+            .chat-area {
+                display: none;
+            }
+            
+            .chat-area.active {
+                display: flex;
+            }
+            
+            .sidebar.hidden {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="header">
+                <div class="action-btn">
+                    <img src="https://placehold.co/24x24" alt="WhatsApp logo icon">
+                </div>
+                <div style="display: flex;">
+                    <div class="action-btn">
+                        <img src="https://placehold.co/20x20" alt="Status icon">
+                    </div>
+                    <div class="action-btn">
+                        <img src="https://placehold.co/20x20" alt="New chat icon">
+                    </div>
+                    <div class="action-btn">
+                        <img src="https://placehold.co/20x20" alt="Menu icon">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="search-bar">
+                <input type="text" placeholder="Search or start new chat">
+            </div>
+            
+            <div class="chat-list">
+                <!-- Sample chat items -->
+                <div class="chat-item" onclick="openChat(event)">
+                    <div class="chat-avatar">
+                        <img src="https://placehold.co/50x50" alt="User profile picture of John Doe">
+                    </div>
+                    <div class="chat-info">
+                        <h3>John Doe</h3>
+                        <p>Hey, how are you doing?</p>
+                    </div>
+                    <div class="chat-time">
+                        10:30 AM
+                    </div>
+                    <div class="notification-badge">3</div>
+                </div>
+                
+                <div class="chat-item" onclick="openChat(event)">
+                    <div class="chat-avatar">
+                        <img src="https://placehold.co/50x50" alt="User profile picture of Jane Smith">
+                    </div>
+                    <div class="chat-info">
+                        <h3>Jane Smith</h3>
+                        <p>Meeting at 2 PM</p>
+                    </div>
+                    <div class="chat-time">
+                        Yesterday
+                    </div>
+                </div>
+                
+                <div class="chat-item" onclick="openChat(event)">
+                    <div class="chat-avatar">
+                        <img src="https://placehold.co/50x50" alt="User profile picture of Work Group">
+                    </div>
+                    <div class="chat-info">
+                        <h3>Work Group</h3>
+                        <p>Alice: I'll send the files soon</p>
+                    </div>
+                    <div class="chat-time">
+                        9:15 AM
+                    </div>
+                    <div class="notification-badge">5</div>
+                </div>
+                
+                <div class="chat-item" onclick="openChat(event)">
+                    <div class="chat-avatar">
+                        <img src="https://placehold.co/50x50" alt="User profile picture of Mom">
+                    </div>
+                    <div class="chat-info">
+                        <h3>Mom</h3>
+                        <p>Call me when you're free</p>
+                    </div>
+                    <div class="chat-time">
+                        Yesterday
+                    </div>
+                </div>
+                
+                <div class="chat-item" onclick="openChat(event)">
+                    <div class="chat-avatar">
+                        <img src="https://placehold.co/50x50" alt="User profile picture of David Wilson">
+                    </div>
+                    <div class="chat-info">
+                        <h3>David Wilson</h3>
+                        <p>Thanks for the help!</p>
+                    </div>
+                    <div class="chat-time">
+                        Monday
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chat Area -->
+        <div class="chat-area" id="chatArea">
+            <div class="chat-header">
+                <div style="display: flex; align-items: center;">
+                    <div class="action-btn" onclick="backToChatList()">
+                        <img src="https://placehold.co/20x20" alt="Back arrow icon">
+                    </div>
+                    <div class="chat-avatar" style="margin-right: 10px;">
+                        <img src="https://placehold.co/50x50" alt="User profile picture of John Doe">
+                    </div>
+                    <div>
+                        <h3>John Doe</h3>
+                        <p style="font-size: 12px;">online</p>
+                    </div>
+                </div>
+                <div style="display: flex;">
+                    <div class="action-btn">
+                        <img src="https://placehold.co/20x20" alt="Search in chat icon">
+                    </div>
+                    <div class="action-btn">
+                        <img src="https://placehold.co/20x20" alt="Menu icon">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="message-area" id="messageArea">
+                <!-- Sample messages -->
+                <div class="message received">
+                    <p>Hey there! How are you doing?</p>
+                    <div class="message-time">10:15 AM</div>
+                </div>
+                
+                <div class="message sent">
+                    <p>I'm doing great! Just finished my work.</p>
+                    <div class="message-time">10:16 AM</div>
+                </div>
+                
+                <div class="message received">
+                    <p>That's awesome! Want to meet up for lunch tomorrow?</p>
+                    <div class="message-time">10:17 AM</div>
+                </div>
+                
+                <div class="message sent">
+                    <p>Sure, sounds good to me. What time and where?</p>
+                    <div class="message-time">10:18 AM</div>
+                </div>
+                
+                <div class="message received">
+                    <p>How about 12:30 at the new Italian place downtown?</p>
+                    <div class="message-time">10:20 AM</div>
+                </div>
+                
+                <div class="message sent">
+                    <p>Perfect! See you then 😊</p>
+                    <div class="message-time">10:21 AM</div>
+                </div>
+            </div>
+            
+            <div class="typing-area">
+                <div class="action-btn">
+                    <img src="https://placehold.co/20x20" alt="Emoji icon">
+                </div>
+                <div class="action-btn">
+                    <img src="https://placehold.co/20x20" alt="Attachment icon">
+                </div>
+                <input type="text" placeholder="Type a message" id="messageInput">
+                <div class="action-btn send-btn" onclick="sendMessage()">
+                    <img src="https://placehold.co/20x20" alt="Send message icon">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initially hide chat area on mobile
+        if (window.innerWidth <= 768) {
+            document.getElementById('chatArea').style.display = 'none';
+        }
+        
+        function openChat(event) {
+            const chatItem = event.currentTarget;
+            const contactName = chatItem.querySelector('h3').textContent;
+            const avatarSrc = chatItem.querySelector('.chat-avatar img').src;
+            
+            // Update chat header
+            const chatHeader = document.querySelector('.chat-header');
+            chatHeader.querySelector('h3').textContent = contactName;
+            chatHeader.querySelector('.chat-avatar img').src = avatarSrc;
+            
+            // Clear notifications for this chat
+            const badge = chatItem.querySelector('.notification-badge');
+            if (badge) {
+                badge.remove();
+            }
+            
+            // Show chat area and hide sidebar on mobile
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.add('hidden');
+                document.getElementById('chatArea').classList.add('active');
+            }
+        }
+        
+        function backToChatList() {
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('hidden');
+                document.getElementById('chatArea').classList.remove('active');
+            }
+        }
+        
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                const messageArea = document.getElementById('messageArea');
+                
+                // Create new message element
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message sent';
+                
+                const messageText = document.createElement('p');
+                messageText.textContent = message;
+                
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                
+                const now = new Date();
+                const hours = now.getHours();
+                const minutes = now.getMinutes();
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                const formattedHours = hours % 12 || 12;
+                const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+                
+                timeDiv.textContent = `${formattedHours}:${formattedMinutes} ${ampm}`;
+                
+                messageDiv.appendChild(messageText);
+                messageDiv.appendChild(timeDiv);
+                
+                messageArea.appendChild(messageDiv);
+                input.value = '';
+                
+                // Scroll to bottom
+                messageArea.scrollTop = messageArea.scrollHeight;
+                
+                // Simulate reply after 1-3 seconds
+                setTimeout(() => {
+                    const replies = [
+                        "Nice!",
+                        "Sounds good to me.",
+                        "I'll get back to you on that.",
+                        "Thanks for letting me know.",
+                        "Can we talk about this later?",
+                        "I'm busy right now.",
+                        "Sure thing!",
+                        "I'll be there."
+                    ];
+                    
+                    const randomReply = replies[Math.floor(Math.random() * replies.length)];
+                    
+                    const replyDiv = document.createElement('div');
+                    replyDiv.className = 'message received';
+                    
+                    const replyText = document.createElement('p');
+                    replyText.textContent = randomReply;
+                    
+                    const replyTimeDiv = document.createElement('div');
+                    replyTimeDiv.className = 'message-time';
+                    
+                    const replyNow = new Date();
+                    const replyHours = replyNow.getHours();
+                    const replyMinutes = replyNow.getMinutes();
+                    const replyAmpm = replyHours >= 12 ? 'PM' : 'AM';
+                    const replyFormattedHours = replyHours % 12 || 12;
+                    const replyFormattedMinutes = replyMinutes < 10 ? '0' + replyMinutes : replyMinutes;
+                    
+                    replyTimeDiv.textContent = `${replyFormattedHours}:${replyFormattedMinutes} ${replyAmpm}`;
+                    
+                    replyDiv.appendChild(replyText);
+                    replyDiv.appendChild(replyTimeDiv);
+                    
+                    messageArea.appendChild(replyDiv);
+                    messageArea.scrollTop = messageArea.scrollHeight;
+                }, 1000 + Math.random() * 2000);
+            }
+        }
+        
+        // Allow pressing Enter to send message
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Responsive behavior on window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.remove('hidden');
+                document.getElementById('chatArea').classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

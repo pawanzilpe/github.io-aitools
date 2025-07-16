@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Clone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #e5ddd5;
+            height: 100vh;
+            display: flex;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1200px;
+            height: 95vh;
+            margin: auto;
+            display: flex;
+            background-color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        /* Sidebar (Chat list) */
+        .sidebar {
+            width: 30%;
+            border-right: 1px solid #e9edef;
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 10px 16px;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .sidebar-search {
+            padding: 10px;
+            background-color: #f0f2f5;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            background-color: white;
+            font-size: 14px;
+        }
+
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .chat-item {
+            display: flex;
+            padding: 12px;
+            border-bottom: 1px solid #f0f2f5;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .chat-item:hover {
+            background-color: #f5f6f6;
+        }
+
+        .chat-item.active {
+            background-color: #f0f2f5;
+        }
+
+        .chat-item-avatar {
+            position: relative;
+            margin-right: 12px;
+        }
+
+        .chat-item-avatar img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+        .chat-item-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .chat-item-name-unread {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .chat-item-name {
+            font-weight: 600;
+            color: #111b21;
+        }
+
+        .chat-item-time {
+            font-size: 12px;
+            color: #667781;
+        }
+
+        .chat-item-lastmsg {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chat-item-preview {
+            font-size: 14px;
+            color: #667781;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+
+        .chat-item-unread {
+            background-color: #25d366;
+            color: white;
+            font-size: 12px;
+            padding: 2px 5px;
+            border-radius: 10px;
+        }
+
+        .online-dot {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #25d366;
+            border: 2px solid white;
+        }
+
+        /* Main chat area */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #e5ddd5;
+            position: relative;
+        }
+
+        .chat-header {
+            padding: 10px 16px;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e9edef;
+        }
+
+        .chat-header-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-header-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .chat-header-name {
+            font-weight: 600;
+            color: #111b21;
+        }
+
+        .chat-header-status {
+            font-size: 13px;
+            color: #667781;
+        }
+
+        .chat-header-actions {
+            display: flex;
+            gap: 20px;
+        }
+
+        .chat-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-image: url('https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/f1894bbf-f605-4268-8028-8439a18315ed.png');
+            background-repeat: repeat;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message.received {
+            align-items: flex-start;
+        }
+
+        .message.sent {
+            align-items: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 60%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.4;
+            position: relative;
+            margin-bottom: 2px;
+        }
+
+        .message.received .message-bubble {
+            background-color: white;
+            color: #111b21;
+            border-top-left-radius: 0;
+        }
+
+        .message.sent .message-bubble {
+            background-color: #d9fdd3;
+            color: #111b21;
+            border-top-right-radius: 0;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #667781;
+            margin-top: 5px;
+        }
+
+        .chat-input {
+            padding: 10px;
+            background-color: #f0f2f5;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .chat-input button {
+            background-color: #25d366;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .chat-input button:hover {
+            background-color: #128c7e;
+        }
+
+        /* Empty state */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 20px;
+            color: #667781;
+        }
+
+        .empty-state img {
+            width: 200px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h2 {
+            font-weight: normal;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+
+            .sidebar {
+                width: 100%;
+                display: none;
+            }
+
+            .sidebar.active {
+                display: flex;
+            }
+
+            .chat-area {
+                display: none;
+            }
+
+            .chat-area.active {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/f1125e27-7322-46aa-992a-9cb3f6dc7d72.png" alt="WhatsApp logo icon with green background" />
+                <div class="sidebar-actions">
+                    <!-- Actions would go here -->
+                </div>
+            </div>
+            <div class="sidebar-search">
+                <input type="text" class="search-box" placeholder="Search or start new chat">
+            </div>
+            <div class="chat-list">
+                <!-- Chat items will be populated via JavaScript -->
+            </div>
+        </div>
+
+        <!-- Chat area -->
+        <div class="chat-area">
+            <!-- Empty state when no chat is selected -->
+            <div class="empty-state" id="emptyState">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/a583a51e-a35a-43bd-b73e-f93194527af0.png" alt="WhatsApp logo with default background pattern" />
+                <h2>WhatsApp Web</h2>
+                <p>Send and receive messages without keeping your phone online.<br>
+                Use WhatsApp on up to 4 linked devices and 1 phone at the same time.</p>
+            </div>
+
+            <!-- Active chat UI (hidden by default) -->
+            <div class="chat-header" id="chatHeader" style="display: none;">
+                <div class="chat-header-info">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/15df85de-3b15-44b8-b389-346082ce9548.png" id="currentChatAvatar" alt="Profile picture of current chat contact" />
+                    <div>
+                        <div class="chat-header-name" id="currentChatName">Contact Name</div>
+                        <div class="chat-header-status" id="currentChatStatus">last seen today at 12:34 PM</div>
+                    </div>
+                </div>
+                <div class="chat-header-actions">
+                    <!-- Actions would go here -->
+                </div>
+            </div>
+
+            <div class="chat-content" id="chatContent" style="display: none;">
+                <!-- Messages will be populated via JavaScript -->
+            </div>
+
+            <div class="chat-input" id="chatInput" style="display: none;">
+                <input type="text" id="messageInput" placeholder="Type a message">
+                <button id="sendButton">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        const chats = [
+            {
+                id: 1,
+                name: "John Doe",
+                avatar: "https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/bdd2b1d4-e780-412b-bf05-80b90344feed.png",
+                lastMessage: "Hey, how are you doing?",
+                time: "10:30 AM",
+                unread: 2,
+                online: true,
+                messages: [
+                    { text: "Hey there!", time: "10:20 AM", sent: false },
+                    { text: "How are you?", time: "10:22 AM", sent: false },
+                    { text: "I'm good, thanks!", time: "10:25 AM", sent: true },
+                    { text: "Hey, how are you doing?", time: "10:30 AM", sent: false }
+                ]
+            },
+            {
+                id: 2,
+                name: "Jane Smith",
+                avatar: "https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/370bbc76-af94-4eac-8f2f-1d4d5f6a4a3c.png",
+                lastMessage: "Let's meet tomorrow",
+                time: "Yesterday",
+                unread: 0,
+                online: false,
+                messages: [
+                    { text: "Hi Jane!", time: "9:00 AM", sent: true },
+                    { text: "Hi! How are you?", time: "9:05 AM", sent: false },
+                    { text: "I'm planning something", time: "9:10 AM", sent: false },
+                    { text: "What's the plan?", time: "9:15 AM", sent: true },
+                    { text: "Let's meet tomorrow", time: "9:20 AM", sent: false }
+                ]
+            },
+            {
+                id: 3,
+                name: "Work Group",
+                avatar: "https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/e3138961-97d8-4db0-8bad-7749c431bacc.png",
+                lastMessage: "Alice: The meeting is at 3PM",
+                time: "Yesterday",
+                unread: 5,
+                online: false,
+                messages: [
+                    { text: "Bob: Good morning team", time: "8:00 AM", sent: false },
+                    { text: "Charlie: We have updates", time: "8:30 AM", sent: false },
+                    { text: "I'll prepare the report", time: "9:00 AM", sent: true },
+                    { text: "Alice: The meeting is at 3PM", time: "10:00 AM", sent: false }
+                ]
+            }
+        ];
+
+        // DOM elements
+        const chatList = document.querySelector('.chat-list');
+        const emptyState = document.getElementById('emptyState');
+        const chatHeader = document.getElementById('chatHeader');
+        const chatContent = document.getElementById('chatContent');
+        const chatInput = document.getElementById('chatInput');
+        const currentChatName = document.getElementById('currentChatName');
+        const currentChatStatus = document.getElementById('currentChatStatus');
+        const currentChatAvatar = document.getElementById('currentChatAvatar');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+
+        // Current active chat
+        let activeChat = null;
+
+        // Render chat list
+        function renderChatList() {
+            chatList.innerHTML = '';
+            chats.forEach(chat => {
+                const chatItem = document.createElement('div');
+                chatItem.className = 'chat-item';
+                if (activeChat && activeChat.id === chat.id) {
+                    chatItem.classList.add('active');
+                }
+                chatItem.innerHTML = `
+                    <div class="chat-item-avatar">
+                        <img src="${chat.avatar}" alt="Profile picture of ${chat.name}">
+                        ${chat.online ? '<div class="online-dot"></div>' : ''}
+                    </div>
+                    <div class="chat-item-info">
+                        <div class="chat-item-name-unread">
+                            <div class="chat-item-name">${chat.name}</div>
+                            <div class="chat-item-time">${chat.time}</div>
+                        </div>
+                        <div class="chat-item-lastmsg">
+                            <div class="chat-item-preview">${chat.lastMessage}</div>
+                            ${chat.unread > 0 ? `<div class="chat-item-unread">${chat.unread}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+                chatItem.addEventListener('click', () => openChat(chat.id));
+                chatList.appendChild(chatItem);
+            });
+        }
+
+        // Open a chat
+        function openChat(chatId) {
+            activeChat = chats.find(chat => chat.id === chatId);
+            if (!activeChat) return;
+
+            // Update UI
+            currentChatName.textContent = activeChat.name;
+            currentChatStatus.textContent = activeChat.online ? 'online' : 'last seen today at ' + activeChat.time;
+            currentChatAvatar.src = activeChat.avatar;
+            
+            // Hide empty state, show chat UI
+            emptyState.style.display = 'none';
+            chatHeader.style.display = 'flex';
+            chatContent.style.display = 'flex';
+            chatInput.style.display = 'flex';
+
+            // Render messages
+            renderMessages();
+            
+            // Update chat list highlights
+            renderChatList();
+        }
+
+        // Render messages for active chat
+        function renderMessages() {
+            chatContent.innerHTML = '';
+            if (!activeChat) return;
+
+            activeChat.messages.forEach(message => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${message.sent ? 'sent' : 'received'}`;
+                messageDiv.innerHTML = `
+                    <div class="message-bubble">${message.text}</div>
+                    <div class="message-time">${message.time}</div>
+                `;
+                chatContent.appendChild(messageDiv);
+            });
+
+            // Scroll to bottom
+            chatContent.scrollTop = chatContent.scrollHeight;
+        }
+
+        // Send a new message
+        function sendMessage() {
+            const text = messageInput.value.trim();
+            if (!text || !activeChat) return;
+
+            // Create new message
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const newMessage = {
+                text: text,
+                time: timeString,
+                sent: true
+            };
+
+            // Add to chat
+            activeChat.messages.push(newMessage);
+            activeChat.lastMessage = text.substring(0, 30) + (text.length > 30 ? '...' : '');
+            activeChat.time = timeString;
+
+            // Update UI
+            renderMessages();
+            renderChatList();
+            
+            // Clear input
+            messageInput.value = '';
+
+            // Simulate reply after 1-3 seconds
+            setTimeout(() => {
+                const replyTime = new Date();
+                const replyTimeString = replyTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const replyMessage = {
+                    text: 'Thanks for your message!',
+                    time: replyTimeString,
+                    sent: false
+                };
+                activeChat.messages.push(replyMessage);
+                activeChat.lastMessage = 'Thanks for your message!';
+                activeChat.time = replyTimeString;
+                renderMessages();
+                renderChatList();
+            }, Math.random() * 2000 + 1000);
+        }
+
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Initialize
+        renderChatList();
+    </script>
+</body>
+</html>
+
