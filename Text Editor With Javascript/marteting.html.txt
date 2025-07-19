@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarketAnalytics Pro - Stock Analysis Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #1e293b;
+            --accent: #0ea5e9;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --dark: #0f172a;
+            --gray: #64748b;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --sidebar-width: 260px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f1f5f9;
+            color: var(--dark);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--secondary);
+            color: white;
+            padding: 1.5rem 0;
+            transition: all 0.3s ease;
+            height: 100vh;
+            position: fixed;
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+
+        .logo-icon {
+            background: var(--accent);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .nav-menu {
+            padding: 1.5rem 0;
+        }
+
+        .nav-item {
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            border-left: 4px solid var(--accent);
+        }
+
+        .nav-item i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 0.7rem 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            width: 400px;
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            margin-left: 10px;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-btn, .user-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 12px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .card-actions {
+            color: var(--gray);
+        }
+
+        /* Charts Container */
+        .charts-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            height: 400px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Stock Ticker */
+        .stock-ticker {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .ticker-container {
+            display: flex;
+            animation: ticker 30s linear infinite;
+        }
+
+        .ticker-item {
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            border-right: 1px solid var(--border);
+            min-width: 200px;
+        }
+
+        .ticker-symbol {
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .ticker-price {
+            font-weight: 500;
+            margin-right: 8px;
+        }
+
+        .ticker-change {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .positive {
+            color: var(--success);
+        }
+
+        .negative {
+            color: var(--danger);
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 1rem 0;
+        }
+
+        .metric-title {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            
+            .logo h1, .nav-item span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+            
+            .search-bar {
+                width: 200px;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Utility Classes */
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .bg-blue { background: rgba(37, 99, 235, 0.1); color: var(--primary); }
+        .bg-green { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .bg-orange { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .bg-red { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h1>MarketAnalytics Pro</h1>
+        </div>
+        
+        <div class="nav-menu">
+            <div class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Market Analysis</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-search-dollar"></i>
+                <span>Stock Screener</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-wallet"></i>
+                <span>Portfolio</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-newspaper"></i>
+                <span>Financial News</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search stocks, indices, or assets...">
+            </div>
+            
+            <div class="user-actions">
+                <div class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="user-profile">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock Ticker -->
+        <div class="stock-ticker">
+            <div class="ticker-container">
+                <div class="ticker-item">
+                    <span class="ticker-symbol">AAPL</span>
+                    <span class="ticker-price">$189.25</span>
+                    <span class="ticker-change positive">+1.25%</span>
+                </div>
+                <div class="ticker-item">
+                    <span class="ticker-symbol">MSFT</span>
+                    <span class="ticker-price">$345.67</span>
+                    <span class="ticker-change positive">+0.87%</span>
+                </div>
+                <div class="ticker-item">
+                    <span class="ticker-symbol">GOOGL</span>
+                    <span class="ticker-price">$138.42</span>
+                    <span class="ticker-change negative">-0.35%</span>
+                </div>
+                <div class="ticker-item">
+                    <span class="ticker-symbol">AMZN</span>
+                    <span class="ticker-price">$128.91</span>
+                    <span class="ticker-change positive">+2.15%</span>
+                </div>
+                <div class="ticker-item">
+                    <span class="ticker-symbol">TSLA</span>
+                    <span class="ticker-price">$248.50</span>
+                    <span class="ticker-change negative">-1.75%</span>
+                </div>
+                <div class="ticker-item">
+                    <span class="ticker-symbol">META</span>
+                    <span class="ticker-price">$312.09</span>
+                    <span class="ticker-change positive">+0.62%</span>
+                </div>
+                <div class="ticker-item">
+                    <span class="ticker-symbol">NFLX</span>
+                    <span class="ticker-price">$425.33</span>
+                    <span class="ticker-change positive">+1.33%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Metrics -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="card-icon bg-blue">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="metric-title">Portfolio Value</div>
+                <div class="metric-value">$124,567</div>
+                <div class="metric-change positive">+2.4% Today</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="card-icon bg-green">
+                    <i class="fas fa-arrow-trend-up"></i>
+                </div>
+                <div class="metric-title">S&P 500</div>
+                <div class="metric-value">4,567.25</div>
+                <div class="metric-change positive">+0.75%</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="card-icon bg-orange">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="metric-title">DXY Index</div>
+                <div class="metric-value">102.34</div>
+                <div class="metric-change negative">-0.23%</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="card-icon bg-red">
+                    <i class="fas fa-percent"></i>
+                </div>
+                <div class="metric-title">Fed Rate</div>
+                <div class="metric-value">5.25%</div>
+                <div class="metric-change">No change</div>
+            </div>
+        </div>
+
+        <!-- Charts Container -->
+        <div class="charts-container">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2 class="card-title">Stock Performance - AAPL</h2>
+                    <div class="chart-actions">
+                        <button class="btn">1D</button>
+                        <button class="btn">1W</button>
+                        <button class="btn">1M</button>
+                        <button class="btn">6M</button>
+                        <button class="btn">1Y</button>
+                    </div>
+                </div>
+                <canvas id="priceChart"></canvas>
+            </div>
+            
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2 class="card-title">Technical Indicators</h2>
+                </div>
+                <canvas id="indicatorsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Dashboard Cards -->
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Top Gainers</h2>
+                    <div class="card-actions">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <ul class="stock-list">
+                        <li class="stock-item">
+                            <span class="stock-name">Tesla Inc</span>
+                            <span class="stock-change positive">+5.2%</span>
+                        </li>
+                        <li class="stock-item">
+                            <span class="stock-name">NVIDIA Corp</span>
+                            <span class="stock-change positive">+4.7%</span>
+                        </li>
+                        <li class="stock-item">
+                            <span class="stock-name">Adobe Inc</span>
+                            <span class="stock-change positive">+3.9%</span>
+                        </li>
+                        <li class="stock-item">
+                            <span class="stock-name">PayPal Holdings</span>
+                            <span class="stock-change positive">+3.5%</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Top Losers</h2>
+                    <div class="card-actions">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <ul class="stock-list">
+                        <li class="stock-item">
+                            <span class="stock-name">Boeing Co</span>
+                            <span class="stock-change negative">-4.2%</span>
+                        </li>
+                        <li class="stock-item">
+                            <span class="stock-name">Intel Corp</span>
+                            <span class="stock-change negative">-3.8%</span>
+                        </li>
+                        <li class="stock-item">
+                            <span class="stock-name">Walmart Inc</span>
+                            <span class="stock-change negative">-2.7%</span>
+                        </li>
+                        <li class="stock-item">
+                            <span class="stock-name">Verizon Comms</span>
+                            <span class="stock-change negative">-2.1%</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Market News</h2>
+                    <div class="card-actions">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="news-item">
+                        <h3>Fed Holds Rates Steady Amid Inflation Concerns</h3>
+                        <p>The Federal Reserve kept interest rates unchanged but signaled possible hikes later this year...</p>
+                    </div>
+                    <div class="news-item">
+                        <h3>Tech Stocks Rally on AI Optimism</h3>
+                        <p>Major tech companies surged as investors bet on AI-driven growth...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Price Chart
+            const priceCtx = document.getElementById('priceChart').getContext('2d');
+            const priceChart = new Chart(priceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'AAPL Price',
+                        data: [142, 148, 152, 158, 165, 172, 168, 175, 180, 185, 182, 189],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Indicators Chart
+            const indicatorsCtx = document.getElementById('indicatorsChart').getContext('2d');
+            const indicatorsChart = new Chart(indicatorsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['RSI', 'MACD', 'SMA(50)', 'SMA(200)', 'Volume', 'Volatility'],
+                    datasets: [{
+                        label: 'Technical Indicators',
+                        data: [62, 0.8, 175, 165, 45, 22],
+                        backgroundColor: [
+                            'rgba(37, 99, 235, 0.7)',
+                            'rgba(16, 185, 129, 0.7)',
+                            'rgba(245, 158, 11, 0.7)',
+                            'rgba(239, 68, 68, 0.7)',
+                            'rgba(156, 163, 175, 0.7)',
+                            'rgba(139, 92, 246, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(37, 99, 235, 1)',
+                            'rgba(16, 185, 129, 1)',
+                            'rgba(245, 158, 11, 1)',
+                            'rgba(239, 68, 68, 1)',
+                            'rgba(156, 163, 175, 1)',
+                            'rgba(139, 92, 246, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Simulate live ticker
+            const ticker = document.querySelector('.ticker-container');
+            ticker.innerHTML = ticker.innerHTML + ticker.innerHTML;
+        });
+    </script>
+</body>
+</html>

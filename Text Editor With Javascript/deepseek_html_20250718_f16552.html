@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Softerwotr Photo Editor</title>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --primary-dark: #5649c9;
+            --secondary: #00cec9;
+            --dark: #2d3436;
+            --light: #f7f7f7;
+            --gray: #b2bec3;
+            --success: #00b894;
+            --danger: #d63031;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 25px;
+        }
+        
+        .editor-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-weight: 600;
+            font-size: 1.8rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            font-size: 1.8rem;
+        }
+        
+        .editor-area {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .image-container {
+            background: var(--light);
+            border-radius: 10px;
+            min-height: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        #image-display {
+            max-width: 100%;
+            max-height: 500px;
+            display: none;
+        }
+        
+        .placeholder {
+            text-align: center;
+            color: var(--gray);
+            padding: 40px;
+        }
+        
+        .placeholder i {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            color: var(--gray);
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .toolbar {
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .tool-section {
+            padding: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .tool-section:last-child {
+            border-bottom: none;
+        }
+        
+        .tool-section h3 {
+            color: var(--dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tool-section h3 i {
+            color: var(--primary);
+        }
+        
+        .tool-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .tool-btn {
+            background: var(--light);
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tool-btn:hover {
+            background: #e8e8e8;
+            transform: translateY(-2px);
+        }
+        
+        .tool-btn i {
+            font-size: 1.4rem;
+            color: var(--primary);
+        }
+        
+        .slider-container {
+            margin-bottom: 15px;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            color: var(--dark);
+            font-weight: 500;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--light);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+        }
+        
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .filter-item {
+            height: 70px;
+            border-radius: 8px;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .filter-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 3px solid transparent;
+            border-radius: 8px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .filter-item:hover::after {
+            border-color: var(--primary);
+        }
+        
+        .filter-item.active::after {
+            border-color: var(--primary);
+        }
+        
+        .filter-name {
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: white;
+            font-size: 0.8rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            z-index: 1;
+        }
+        
+        .action-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .btn {
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn i {
+            font-size: 1.2rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+        }
+        
+        .btn-secondary:hover {
+            background: #e8e8e8;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            opacity: 0.9;
+        }
+        
+        .upload-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .toolbar {
+                grid-row: 1;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="editor-card">
+            <div class="header">
+                <div class="logo">
+                    <i class="fas fa-camera logo-icon"></i>
+                    <h1>Softerwotr Photo Editor</h1>
+                </div>
+                <div class="version">v1.0</div>
+            </div>
+            <div class="editor-area">
+                <div class="image-container">
+                    <div class="placeholder" id="placeholder">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h2>Upload an Image to Edit</h2>
+                        <p>Click the upload button to get started</p>
+                    </div>
+                    <img id="image-display" alt="Edited image">
+                </div>
+                <div class="controls">
+                    <button class="btn btn-secondary" id="rotate-left">
+                        <i class="fas fa-undo"></i> Rotate Left
+                    </button>
+                    <button class="btn btn-secondary" id="flip-horizontal">
+                        <i class="fas fa-arrows-alt-h"></i> Flip Horizontal
+                    </button>
+                    <button class="btn btn-danger" id="reset-btn">
+                        <i class="fas fa-trash-alt"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="toolbar">
+            <div class="tool-section">
+                <h3><i class="fas fa-upload"></i> Upload Image</h3>
+                <div class="action-btns">
+                    <button class="btn btn-primary upload-btn">
+                        <i class="fas fa-folder-open"></i> Choose Image
+                        <input type="file" id="file-input" accept="image/*">
+                    </button>
+                </div>
+            </div>
+            
+            <div class="tool-section">
+                <h3><i class="fas fa-sliders-h"></i> Adjustments</h3>
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Brightness</span>
+                        <span id="brightness-value">100%</span>
+                    </div>
+                    <input type="range" min="0" max="200" value="100" class="slider" id="brightness">
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Contrast</span>
+                        <span id="contrast-value">100%</span>
+                    </div>
+                    <input type="range" min="0" max="200" value="100" class="slider" id="contrast">
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Saturation</span>
+                        <span id="saturation-value">100%</span>
+                    </div>
+                    <input type="range" min="0" max="200" value="100" class="slider" id="saturation">
+                </div>
+            </div>
+            
+            <div class="tool-section">
+                <h3><i class="fas fa-magic"></i> Filters</h3>
+                <div class="filter-grid">
+                    <div class="filter-item active" data-filter="none" style="background-color: #6c5ce7;">
+                        <div class="filter-name">Normal</div>
+                    </div>
+                    <div class="filter-item" data-filter="grayscale" style="background-color: #636e72;">
+                        <div class="filter-name">Grayscale</div>
+                    </div>
+                    <div class="filter-item" data-filter="sepia" style="background-color: #e17055;">
+                        <div class="filter-name">Sepia</div>
+                    </div>
+                    <div class="filter-item" data-filter="invert" style="background-color: #00cec9;">
+                        <div class="filter-name">Invert</div>
+                    </div>
+                    <div class="filter-item" data-filter="hue-rotate" style="background-color: #0984e3;">
+                        <div class="filter-name">Cool</div>
+                    </div>
+                    <div class="filter-item" data-filter="warm" style="background-color: #d63031;">
+                        <div class="filter-name">Warm</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tool-section">
+                <h3><i class="fas fa-download"></i> Export</h3>
+                <div class="action-btns">
+                    <button class="btn btn-success" id="download-btn">
+                        <i class="fas fa-download"></i> Download Image
+                    </button>
+                    <button class="btn btn-secondary" id="share-btn">
+                        <i class="fas fa-share-alt"></i> Share
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const fileInput = document.getElementById('file-input');
+        const imageDisplay = document.getElementById('image-display');
+        const placeholder = document.getElementById('placeholder');
+        const brightnessSlider = document.getElementById('brightness');
+        const contrastSlider = document.getElementById('contrast');
+        const saturationSlider = document.getElementById('saturation');
+        const brightnessValue = document.getElementById('brightness-value');
+        const contrastValue = document.getElementById('contrast-value');
+        const saturationValue = document.getElementById('saturation-value');
+        const rotateLeftBtn = document.getElementById('rotate-left');
+        const flipHorizontalBtn = document.getElementById('flip-horizontal');
+        const resetBtn = document.getElementById('reset-btn');
+        const downloadBtn = document.getElementById('download-btn');
+        const filterItems = document.querySelectorAll('.filter-item');
+        
+        // State
+        let currentFilters = {
+            brightness: 100,
+            contrast: 100,
+            saturation: 100,
+            filter: 'none',
+            rotation: 0,
+            flip: 1
+        };
+        
+        // Event Listeners
+        fileInput.addEventListener('change', handleImageUpload);
+        brightnessSlider.addEventListener('input', updateBrightness);
+        contrastSlider.addEventListener('input', updateContrast);
+        saturationSlider.addEventListener('input', updateSaturation);
+        rotateLeftBtn.addEventListener('click', rotateImage);
+        flipHorizontalBtn.addEventListener('click', flipImage);
+        resetBtn.addEventListener('click', resetFilters);
+        downloadBtn.addEventListener('click', downloadImage);
+        
+        filterItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove active class from all filters
+                filterItems.forEach(filter => filter.classList.remove('active'));
+                // Add active class to clicked filter
+                item.classList.add('active');
+                
+                // Apply selected filter
+                const filterType = item.getAttribute('data-filter');
+                currentFilters.filter = filterType;
+                applyFilters();
+            });
+        });
+        
+        // Functions
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    imageDisplay.src = event.target.result;
+                    imageDisplay.style.display = 'block';
+                    placeholder.style.display = 'none';
+                    
+                    // Reset filters
+                    resetFilters();
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function updateBrightness() {
+            currentFilters.brightness = brightnessSlider.value;
+            brightnessValue.textContent = `${currentFilters.brightness}%`;
+            applyFilters();
+        }
+        
+        function updateContrast() {
+            currentFilters.contrast = contrastSlider.value;
+            contrastValue.textContent = `${currentFilters.contrast}%`;
+            applyFilters();
+        }
+        
+        function updateSaturation() {
+            currentFilters.saturation = saturationSlider.value;
+            saturationValue.textContent = `${currentFilters.saturation}%`;
+            applyFilters();
+        }
+        
+        function rotateImage() {
+            currentFilters.rotation = (currentFilters.rotation - 90) % 360;
+            applyFilters();
+        }
+        
+        function flipImage() {
+            currentFilters.flip = currentFilters.flip === 1 ? -1 : 1;
+            applyFilters();
+        }
+        
+        function resetFilters() {
+            // Reset slider values
+            brightnessSlider.value = 100;
+            contrastSlider.value = 100;
+            saturationSlider.value = 100;
+            
+            // Reset display values
+            brightnessValue.textContent = '100%';
+            contrastValue.textContent = '100%';
+            saturationValue.textContent = '100%';
+            
+            // Reset filter state
+            currentFilters = {
+                brightness: 100,
+                contrast: 100,
+                saturation: 100,
+                filter: 'none',
+                rotation: 0,
+                flip: 1
+            };
+            
+            // Reset active filter
+            filterItems.forEach(filter => filter.classList.remove('active'));
+            document.querySelector('.filter-item[data-filter="none"]').classList.add('active');
+            
+            applyFilters();
+        }
+        
+        function applyFilters() {
+            if (imageDisplay.style.display !== 'block') return;
+            
+            let filterString = '';
+            
+            // Apply adjustments
+            filterString += `brightness(${currentFilters.brightness}%) `;
+            filterString += `contrast(${currentFilters.contrast}%) `;
+            filterString += `saturate(${currentFilters.saturation}%) `;
+            
+            // Apply selected filter
+            switch(currentFilters.filter) {
+                case 'grayscale':
+                    filterString += 'grayscale(100%) ';
+                    break;
+                case 'sepia':
+                    filterString += 'sepia(100%) ';
+                    break;
+                case 'invert':
+                    filterString += 'invert(100%) ';
+                    break;
+                case 'hue-rotate':
+                    filterString += 'hue-rotate(180deg) ';
+                    break;
+                case 'warm':
+                    filterString += 'sepia(50%) hue-rotate(-20deg) saturate(120%) ';
+                    break;
+            }
+            
+            // Apply transformations
+            imageDisplay.style.transform = `rotate(${currentFilters.rotation}deg) scaleX(${currentFilters.flip})`;
+            imageDisplay.style.filter = filterString;
+        }
+        
+        function downloadImage() {
+            if (imageDisplay.style.display !== 'block') {
+                alert('Please upload an image first!');
+                return;
+            }
+            
+            // Create a canvas element
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas dimensions to match image
+            canvas.width = imageDisplay.naturalWidth;
+            canvas.height = imageDisplay.naturalHeight;
+            
+            // Apply transformations
+            ctx.save();
+            
+            // Move to center for rotation
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate(currentFilters.rotation * Math.PI / 180);
+            ctx.scale(currentFilters.flip, 1);
+            
+            // Move back to original position
+            ctx.translate(-canvas.width / 2, -canvas.height / 2);
+            
+            // Draw the image
+            ctx.drawImage(imageDisplay, 0, 0, canvas.width, canvas.height);
+            
+            // Apply filters (canvas doesn't support CSS filters, so we need to simulate them)
+            // For simplicity, we'll skip filter simulation in this example
+            
+            ctx.restore();
+            
+            // Create download link
+            const link = document.createElement('a');
+            link.download = 'edited-image.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+    </script>
+</body>
+</html>

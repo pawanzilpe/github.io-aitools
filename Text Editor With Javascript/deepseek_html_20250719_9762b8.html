@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mass Unit Converter</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            width: 100%;
+            max-width: 500px;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(to right, #4776E6, #8E54E9);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .converter {
+            padding: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .input-container {
+            display: flex;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .input-container input {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            font-size: 18px;
+            background: #f8f9fa;
+            outline: none;
+        }
+        
+        .input-container select {
+            padding: 0 15px;
+            border: none;
+            background: #e9ecef;
+            cursor: pointer;
+            font-weight: 500;
+            outline: none;
+        }
+        
+        .swap-btn {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+        }
+        
+        .swap-btn button {
+            background: linear-gradient(to right, #4776E6, #8E54E9);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+        
+        .swap-btn button:hover {
+            transform: rotate(180deg) scale(1.05);
+        }
+        
+        .result {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 25px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+        }
+        
+        .result h3 {
+            color: #6c757d;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .result-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #4776E6;
+            margin: 5px 0;
+        }
+        
+        .result-unit {
+            font-size: 18px;
+            color: #495057;
+            font-weight: 500;
+        }
+        
+        .history {
+            margin-top: 30px;
+        }
+        
+        .history h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 14px;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .conversion-info {
+            background: #e7f4ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 25px;
+            font-size: 14px;
+            color: #495057;
+        }
+        
+        .conversion-info h4 {
+            margin-bottom: 10px;
+            color: #4776E6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .conversion-info ul {
+            padding-left: 20px;
+        }
+        
+        .conversion-info li {
+            margin-bottom: 5px;
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .converter {
+                padding: 20px;
+            }
+            
+            .result-value {
+                font-size: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-weight-hanging"></i> Mass Unit Converter</h1>
+            <p>Convert between kilograms, grams, pounds, and ounces</p>
+        </div>
+        
+        <div class="converter">
+            <div class="input-group">
+                <label>Enter Value:</label>
+                <div class="input-container">
+                    <input type="number" id="inputValue" value="1" min="0" step="any">
+                    <select id="inputUnit">
+                        <option value="kg">Kilograms (kg)</option>
+                        <option value="g">Grams (g)</option>
+                        <option value="lb">Pounds (lb)</option>
+                        <option value="oz">Ounces (oz)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="swap-btn">
+                <button id="swapBtn"><i class="fas fa-exchange-alt"></i></button>
+            </div>
+            
+            <div class="input-group">
+                <label>Convert To:</label>
+                <div class="input-container">
+                    <input type="text" id="resultValue" readonly value="2.2046">
+                    <select id="resultUnit">
+                        <option value="lb">Pounds (lb)</option>
+                        <option value="kg">Kilograms (kg)</option>
+                        <option value="g">Grams (g)</option>
+                        <option value="oz">Ounces (oz)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="result">
+                <h3>Conversion Result</h3>
+                <div class="result-value" id="mainResult">2.2046</div>
+                <div class="result-unit">Pounds (lb)</div>
+            </div>
+            
+            <div class="history">
+                <h3><i class="fas fa-history"></i> Recent Conversions</h3>
+                <div class="history-list" id="historyList">
+                    <!-- History items will be added here dynamically -->
+                </div>
+            </div>
+            
+            <div class="conversion-info">
+                <h4><i class="fas fa-info-circle"></i> Conversion Information</h4>
+                <ul>
+                    <li>1 kilogram (kg) = 1000 grams (g)</li>
+                    <li>1 kilogram (kg) = 2.20462 pounds (lb)</li>
+                    <li>1 pound (lb) = 16 ounces (oz)</li>
+                    <li>1 ounce (oz) = 28.3495 grams (g)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const inputValue = document.getElementById('inputValue');
+        const inputUnit = document.getElementById('inputUnit');
+        const resultValue = document.getElementById('resultValue');
+        const resultUnit = document.getElementById('resultUnit');
+        const swapBtn = document.getElementById('swapBtn');
+        const mainResult = document.getElementById('mainResult');
+        const historyList = document.getElementById('historyList');
+        
+        // Conversion factors to grams (base unit)
+        const conversionFactors = {
+            kg: 1000,
+            g: 1,
+            lb: 453.592,
+            oz: 28.3495
+        };
+        
+        // Conversion history
+        let history = [];
+        const MAX_HISTORY = 5;
+        
+        // Function to convert units
+        function convert() {
+            const value = parseFloat(inputValue.value);
+            
+            if (isNaN(value)) {
+                resultValue.value = '';
+                mainResult.textContent = '0';
+                return;
+            }
+            
+            // Convert input to grams
+            const inputInGrams = value * conversionFactors[inputUnit.value];
+            
+            // Convert grams to target unit
+            const result = inputInGrams / conversionFactors[resultUnit.value];
+            
+            // Format result to 4 decimal places
+            const formattedResult = result.toFixed(4);
+            
+            // Update result fields
+            resultValue.value = formattedResult;
+            mainResult.textContent = formattedResult;
+            
+            // Add to history
+            addToHistory(value, inputUnit.value, formattedResult, resultUnit.value);
+        }
+        
+        // Function to add conversion to history
+        function addToHistory(value, fromUnit, result, toUnit) {
+            const conversion = {
+                fromValue: value,
+                fromUnit: fromUnit,
+                toValue: result,
+                toUnit: toUnit,
+                timestamp: new Date().toLocaleTimeString()
+            };
+            
+            history.unshift(conversion);
+            
+            // Keep only the latest 5 conversions
+            if (history.length > MAX_HISTORY) {
+                history.pop();
+            }
+            
+            updateHistory();
+        }
+        
+        // Function to update history display
+        function updateHistory() {
+            historyList.innerHTML = '';
+            
+            history.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div>${item.fromValue} ${getUnitName(item.fromUnit)}</div>
+                    <div><i class="fas fa-arrow-right"></i></div>
+                    <div>${item.toValue} ${getUnitName(item.toUnit)}</div>
+                    <div class="timestamp">${item.timestamp}</div>
+                `;
+                historyList.appendChild(historyItem);
+            });
+        }
+        
+        // Function to get full unit name for display
+        function getUnitName(unit) {
+            const names = {
+                kg: 'kg',
+                g: 'g',
+                lb: 'lb',
+                oz: 'oz'
+            };
+            return names[unit];
+        }
+        
+        // Function to swap units
+        function swapUnits() {
+            const tempUnit = inputUnit.value;
+            inputUnit.value = resultUnit.value;
+            resultUnit.value = tempUnit;
+            
+            convert();
+        }
+        
+        // Event Listeners
+        inputValue.addEventListener('input', convert);
+        inputUnit.addEventListener('change', convert);
+        resultUnit.addEventListener('change', convert);
+        swapBtn.addEventListener('click', swapUnits);
+        
+        // Initialize converter
+        convert();
+    </script>
+</body>
+</html>

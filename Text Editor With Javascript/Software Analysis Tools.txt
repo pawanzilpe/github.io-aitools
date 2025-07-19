@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Software Analysis Tools Directory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --dark: #2b2d42;
+            --light: #f8f9fa;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --gray: #8d99ae;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: var(--light);
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, var(--accent), var(--success));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            color: var(--gray);
+            line-height: 1.6;
+        }
+        
+        .search-container {
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .search-container input {
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 50px;
+            border: none;
+            background: rgba(15, 23, 42, 0.7);
+            color: white;
+            font-size: 1.1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .search-container input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .search-container i {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+        
+        .filters {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            max-width: 1300px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .tool-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(72, 149, 239, 0.3);
+        }
+        
+        .card-header {
+            padding: 25px 25px 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .card-category {
+            font-size: 0.85rem;
+            color: var(--accent);
+            font-weight: 500;
+        }
+        
+        .card-body {
+            padding: 20px 25px;
+            color: var(--gray);
+            line-height: 1.7;
+        }
+        
+        .card-footer {
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .tag {
+            background: rgba(72, 149, 239, 0.15);
+            color: var(--accent);
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .card-link {
+            background: rgba(76, 201, 240, 0.15);
+            color: var(--success);
+            padding: 8px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .card-link:hover {
+            background: var(--success);
+            color: var(--dark);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px auto;
+            max-width: 1000px;
+            padding: 20px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .stat-box {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+        
+        .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Software Analysis Tools</h1>
+        <p class="subtitle">Discover the most powerful tools for software analysis, debugging, and performance optimization. Filter by category to find the perfect solution for your needs.</p>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search for tools by name, category, or feature...">
+            <i class="fas fa-search"></i>
+        </div>
+    </header>
+    
+    <div class="filters">
+        <button class="filter-btn active" data-filter="all">All Tools</button>
+        <button class="filter-btn" data-filter="debugging">Debugging</button>
+        <button class="filter-btn" data-filter="performance">Performance</button>
+        <button class="filter-btn" data-filter="security">Security</button>
+        <button class="filter-btn" data-filter="network">Network</button>
+        <button class="filter-btn" data-filter="code">Code Analysis</button>
+    </div>
+    
+    <div class="stats">
+        <div class="stat-box">
+            <div class="stat-value">47</div>
+            <div class="stat-label">Tools Available</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value">12</div>
+            <div class="stat-label">Categories</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value">28</div>
+            <div class="stat-label">Open Source</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value">2024</div>
+            <div class="stat-label">Updated</div>
+        </div>
+    </div>
+    
+    <div class="tools-grid" id="toolsContainer">
+        <!-- Tools will be populated by JavaScript -->
+    </div>
+
+    <script>
+        // Software tools data
+        const tools = [
+            {
+                id: 1,
+                name: "Wireshark",
+                category: "network",
+                description: "Network protocol analyzer that lets you capture and interactively browse the traffic running on a computer network.",
+                tags: ["Network", "Protocol", "Security"],
+                link: "https://www.wireshark.org/",
+                icon: "fa-network-wired"
+            },
+            {
+                id: 2,
+                name: "Valgrind",
+                category: "performance",
+                description: "Programming tool for memory debugging, memory leak detection, and profiling. Helps detect threading errors and profile programs in detail.",
+                tags: ["Memory", "Debugging", "Profiling"],
+                link: "https://valgrind.org/",
+                icon: "fa-microchip"
+            },
+            {
+                id: 3,
+                name: "SonarQube",
+                category: "code",
+                description: "Automatic code review tool to detect bugs, vulnerabilities, and code smells in your code. Supports multiple programming languages.",
+                tags: ["Static Analysis", "Quality", "Security"],
+                link: "https://www.sonarqube.org/",
+                icon: "fa-code"
+            },
+            {
+                id: 4,
+                name: "Burp Suite",
+                category: "security",
+                description: "Integrated platform for performing security testing of web applications. Used by security professionals for penetration testing.",
+                tags: ["Web Security", "Testing", "HTTP"],
+                link: "https://portswigger.net/burp",
+                icon: "fa-shield-alt"
+            },
+            {
+                id: 5,
+                name: "GDB",
+                category: "debugging",
+                description: "The GNU Debugger allows you to see what is going on inside another program while it executes or what it was doing at the moment it crashed.",
+                tags: ["Debugger", "GNU", "C/C++"],
+                link: "https://www.gnu.org/software/gdb/",
+                icon: "fa-bug"
+            },
+            {
+                id: 6,
+                name: "JMeter",
+                category: "performance",
+                description: "Apache JMeter is used to test performance both on static and dynamic resources, dynamic web applications, and simulate heavy load.",
+                tags: ["Testing", "Load", "Performance"],
+                link: "https://jmeter.apache.org/",
+                icon: "fa-tachometer-alt"
+            },
+            {
+                id: 7,
+                name: "Dynatrace",
+                category: "performance",
+                description: "Software intelligence platform that provides application performance management, infrastructure monitoring, and digital experience management.",
+                tags: ["APM", "Monitoring", "AI"],
+                link: "https://www.dynatrace.com/",
+                icon: "fa-chart-line"
+            },
+            {
+                id: 8,
+                name: "OWASP ZAP",
+                category: "security",
+                description: "Open source web application security scanner. Designed to be used by both those new to application security and professional penetration testers.",
+                tags: ["Security", "Web", "Scanner"],
+                link: "https://www.zaproxy.org/",
+                icon: "fa-search"
+            }
+        ];
+
+        // DOM elements
+        const toolsContainer = document.getElementById('toolsContainer');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const searchInput = document.getElementById('searchInput');
+        
+        // Display all tools
+        function renderTools(toolsArray) {
+            toolsContainer.innerHTML = '';
+            
+            toolsArray.forEach(tool => {
+                const toolCard = document.createElement('div');
+                toolCard.className = 'tool-card';
+                
+                toolCard.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas ${tool.icon}"></i>
+                        </div>
+                        <div>
+                            <div class="card-title">${tool.name}</div>
+                            <div class="card-category">${tool.category.charAt(0).toUpperCase() + tool.category.slice(1)} Tool</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p>${tool.description}</p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-tags">
+                            ${tool.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                        <a href="${tool.link}" target="_blank" class="card-link">Learn More</a>
+                    </div>
+                `;
+                
+                toolsContainer.appendChild(toolCard);
+            });
+        }
+        
+        // Filter tools by category
+        function filterTools(category) {
+            if (category === 'all') {
+                renderTools(tools);
+                return;
+            }
+            
+            const filteredTools = tools.filter(tool => tool.category === category);
+            renderTools(filteredTools);
+        }
+        
+        // Search tools
+        function searchTools(term) {
+            const filteredTools = tools.filter(tool => 
+                tool.name.toLowerCase().includes(term) || 
+                tool.description.toLowerCase().includes(term) ||
+                tool.tags.some(tag => tag.toLowerCase().includes(term)) ||
+                tool.category.toLowerCase().includes(term)
+            );
+            
+            renderTools(filteredTools);
+        }
+        
+        // Event listeners
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                button.classList.add('active');
+                
+                const filter = button.getAttribute('data-filter');
+                filterTools(filter);
+            });
+        });
+        
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            searchTools(searchTerm);
+        });
+        
+        // Initialize page
+        renderTools(tools);
+        
+        // Add subtle animation to cards on load
+        setTimeout(() => {
+            const cards = document.querySelectorAll('.tool-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = 1;
+                    card.style.transform = 'translateY(0)';
+                }, 150 * index);
+            });
+        }, 300);
+    </script>
+</body>
+</html>

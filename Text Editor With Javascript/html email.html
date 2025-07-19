@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Composer - HTML Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #f8f9fa;
+            --dark: #212529;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --success: #4caf50;
+            --danger: #f44336;
+            --border: #dee2e6;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), #3a0ca3);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+        }
+        
+        header h1 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 700px;
+        }
+        
+        .app-container {
+            display: flex;
+            flex: 1;
+            gap: 25px;
+        }
+        
+        .editor-panel {
+            flex: 3;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .output-panel {
+            flex: 2;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .panel-header {
+            background: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .panel-header h2 {
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .panel-content {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            background: var(--secondary);
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            background: white;
+            color: var(--dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .btn:hover {
+            background: #e9ecef;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.9rem;
+        }
+        
+        .editor {
+            flex: 1;
+            padding: 20px;
+            min-height: 400px;
+            outline: none;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin: 15px;
+        }
+        
+        .editor:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .code-container {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            min-height: 300px;
+            max-height: 400px;
+        }
+        
+        .preview-container {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .template-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .template-card {
+            flex: 1;
+            min-width: 200px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .template-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .template-card.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.3);
+        }
+        
+        .template-preview {
+            height: 120px;
+            background: linear-gradient(45deg, #4361ee, #3a0ca3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+        
+        .template-info {
+            padding: 12px;
+            text-align: center;
+            background: white;
+        }
+        
+        .template-card:nth-child(2) .template-preview {
+            background: linear-gradient(45deg, #f72585, #7209b7);
+        }
+        
+        .template-card:nth-child(3) .template-preview {
+            background: linear-gradient(45deg, #4cc9f0, #4895ef);
+        }
+        
+        .color-picker {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .color-option.active {
+            border-color: var(--dark);
+            transform: scale(1.1);
+        }
+        
+        .color-option:nth-child(1) { background: #4361ee; }
+        .color-option:nth-child(2) { background: #f72585; }
+        .color-option:nth-child(3) { background: #4cc9f0; }
+        .color-option:nth-child(4) { background: #2ec4b6; }
+        .color-option:nth-child(5) { background: #ff9e00; }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .tag {
+            background: var(--primary);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-left: 8px;
+        }
+        
+        @media (max-width: 900px) {
+            .app-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-envelope"></i> Email Composer & HTML Generator</h1>
+            <p>Create professional email templates with our WYSIWYG editor. Automatically generate responsive HTML/CSS code for your emails.</p>
+        </header>
+        
+        <div class="app-container">
+            <div class="editor-panel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-edit"></i> Compose Your Email</h2>
+                    <button class="btn btn-primary btn-sm" id="generate-btn">
+                        <i class="fas fa-code"></i> Generate HTML
+                    </button>
+                </div>
+                
+                <div class="toolbar">
+                    <button class="btn" data-command="bold"><i class="fas fa-bold"></i></button>
+                    <button class="btn" data-command="italic"><i class="fas fa-italic"></i></button>
+                    <button class="btn" data-command="underline"><i class="fas fa-underline"></i></button>
+                    <div class="divider"></div>
+                    <button class="btn" data-command="insertUnorderedList"><i class="fas fa-list-ul"></i></button>
+                    <button class="btn" data-command="insertOrderedList"><i class="fas fa-list-ol"></i></button>
+                    <div class="divider"></div>
+                    <button class="btn" data-command="createLink"><i class="fas fa-link"></i></button>
+                    <button class="btn" data-command="insertImage"><i class="fas fa-image"></i></button>
+                    <div class="divider"></div>
+                    <button class="btn" data-command="formatBlock" data-value="h2"><i class="fas fa-heading"></i> H2</button>
+                    <button class="btn" data-command="formatBlock" data-value="h3"><i class="fas fa-heading"></i> H3</button>
+                </div>
+                
+                <div class="panel-content">
+                    <div class="template-selector">
+                        <div class="template-card active" data-template="business">
+                            <div class="template-preview">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <div class="template-info">
+                                Business <span class="tag">Default</span>
+                            </div>
+                        </div>
+                        <div class="template-card" data-template="modern">
+                            <div class="template-preview">
+                                <i class="fas fa-paint-brush"></i>
+                            </div>
+                            <div class="template-info">Modern</div>
+                        </div>
+                        <div class="template-card" data-template="minimal">
+                            <div class="template-preview">
+                                <i class="fas fa-minimize"></i>
+                            </div>
+                            <div class="template-info">Minimal</div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-picker">
+                        <span>Template Color:</span>
+                        <div class="color-option active" data-color="#4361ee"></div>
+                        <div class="color-option" data-color="#f72585"></div>
+                        <div class="color-option" data-color="#4cc9f0"></div>
+                        <div class="color-option" data-color="#2ec4b6"></div>
+                        <div class="color-option" data-color="#ff9e00"></div>
+                    </div>
+                    
+                    <div 
+                        class="editor" 
+                        id="email-editor" 
+                        contenteditable="true"
+                        data-placeholder="Compose your email here...">
+                        <h2 style="color: #4361ee;">Professional Email Template</h2>
+                        <p>Hello [Recipient Name],</p>
+                        <p>This is a professionally designed email template created with our HTML Email Generator. You can customize every aspect of this template to match your brand identity.</p>
+                        <p>Key features:</p>
+                        <ul>
+                            <li>Responsive design for all devices</li>
+                            <li>Clean, modern layout</li>
+                            <li>Easy customization options</li>
+                            <li>Automatic HTML/CSS generation</li>
+                        </ul>
+                        <p>Best regards,<br>[Your Name]</p>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="save-btn">
+                            <i class="fas fa-save"></i> Save Template
+                        </button>
+                        <button class="btn" id="clear-btn">
+                            <i class="fas fa-trash"></i> Clear
+                        </button>
+                        <button class="btn" id="preview-btn">
+                            <i class="fas fa-eye"></i> Preview Email
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="output-panel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-code"></i> Generated HTML</h2>
+                </div>
+                
+                <div class="panel-content">
+                    <h3><i class="fas fa-file-code"></i> HTML Output</h3>
+                    <div class="code-container" id="html-output">
+                        <p style="color: #aaa;">// Your generated HTML will appear here</p>
+                        <p style="color: #aaa;">// Click "Generate HTML" to create the code</p>
+                    </div>
+                    
+                    <h3 style="margin-top: 20px;"><i class="fas fa-eye"></i> Email Preview</h3>
+                    <div class="preview-container" id="email-preview">
+                        <p style="color: #6c757d; text-align: center;">Email preview will be displayed here</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const editor = document.getElementById('email-editor');
+            const htmlOutput = document.getElementById('html-output');
+            const emailPreview = document.getElementById('email-preview');
+            const generateBtn = document.getElementById('generate-btn');
+            const saveBtn = document.getElementById('save-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const previewBtn = document.getElementById('preview-btn');
+            const templateCards = document.querySelectorAll('.template-card');
+            const colorOptions = document.querySelectorAll('.color-option');
+            const toolbarButtons = document.querySelectorAll('.toolbar .btn');
+            
+            let selectedTemplate = 'business';
+            let selectedColor = '#4361ee';
+            
+            // Set placeholder for contenteditable
+            editor.addEventListener('focus', function() {
+                if (this.innerHTML === this.getAttribute('data-placeholder')) {
+                    this.innerHTML = '';
+                }
+            });
+            
+            editor.addEventListener('blur', function() {
+                if (this.innerHTML === '') {
+                    this.innerHTML = this.getAttribute('data-placeholder');
+                }
+            });
+            
+            // Initialize editor with placeholder if empty
+            if (editor.innerHTML.trim() === '') {
+                editor.innerHTML = editor.getAttribute('data-placeholder');
+            }
+            
+            // Toolbar button functionality
+            toolbarButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const command = this.dataset.command;
+                    const value = this.dataset.value || null;
+                    
+                    document.execCommand(command, false, value);
+                    editor.focus();
+                });
+            });
+            
+            // Template selection
+            templateCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    templateCards.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    selectedTemplate = this.dataset.template;
+                    
+                    // Update template preview
+                    const preview = this.querySelector('.template-preview');
+                    const gradientColors = {
+                        business: ['#4361ee', '#3a0ca3'],
+                        modern: ['#f72585', '#7209b7'],
+                        minimal: ['#4cc9f0', '#4895ef']
+                    };
+                    
+                    preview.style.background = `linear-gradient(45deg, ${gradientColors[selectedTemplate][0]}, ${gradientColors[selectedTemplate][1]})`;
+                });
+            });
+            
+            // Color selection
+            colorOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    colorOptions.forEach(o => o.classList.remove('active'));
+                    this.classList.add('active');
+                    selectedColor = this.dataset.color;
+                });
+            });
+            
+            // Generate HTML code
+            generateBtn.addEventListener('click', function() {
+                const emailContent = editor.innerHTML;
+                
+                // Basic email HTML template
+                const htmlCode = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Template</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .email-header {
+            background: ${selectedColor};
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        
+        .email-header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .email-body {
+            padding: 30px;
+        }
+        
+        .email-footer {
+            background: #f1f3f5;
+            padding: 20px 30px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: ${selectedColor};
+            color: white !important;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            margin: 15px 0;
+        }
+        
+        @media (max-width: 600px) {
+            .email-container {
+                margin: 10px;
+            }
+            
+            .email-header, .email-body, .email-footer {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <h1>Your Company Name</h1>
+        </div>
+        
+        <div class="email-body">
+            ${emailContent}
+        </div>
+        
+        <div class="email-footer">
+            <p>&copy; ${new Date().getFullYear()} Your Company. All rights reserved.</p>
+            <p><a href="#" style="color: ${selectedColor};">Unsubscribe</a> | <a href="#" style="color: ${selectedColor};">Privacy Policy</a></p>
+        </div>
+    </div>
+</body>
+</html>
+                `.trim();
+                
+                // Display the generated HTML
+                htmlOutput.textContent = htmlCode;
+                
+                // Highlight the code (simulated with CSS classes)
+                htmlOutput.innerHTML = htmlCode
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/(".*?")/g, '<span style="color:#ff79c6;">$1</span>')
+                    .replace(/(&lt;\/?[a-z][a-z0-9]*&gt;)/gi, '<span style="color:#50fa7b;">$1</span>')
+                    .replace(/(#[0-9a-f]{6})/gi, '<span style="color:#f1fa8c;">$1</span>');
+                
+                // Update preview
+                emailPreview.innerHTML = emailContent;
+            });
+            
+            // Preview email button
+            previewBtn.addEventListener('click', function() {
+                // Create a new window with the full email preview
+                const previewWindow = window.open('', '_blank');
+                const emailContent = editor.innerHTML;
+                
+                previewWindow.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Preview</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .email-preview-container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .email-header {
+            background: ${selectedColor};
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        
+        .email-header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .email-body {
+            padding: 30px;
+        }
+        
+        .email-footer {
+            background: #f1f3f5;
+            padding: 20px 30px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: ${selectedColor};
+            color: white !important;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-preview-container">
+        <div class="email-header">
+            <h1>Your Company Name</h1>
+        </div>
+        
+        <div class="email-body">
+            ${emailContent}
+        </div>
+        
+        <div class="email-footer">
+            <p>&copy; ${new Date().getFullYear()} Your Company. All rights reserved.</p>
+            <p><a href="#" style="color: ${selectedColor};">Unsubscribe</a> | <a href="#" style="color: ${selectedColor};">Privacy Policy</a></p>
+        </div>
+    </div>
+</body>
+</html>
+                `);
+            });
+            
+            // Save template functionality
+            saveBtn.addEventListener('click', function() {
+                const emailContent = editor.innerHTML;
+                localStorage.setItem('emailTemplate', emailContent);
+                alert('Template saved successfully!');
+            });
+            
+            // Clear editor
+            clearBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear the editor?')) {
+                    editor.innerHTML = '';
+                }
+            });
+            
+            // Load saved template if exists
+            if (localStorage.getItem('emailTemplate')) {
+                editor.innerHTML = localStorage.getItem('emailTemplate');
+            }
+        });
+    </script>
+</body>
+</html>

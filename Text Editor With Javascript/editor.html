@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Code Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(45deg, #ff8a00, #e52e71);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .editor-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .code-editor {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(30, 30, 40, 0.85);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .preview {
+            flex: 1;
+            min-width: 300px;
+            background: #fff;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-header {
+            padding: 15px 20px;
+            background: rgba(20, 20, 30, 0.95);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ff6b6b;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .tab {
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            background: #ff6b6b;
+            color: #fff;
+        }
+        
+        .tab:hover:not(.active) {
+            background: rgba(255, 107, 107, 0.3);
+        }
+        
+        .panel-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .panel-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border-radius: 6px;
+            background: #4ecdc4;
+            color: #000;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            background: #ff6b6b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn i {
+            font-size: 1.1rem;
+        }
+        
+        .code-area {
+            height: 450px;
+            padding: 15px;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 100%;
+            background: rgba(25, 25, 35, 0.95);
+            color: #f8f8f2;
+            border: none;
+            padding: 15px;
+            font-family: 'Fira Code', monospace;
+            font-size: 16px;
+            border-radius: 8px;
+            resize: none;
+            outline: none;
+            line-height: 1.5;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .preview-area {
+            flex: 1;
+            padding: 20px;
+            overflow: auto;
+            background: white;
+            color: #333;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .features {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 20px;
+            padding: 20px;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            width: 200px;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .feature-card i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #4ecdc4;
+        }
+        
+        .feature-card h3 {
+            margin-bottom: 10px;
+            color: #ff6b6b;
+        }
+        
+        @media (max-width: 768px) {
+            .editor-container {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .code-area {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-code"></i> Online Code Editor</h1>
+            <p class="subtitle">Write HTML, CSS, and JavaScript code and see the results in real-time. Perfect for prototyping, learning, and quick testing.</p>
+        </header>
+        
+        <div class="editor-container">
+            <div class="code-editor">
+                <div class="panel-header">
+                    <div class="tabs">
+                        <div class="tab active" data-tab="html">HTML</div>
+                        <div class="tab" data-tab="css">CSS</div>
+                        <div class="tab" data-tab="js">JavaScript</div>
+                    </div>
+                    <div class="panel-actions">
+                        <button class="btn" id="runBtn">
+                            <i class="fas fa-play"></i> Run
+                        </button>
+                        <button class="btn" id="resetBtn">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                </div>
+                <div class="code-area">
+                    <textarea id="html-code" placeholder="Write your HTML code here...">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;My Page&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Hello, World!&lt;/h1&gt;
+  &lt;p&gt;This is a live preview of your code.&lt;/p&gt;
+  &lt;div id="demo"&gt;Try changing me!&lt;/div&gt;
+  &lt;button onclick="changeText()"&gt;Click Me&lt;/button&gt;
+&lt;/body&gt;
+&lt;/html&gt;</textarea>
+                    <textarea id="css-code" placeholder="Write your CSS code here..." style="display:none;">body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 30px;
+  background: #f0f8ff;
+}
+
+h1 {
+  color: #ff6b6b;
+  margin-bottom: 20px;
+}
+
+p {
+  color: #333;
+  font-size: 18px;
+}
+
+#demo {
+  padding: 15px;
+  margin: 20px auto;
+  background: #4ecdc4;
+  color: white;
+  width: 80%;
+  border-radius: 8px;
+}
+
+button {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #ff5252;
+}</textarea>
+                    <textarea id="js-code" placeholder="Write your JavaScript code here..." style="display:none;">function changeText() {
+  const demo = document.getElementById('demo');
+  demo.innerHTML = 'You clicked the button!';
+  demo.style.backgroundColor = '#ff6b6b';
+  
+  setTimeout(() => {
+    demo.innerHTML = 'Try changing me!';
+    demo.style.backgroundColor = '#4ecdc4';
+  }, 2000);
+}</textarea>
+                </div>
+            </div>
+            
+            <div class="preview">
+                <div class="panel-header">
+                    <div class="panel-title">Live Preview</div>
+                    <div class="panel-actions">
+                        <button class="btn" id="fullscreenBtn">
+                            <i class="fas fa-expand"></i> Fullscreen
+                        </button>
+                    </div>
+                </div>
+                <div class="preview-area" id="preview"></div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <i class="fas fa-bolt"></i>
+                <h3>Real-time Preview</h3>
+                <p>See results as you type with live updates</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-sync-alt"></i>
+                <h3>Auto-Save</h3>
+                <p>Your code is automatically saved</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-mobile-alt"></i>
+                <h3>Responsive</h3>
+                <p>Works on all device sizes</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-share-alt"></i>
+                <h3>Easy Sharing</h3>
+                <p>Share your creations with others</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Created with ❤️ | Online Code Editor v1.0 | © 2023 All rights reserved</p>
+        </footer>
+    </div>
+
+    <script>
+        // DOM Elements
+        const htmlTextarea = document.getElementById('html-code');
+        const cssTextarea = document.getElementById('css-code');
+        const jsTextarea = document.getElementById('js-code');
+        const previewFrame = document.getElementById('preview');
+        const tabs = document.querySelectorAll('.tab');
+        const runBtn = document.getElementById('runBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        
+        // Default code
+        const defaultHTML = htmlTextarea.value;
+        const defaultCSS = cssTextarea.value;
+        const defaultJS = jsTextarea.value;
+        
+        // Tab switching functionality
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                tabs.forEach(t => t.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Show the corresponding textarea
+                const tabType = tab.getAttribute('data-tab');
+                htmlTextarea.style.display = tabType === 'html' ? 'block' : 'none';
+                cssTextarea.style.display = tabType === 'css' ? 'block' : 'none';
+                jsTextarea.style.display = tabType === 'js' ? 'block' : 'none';
+            });
+        });
+        
+        // Update preview function
+        function updatePreview() {
+            const htmlCode = htmlTextarea.value;
+            const cssCode = cssTextarea.value;
+            const jsCode = jsTextarea.value;
+            
+            const previewDocument = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>${cssCode}</style>
+                </head>
+                <body>
+                    ${htmlCode}
+                    <script>${jsCode}<\/script>
+                </body>
+                </html>
+            `;
+            
+            previewFrame.innerHTML = '';
+            const iframe = document.createElement('iframe');
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.border = 'none';
+            previewFrame.appendChild(iframe);
+            
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            iframeDoc.open();
+            iframeDoc.write(previewDocument);
+            iframeDoc.close();
+        }
+        
+        // Auto-update preview with debounce
+        let timeout;
+        function debounceUpdate() {
+            clearTimeout(timeout);
+            timeout = setTimeout(updatePreview, 300);
+        }
+        
+        // Event listeners
+        htmlTextarea.addEventListener('input', debounceUpdate);
+        cssTextarea.addEventListener('input', debounceUpdate);
+        jsTextarea.addEventListener('input', debounceUpdate);
+        
+        runBtn.addEventListener('click', updatePreview);
+        
+        resetBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to reset all code to default?')) {
+                htmlTextarea.value = defaultHTML;
+                cssTextarea.value = defaultCSS;
+                jsTextarea.value = defaultJS;
+                updatePreview();
+            }
+        });
+        
+        fullscreenBtn.addEventListener('click', () => {
+            const elem = previewFrame;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+        });
+        
+        // Initialize preview
+        updatePreview();
+    </script>
+</body>
+</html>

@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoMail - Automated Email Writer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        header p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+
+        .app-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .editor-panel, .preview-panel {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 25px;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-title i {
+            color: #3498db;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .templates {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .template {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .template:hover {
+            border-color: #3498db;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .template i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #3498db;
+        }
+
+        .template.active {
+            border-color: #3498db;
+            background-color: #e3f2fd;
+        }
+
+        .preview-container {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            min-height: 400px;
+            padding: 25px;
+            background: #f9f9f9;
+            overflow-y: auto;
+            max-height: 500px;
+        }
+
+        .email-header {
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .email-header h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .email-meta {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .email-body {
+            line-height: 1.6;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #3498db;
+            color: #3498db;
+        }
+
+        .btn-outline:hover {
+            background: #e3f2fd;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            font-size: 1.8rem;
+            color: #2c3e50;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2ecc71;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-envelope"></i> AutoMail Writer</h1>
+            <p>Create professional emails in seconds with our automated email writing tool. Select a template, customize, and generate!</p>
+        </header>
+
+        <div class="app-container">
+            <div class="editor-panel">
+                <h2 class="panel-title"><i class="fas fa-edit"></i> Compose Email</h2>
+                
+                <div class="form-group">
+                    <label for="recipient">Recipient</label>
+                    <input type="email" id="recipient" placeholder="recipient@company.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <input type="text" id="subject" placeholder="Email subject...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="template">Select Template</label>
+                    <div class="templates">
+                        <div class="template active" data-template="business">
+                            <i class="fas fa-briefcase"></i>
+                            <div>Business</div>
+                        </div>
+                        <div class="template" data-template="followup">
+                            <i class="fas fa-sync-alt"></i>
+                            <div>Follow-up</div>
+                        </div>
+                        <div class="template" data-template="thankyou">
+                            <i class="fas fa-hands-helping"></i>
+                            <div>Thank You</div>
+                        </div>
+                        <div class="template" data-template="meeting">
+                            <i class="fas fa-calendar-check"></i>
+                            <div>Meeting</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="body">Email Body</label>
+                    <textarea id="body" placeholder="Write your email content here..."></textarea>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="preview-btn">
+                        <i class="fas fa-eye"></i> Update Preview
+                    </button>
+                    <button class="btn btn-outline" id="reset-btn">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+            </div>
+            
+            <div class="preview-panel">
+                <h2 class="panel-title"><i class="fas fa-desktop"></i> Email Preview</h2>
+                
+                <div class="preview-container" id="email-preview">
+                    <div class="email-header">
+                        <h2 id="preview-subject">Your Email Subject</h2>
+                        <div class="email-meta">
+                            <div>To: <span id="preview-recipient">recipient@example.com</span></div>
+                            <div>From: <span id="preview-sender">you@yourcompany.com</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="email-body" id="preview-body">
+                        <p>Your email content will appear here. Start composing on the left panel.</p>
+                    </div>
+                    
+                    <div class="email-signature">
+                        <p>Best regards,</p>
+                        <p><strong>Your Name</strong></p>
+                        <p>Your Position | Your Company</p>
+                        <p>contact@yourcompany.com | (123) 456-7890</p>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" id="generate-btn">
+                        <i class="fas fa-code"></i> Generate HTML Email
+                    </button>
+                    <button class="btn btn-primary" id="send-btn">
+                        <i class="fas fa-paper-plane"></i> Send Email
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>AutoMail Writer &copy; 2023 | Create professional emails in seconds</p>
+        </footer>
+    </div>
+    
+    <div class="modal" id="html-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-code"></i> Generated HTML Email</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <p>Copy the HTML code below to use in your email campaigns:</p>
+            <div class="code-block" id="html-output"></div>
+            <button class="btn btn-primary" id="copy-btn" style="margin-top: 20px;">
+                <i class="fas fa-copy"></i> Copy to Clipboard
+            </button>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span>Operation completed successfully!</span>
+    </div>
+
+    <script>
+        // Sample email templates
+        const templates = {
+            business: `Dear [Recipient Name],
+
+I hope this email finds you well. I'm writing to discuss our upcoming collaboration and how we can work together to achieve our mutual goals.
+
+At [Your Company], we specialize in providing innovative solutions for businesses like yours. Our team has developed a comprehensive approach that we believe would greatly benefit your organization.
+
+Key points we'd like to cover:
+- Strategic partnership opportunities
+- Customized solutions for your specific needs
+- Implementation timeline and process
+
+I would appreciate the opportunity to schedule a brief call next week to discuss this further. Please let me know what time works best for you.
+
+Looking forward to your response.`,
+            
+            followup: `Hi [Recipient Name],
+
+Following up on my previous email from [Date] regarding [Subject]. I wanted to check if you've had a chance to review the information I sent?
+
+I understand you're busy, but I believe this opportunity could provide significant value for [Their Company]. I'd be happy to provide additional details or answer any questions you may have.
+
+Would you be available for a quick 15-minute call sometime this week? Please suggest a time that works for your schedule.
+
+Thank you for your time and consideration.`,
+            
+            thankyou: `Dear [Recipient Name],
+
+Thank you so much for [Specific Reason - e.g., taking the time to meet with me yesterday, your recent order, etc.]. I truly appreciate your [Specific Action] and wanted to express my gratitude.
+
+It was [Describe Experience - e.g., a pleasure discussing our services with you, wonderful working with you on this project]. I particularly enjoyed [Specific Detail from Interaction].
+
+[If applicable: Next steps or follow-up]
+I'll be in touch soon regarding [Next Step]. In the meantime, please don't hesitate to reach out if you have any questions.
+
+Thanks again for your [Support/Business/Time]. I look forward to [Future Interaction].`,
+            
+            meeting: `Hello [Recipient Name],
+
+I hope you're having a productive week. I'm writing to schedule a meeting to discuss [Meeting Topic/Purpose].
+
+Based on your calendar availability, I'm proposing the following times:
+- [Date 1] at [Time 1]
+- [Date 2] at [Time 2]
+- [Date 3] at [Time 3]
+
+Please let me know which of these times works best for you, or suggest an alternative if none of these are convenient.
+
+Agenda:
+1. [Agenda Item 1]
+2. [Agenda Item 2]
+3. [Agenda Item 3]
+4. Q&A
+
+I've attached [any documents] for your review prior to our meeting. Looking forward to our discussion.`
+        };
+
+        // DOM Elements
+        const recipientInput = document.getElementById('recipient');
+        const subjectInput = document.getElementById('subject');
+        const bodyInput = document.getElementById('body');
+        const templateElements = document.querySelectorAll('.template');
+        const previewBtn = document.getElementById('preview-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const generateBtn = document.getElementById('generate-btn');
+        const sendBtn = document.getElementById('send-btn');
+        const previewSubject = document.getElementById('preview-subject');
+        const previewRecipient = document.getElementById('preview-recipient');
+        const previewBody = document.getElementById('preview-body');
+        const htmlModal = document.getElementById('html-modal');
+        const closeModal = document.querySelector('.close-modal');
+        const htmlOutput = document.getElementById('html-output');
+        const copyBtn = document.getElementById('copy-btn');
+        const notification = document.getElementById('notification');
+        
+        // Set initial template
+        let currentTemplate = 'business';
+        bodyInput.value = templates.business;
+        updatePreview();
+        
+        // Template selection
+        templateElements.forEach(template => {
+            template.addEventListener('click', () => {
+                templateElements.forEach(t => t.classList.remove('active'));
+                template.classList.add('active');
+                currentTemplate = template.dataset.template;
+                bodyInput.value = templates[currentTemplate];
+                updatePreview();
+            });
+        });
+        
+        // Update preview
+        function updatePreview() {
+            previewRecipient.textContent = recipientInput.value || 'recipient@example.com';
+            previewSubject.textContent = subjectInput.value || 'Your Email Subject';
+            
+            // Format body text with line breaks
+            let bodyText = bodyInput.value || 'Your email content will appear here. Start composing on the left panel.';
+            bodyText = bodyText.replace(/\n/g, '<br>');
+            previewBody.innerHTML = bodyText;
+        }
+        
+        // Generate HTML email
+        function generateHTMLEmail() {
+            const subject = subjectInput.value || 'Important Message';
+            const body = bodyInput.value || 'Please provide email content.';
+            
+            const htmlEmail = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>${subject}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .email-container {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 30px;
+            background-color: #ffffff;
+        }
+        .header {
+            border-bottom: 1px solid #eeeeee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #eeeeee;
+            color: #777777;
+            font-size: 0.9em;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h2>${subject}</h2>
+        </div>
+        
+        <div class="content">
+            ${body.replace(/\n/g, '<br>')}
+        </div>
+        
+        <div class="footer">
+            <p>Best regards,<br>
+            <strong>Your Name</strong><br>
+            Your Position | Your Company</p>
+            <p style="font-size: 0.9em; color: #999;">
+                This email was sent automatically by AutoMail Writer.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+            `;
+            
+            htmlOutput.textContent = htmlEmail;
+            htmlModal.style.display = 'flex';
+        }
+        
+        // Show notification
+        function showNotification(message) {
+            notification.querySelector('span').textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Event Listeners
+        previewBtn.addEventListener('click', updatePreview);
+        
+        resetBtn.addEventListener('click', () => {
+            recipientInput.value = '';
+            subjectInput.value = '';
+            bodyInput.value = templates[currentTemplate];
+            updatePreview();
+            showNotification('Form has been reset');
+        });
+        
+        generateBtn.addEventListener('click', generateHTMLEmail);
+        
+        sendBtn.addEventListener('click', () => {
+            if (!recipientInput.value) {
+                showNotification('Please enter a recipient email address');
+                return;
+            }
+            
+            if (!subjectInput.value) {
+                showNotification('Please enter a subject for your email');
+                return;
+            }
+            
+            if (!bodyInput.value) {
+                showNotification('Please write your email content');
+                return;
+            }
+            
+            showNotification('Email sent successfully! (simulated)');
+        });
+        
+        closeModal.addEventListener('click', () => {
+            htmlModal.style.display = 'none';
+        });
+        
+        window.addEventListener('click', (e) => {
+            if (e.target === htmlModal) {
+                htmlModal.style.display = 'none';
+            }
+        });
+        
+        copyBtn.addEventListener('click', () => {
+            const textArea = document.createElement('textarea');
+            textArea.value = htmlOutput.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showNotification('HTML code copied to clipboard!');
+        });
+        
+        // Initialize preview
+        updatePreview();
+    </script>
+</body>
+</html>

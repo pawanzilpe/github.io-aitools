@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web-Based Email Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            color: white;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        header p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .panel-header i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .toolbar {
+            display: flex;
+            background: #f8f9fa;
+            padding: 10px;
+            border-bottom: 1px solid #eaeaea;
+            flex-wrap: wrap;
+        }
+
+        .toolbar button {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin: 0 5px 5px 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .toolbar button:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .toolbar button i {
+            margin-right: 5px;
+            font-size: 0.9rem;
+        }
+
+        .editor-container, .preview-container, .html-container {
+            padding: 20px;
+        }
+
+        #emailEditor {
+            min-height: 300px;
+            border: 1px solid #eaeaea;
+            border-radius: 6px;
+            padding: 15px;
+            outline: none;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        #emailPreview {
+            min-height: 300px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            border: 1px solid #eaeaea;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        #htmlOutput {
+            width: 100%;
+            min-height: 300px;
+            padding: 15px;
+            background: #2c3e50;
+            color: #f8f9fa;
+            border-radius: 6px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            border: none;
+        }
+
+        .html-container {
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: #2980b9;
+        }
+
+        .html-panel {
+            grid-column: 1 / -1;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn-primary {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #219653;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #c0392b;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            padding: 20px;
+            opacity: 0.8;
+        }
+
+        /* Email styling for preview */
+        .email-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .email-header {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .email-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .email-meta {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .email-body {
+            line-height: 1.7;
+        }
+
+        .email-body p {
+            margin-bottom: 15px;
+        }
+
+        .email-signature {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #7f8c8d;
+        }
+
+        .highlight {
+            background-color: #fff9c4;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-envelope"></i> Web-Based Email Editor</h1>
+            <p>Create beautiful emails with rich formatting and automatically generate HTML code for your email campaigns</p>
+        </header>
+
+        <div class="app-container">
+            <div class="panel">
+                <div class="panel-header">
+                    <i class="fas fa-edit"></i> Compose Email
+                </div>
+                <div class="toolbar">
+                    <button id="boldBtn" title="Bold"><i class="fas fa-bold"></i></button>
+                    <button id="italicBtn" title="Italic"><i class="fas fa-italic"></i></button>
+                    <button id="underlineBtn" title="Underline"><i class="fas fa-underline"></i></button>
+                    <button id="ulBtn" title="Bullet List"><i class="fas fa-list-ul"></i></button>
+                    <button id="olBtn" title="Numbered List"><i class="fas fa-list-ol"></i></button>
+                    <button id="linkBtn" title="Insert Link"><i class="fas fa-link"></i></button>
+                    <button id="imageBtn" title="Insert Image"><i class="fas fa-image"></i></button>
+                    <button id="clearBtn" title="Clear Formatting"><i class="fas fa-eraser"></i></button>
+                    <button id="highlightBtn" title="Highlight"><i class="fas fa-highlighter"></i></button>
+                </div>
+                <div class="editor-container">
+                    <div id="emailEditor" contenteditable="true">
+                        <div class="email-content">
+                            <div class="email-header">
+                                <div class="email-title">Your Email Subject Here</div>
+                                <div class="email-meta">To: recipient@example.com</div>
+                                <div class="email-meta">From: you@yourcompany.com</div>
+                            </div>
+                            <div class="email-body">
+                                <p>Hello [Recipient Name],</p>
+                                <p>This is a <strong>sample email</strong> created with our web-based email editor. You can easily format your text using the toolbar above.</p>
+                                <p>Here are some key features:</p>
+                                <ul>
+                                    <li>Real-time HTML preview</li>
+                                    <li>Rich text formatting</li>
+                                    <li>Automatic HTML code generation</li>
+                                    <li>Responsive design for all devices</li>
+                                </ul>
+                                <p>Try editing this content to see the HTML update in real-time!</p>
+                            </div>
+                            <div class="email-signature">
+                                <p>Best regards,</p>
+                                <p><strong>Your Name</strong><br>
+                                Your Position<br>
+                                Your Company</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <i class="fas fa-eye"></i> Email Preview
+                </div>
+                <div class="preview-container">
+                    <div id="emailPreview"></div>
+                </div>
+            </div>
+
+            <div class="panel html-panel">
+                <div class="panel-header">
+                    <i class="fas fa-code"></i> Generated HTML Code
+                </div>
+                <div class="html-container">
+                    <button class="copy-btn" id="copyBtn"><i class="fas fa-copy"></i> Copy to Clipboard</button>
+                    <textarea id="htmlOutput" readonly></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-primary" id="generateBtn"><i class="fas fa-code"></i> Generate HTML</button>
+            <button class="btn btn-secondary" id="resetBtn"><i class="fas fa-redo"></i> Reset Editor</button>
+            <button class="btn btn-outline" id="helpBtn"><i class="fas fa-question-circle"></i> How to Use</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>Web-Based Email Editor &copy; 2023 | Create professional emails with automatic HTML generation</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const emailEditor = document.getElementById('emailEditor');
+            const emailPreview = document.getElementById('emailPreview');
+            const htmlOutput = document.getElementById('htmlOutput');
+            const generateBtn = document.getElementById('generateBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const helpBtn = document.getElementById('helpBtn');
+            
+            // Formatting buttons
+            const boldBtn = document.getElementById('boldBtn');
+            const italicBtn = document.getElementById('italicBtn');
+            const underlineBtn = document.getElementById('underlineBtn');
+            const ulBtn = document.getElementById('ulBtn');
+            const olBtn = document.getElementById('olBtn');
+            const linkBtn = document.getElementById('linkBtn');
+            const imageBtn = document.getElementById('imageBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const highlightBtn = document.getElementById('highlightBtn');
+            
+            // Set initial preview
+            updatePreview();
+            
+            // Event listeners for formatting buttons
+            boldBtn.addEventListener('click', () => formatText('bold'));
+            italicBtn.addEventListener('click', () => formatText('italic'));
+            underlineBtn.addEventListener('click', () => formatText('underline'));
+            ulBtn.addEventListener('click', () => formatText('insertUnorderedList'));
+            olBtn.addEventListener('click', () => formatText('insertOrderedList'));
+            linkBtn.addEventListener('click', insertLink);
+            imageBtn.addEventListener('click', insertImage);
+            clearBtn.addEventListener('click', () => formatText('removeFormat'));
+            highlightBtn.addEventListener('click', () => formatText('hiliteColor', '#fff9c4'));
+            
+            // Generate HTML code
+            generateBtn.addEventListener('click', generateHTML);
+            
+            // Reset editor
+            resetBtn.addEventListener('click', resetEditor);
+            
+            // Copy to clipboard
+            copyBtn.addEventListener('click', copyToClipboard);
+            
+            // Help button
+            helpBtn.addEventListener('click', showHelp);
+            
+            // Auto-update preview as user types
+            emailEditor.addEventListener('input', updatePreview);
+            
+            // Formatting function
+            function formatText(command, value = null) {
+                document.execCommand(command, false, value);
+                emailEditor.focus();
+                updatePreview();
+            }
+            
+            // Insert link
+            function insertLink() {
+                const url = prompt('Enter the URL:');
+                if (url) {
+                    document.execCommand('createLink', false, url);
+                }
+                updatePreview();
+            }
+            
+            // Insert image
+            function insertImage() {
+                const url = prompt('Enter the image URL:');
+                if (url) {
+                    document.execCommand('insertImage', false, url);
+                }
+                updatePreview();
+            }
+            
+            // Update preview
+            function updatePreview() {
+                emailPreview.innerHTML = emailEditor.innerHTML;
+                
+                // Add email-specific styling to preview
+                const content = emailPreview.querySelector('.email-content');
+                if (!content) {
+                    emailPreview.innerHTML = `
+                        <div class="email-content">
+                            ${emailPreview.innerHTML}
+                        </div>
+                    `;
+                }
+            }
+            
+            // Generate HTML code
+            function generateHTML() {
+                const content = emailEditor.innerHTML;
+                
+                // Basic email template structure
+                const htmlTemplate = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Template</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .email-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .email-header {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .email-title {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .email-meta {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .email-body {
+            line-height: 1.7;
+        }
+        .email-body p {
+            margin-bottom: 15px;
+        }
+        .email-signature {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #7f8c8d;
+        }
+        .highlight {
+            background-color: #fff9c4;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-content">
+        ${content}
+    </div>
+</body>
+</html>
+                `;
+                
+                htmlOutput.value = htmlTemplate;
+            }
+            
+            // Reset editor
+            function resetEditor() {
+                if (confirm('Are you sure you want to reset the editor? All content will be lost.')) {
+                    emailEditor.innerHTML = `
+                        <div class="email-content">
+                            <div class="email-header">
+                                <div class="email-title">Your Email Subject Here</div>
+                                <div class="email-meta">To: recipient@example.com</div>
+                                <div class="email-meta">From: you@yourcompany.com</div>
+                            </div>
+                            <div class="email-body">
+                                <p>Hello [Recipient Name],</p>
+                                <p>Start composing your email here...</p>
+                            </div>
+                            <div class="email-signature">
+                                <p>Best regards,</p>
+                                <p><strong>Your Name</strong><br>
+                                Your Position<br>
+                                Your Company</p>
+                            </div>
+                        </div>
+                    `;
+                    updatePreview();
+                    htmlOutput.value = '';
+                }
+            }
+            
+            // Copy to clipboard
+            function copyToClipboard() {
+                htmlOutput.select();
+                document.execCommand('copy');
+                
+                // Show confirmation
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                }, 2000);
+            }
+            
+            // Show help
+            function showHelp() {
+                alert("How to use this email editor:\n\n1. Compose your email in the editor area\n2. Use the toolbar buttons to format your text\n3. Preview your email in real-time\n4. Click 'Generate HTML' to create email-ready HTML\n5. Copy the HTML code to use in your email campaigns");
+            }
+            
+            // Initialize with generated HTML
+            generateHTML();
+        });
+    </script>
+</body>
+</html>

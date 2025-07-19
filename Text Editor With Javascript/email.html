@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Email Sender</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --danger: #e63946;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .content {
+            display: flex;
+            min-height: 500px;
+        }
+        
+        .form-section {
+            flex: 1;
+            padding: 30px;
+            border-right: 1px solid #eee;
+        }
+        
+        .preview-section {
+            flex: 1;
+            padding: 30px;
+            background-color: #f9f9f9;
+        }
+        
+        h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-full {
+            width: 100%;
+            padding: 14px;
+            margin-top: 15px;
+        }
+        
+        .btn-success {
+            background-color: #2ecc71;
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        .employee-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-top: 20px;
+            background: white;
+        }
+        
+        .employee-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+        
+        .employee-item:last-child {
+            border-bottom: none;
+        }
+        
+        .employee-info {
+            flex: 1;
+        }
+        
+        .employee-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .employee-email {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .email-preview {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 350px;
+            margin-top: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .email-subject {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .email-body {
+            line-height: 1.6;
+            color: var(--dark);
+        }
+        
+        .status {
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .status.success {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: #27ae60;
+            display: block;
+        }
+        
+        .status.error {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: #c0392b;
+            display: block;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-input-button {
+            display: block;
+            padding: 12px;
+            background: #e9ecef;
+            text-align: center;
+            border-radius: 8px;
+            border: 1px dashed #ced4da;
+            color: var(--gray);
+            transition: all 0.3s;
+        }
+        
+        .file-input-wrapper:hover .file-input-button {
+            background: #dee2e6;
+        }
+        
+        .progress-container {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--success);
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .progress-text {
+            text-align: center;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .form-section {
+                border-right: none;
+                border-bottom: 1px solid #eee;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Employee Email Sender</h1>
+            <p>Send personalized emails to multiple employees at once</p>
+        </header>
+        
+        <div class="content">
+            <div class="form-section">
+                <h2>Compose Email</h2>
+                
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <input type="text" id="subject" placeholder="Important company announcement..." value="Quarterly Update and Important Announcements">
+                </div>
+                
+                <div class="form-group">
+                    <label for="emailBody">Email Content</label>
+                    <textarea id="emailBody" placeholder="Dear {{name}}, ...">
+Dear {{name}},
+
+We're excited to share the latest updates from our company. 
+
+This quarter, we've achieved remarkable growth in all departments, with a 23% increase in overall productivity. 
+
+Please remember to submit your timesheets by Friday for the current pay period. Also, don't forget about the team building event next Tuesday at 3 PM.
+
+If you have any questions, feel free to reach out to HR.
+
+Best regards,
+Management Team
+                    </textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Upload Employee List (CSV)</label>
+                    <div class="file-input-wrapper">
+                        <div class="file-input-button">
+                            <span id="fileName">Click to upload CSV file</span>
+                        </div>
+                        <input type="file" id="csvFile" accept=".csv">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Recipients</label>
+                    <div class="employee-list" id="employeeList">
+                        <div class="employee-item">
+                            <div class="employee-info">
+                                <div class="employee-name">Sarah Johnson</div>
+                                <div class="employee-email">sarah@company.com</div>
+                            </div>
+                        </div>
+                        <div class="employee-item">
+                            <div class="employee-info">
+                                <div class="employee-name">Michael Chen</div>
+                                <div class="employee-email">michael@company.com</div>
+                            </div>
+                        </div>
+                        <div class="employee-item">
+                            <div class="employee-info">
+                                <div class="employee-name">Emma Rodriguez</div>
+                                <div class="employee-email">emma@company.com</div>
+                            </div>
+                        </div>
+                        <div class="employee-item">
+                            <div class="employee-info">
+                                <div class="employee-name">David Kim</div>
+                                <div class="employee-email">david@company.com</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-full btn-success" id="sendEmailsBtn">Send Emails to All Employees</button>
+                
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Processing: 0%</div>
+                </div>
+                
+                <div class="status success" id="successStatus">Emails sent successfully!</div>
+                <div class="status error" id="errorStatus">An error occurred while sending emails.</div>
+            </div>
+            
+            <div class="preview-section">
+                <h2>Email Preview</h2>
+                
+                <div class="email-preview">
+                    <div class="email-subject" id="previewSubject">Quarterly Update and Important Announcements</div>
+                    <div class="email-body" id="previewBody">
+                        Dear {{name}},<br><br>
+                        
+                        We're excited to share the latest updates from our company.<br><br>
+                        
+                        This quarter, we've achieved remarkable growth in all departments, with a 23% increase in overall productivity.<br><br>
+                        
+                        Please remember to submit your timesheets by Friday for the current pay period. Also, don't forget about the team building event next Tuesday at 3 PM.<br><br>
+                        
+                        If you have any questions, feel free to reach out to HR.<br><br>
+                        
+                        Best regards,<br>
+                        Management Team
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="previewEmployee">Preview for:</label>
+                    <select id="previewEmployee">
+                        <option value="Sarah Johnson">Sarah Johnson</option>
+                        <option value="Michael Chen">Michael Chen</option>
+                        <option value="Emma Rodriguez">Emma Rodriguez</option>
+                        <option value="David Kim">David Kim</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <button class="btn btn-full" id="refreshPreviewBtn">Refresh Preview</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const subjectInput = document.getElementById('subject');
+            const emailBodyInput = document.getElementById('emailBody');
+            const csvFileInput = document.getElementById('csvFile');
+            const fileNameSpan = document.getElementById('fileName');
+            const employeeList = document.getElementById('employeeList');
+            const sendEmailsBtn = document.getElementById('sendEmailsBtn');
+            const previewSubject = document.getElementById('previewSubject');
+            const previewBody = document.getElementById('previewBody');
+            const previewEmployeeSelect = document.getElementById('previewEmployee');
+            const refreshPreviewBtn = document.getElementById('refreshPreviewBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const successStatus = document.getElementById('successStatus');
+            const errorStatus = document.getElementById('errorStatus');
+            
+            // Sample employee data (in a real app, this would come from CSV)
+            let employees = [
+                { name: "Sarah Johnson", email: "sarah@company.com" },
+                { name: "Michael Chen", email: "michael@company.com" },
+                { name: "Emma Rodriguez", email: "emma@company.com" },
+                { name: "David Kim", email: "david@company.com" }
+            ];
+            
+            // Update file name when selected
+            csvFileInput.addEventListener('change', function(e) {
+                if (this.files.length > 0) {
+                    fileNameSpan.textContent = this.files[0].name;
+                    // In a real app, you would parse the CSV here
+                    simulateCSVUpload();
+                } else {
+                    fileNameSpan.textContent = 'Click to upload CSV file';
+                }
+            });
+            
+            // Refresh preview when content changes
+            emailBodyInput.addEventListener('input', refreshPreview);
+            subjectInput.addEventListener('input', refreshPreview);
+            previewEmployeeSelect.addEventListener('change', refreshPreview);
+            refreshPreviewBtn.addEventListener('click', refreshPreview);
+            
+            // Initialize preview
+            refreshPreview();
+            
+            // Send emails button handler
+            sendEmailsBtn.addEventListener('click', function() {
+                const subject = subjectInput.value.trim();
+                const body = emailBodyInput.value.trim();
+                
+                if (!subject || !body) {
+                    alert('Please fill in both subject and body fields');
+                    return;
+                }
+                
+                if (employees.length === 0) {
+                    alert('Please add at least one employee');
+                    return;
+                }
+                
+                // Show progress bar
+                progressContainer.style.display = 'block';
+                successStatus.style.display = 'none';
+                errorStatus.style.display = 'none';
+                
+                // Simulate sending emails with progress
+                simulateEmailSending();
+            });
+            
+            function refreshPreview() {
+                const selectedEmployee = previewEmployeeSelect.value;
+                const subject = subjectInput.value;
+                const body = emailBodyInput.value;
+                
+                previewSubject.textContent = subject;
+                
+                // Replace placeholders with actual employee data
+                let personalizedBody = body.replace(/{{name}}/g, selectedEmployee);
+                personalizedBody = personalizedBody.replace(/\n/g, '<br>');
+                
+                previewBody.innerHTML = personalizedBody;
+            }
+            
+            function simulateCSVUpload() {
+                // In a real app, you would parse the CSV file here
+                // For this demo, we'll just add some dummy employees
+                
+                // Clear existing employees
+                employeeList.innerHTML = '';
+                
+                // Add more employees for demo
+                const newEmployees = [
+                    { name: "James Wilson", email: "james@company.com" },
+                    { name: "Lisa Thompson", email: "lisa@company.com" },
+                    { name: "Robert Garcia", email: "robert@company.com" }
+                ];
+                
+                employees = [...employees, ...newEmployees];
+                
+                // Add employees to the list
+                employees.forEach(emp => {
+                    const employeeItem = document.createElement('div');
+                    employeeItem.className = 'employee-item';
+                    employeeItem.innerHTML = `
+                        <div class="employee-info">
+                            <div class="employee-name">${emp.name}</div>
+                            <div class="employee-email">${emp.email}</div>
+                        </div>
+                    `;
+                    employeeList.appendChild(employeeItem);
+                });
+                
+                // Add options to preview dropdown
+                newEmployees.forEach(emp => {
+                    const option = document.createElement('option');
+                    option.value = emp.name;
+                    option.textContent = emp.name;
+                    previewEmployeeSelect.appendChild(option);
+                });
+                
+                refreshPreview();
+            }
+            
+            function simulateEmailSending() {
+                const totalEmails = employees.length;
+                let sentCount = 0;
+                
+                // Reset progress
+                progressFill.style.width = '0%';
+                progressText.textContent = `Processing: 0%`;
+                
+                // Simulate sending each email with delay
+                const sendInterval = setInterval(() => {
+                    sentCount++;
+                    const progress = Math.round((sentCount / totalEmails) * 100);
+                    
+                    progressFill.style.width = `${progress}%`;
+                    progressText.textContent = `Processing: ${progress}% (${sentCount}/${totalEmails})`;
+                    
+                    if (sentCount === totalEmails) {
+                        clearInterval(sendInterval);
+                        
+                        // Show success message after a delay
+                        setTimeout(() => {
+                            successStatus.style.display = 'block';
+                            progressContainer.style.display = 'none';
+                        }, 500);
+                    }
+                }, 300); // Simulate delay between emails
+            }
+        });
+    </script>
+</body>
+</html>

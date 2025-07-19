@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Softwoatr 音乐播放器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+        }
+        
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .player-card {
+            background: rgba(25, 25, 45, 0.8);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            color: #4ecca3;
+            font-size: 28px;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #4ecca3, #00d4ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .music-cover {
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 30px;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .music-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .music-cover:hover img {
+            transform: scale(1.05);
+        }
+        
+        .music-cover::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);
+        }
+        
+        .music-info {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .music-info h2 {
+            font-size: 26px;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .music-info p {
+            color: #aaa;
+            font-size: 18px;
+        }
+        
+        .progress-area {
+            margin-bottom: 30px;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        
+        .progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, #4ecca3, #00d4ff);
+            border-radius: 10px;
+            position: relative;
+        }
+        
+        .progress::after {
+            content: '';
+            position: absolute;
+            height: 14px;
+            width: 14px;
+            background: #fff;
+            border-radius: 50%;
+            right: -7px;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 0 10px rgba(78, 204, 163, 0.8);
+        }
+        
+        .timer {
+            display: flex;
+            justify-content: space-between;
+            color: #aaa;
+            font-size: 14px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .controls i {
+            font-size: 20px;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .controls i:hover {
+            color: #4ecca3;
+            transform: scale(1.1);
+        }
+        
+        .controls i.fa-play-circle,
+        .controls i.fa-pause-circle {
+            font-size: 60px;
+            color: #4ecca3;
+        }
+        
+        .controls i.fa-step-backward,
+        .controls i.fa-step-forward {
+            font-size: 26px;
+        }
+        
+        .volume-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .volume-area i {
+            font-size: 20px;
+            color: #ddd;
+        }
+        
+        .volume-slider {
+            width: 100px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        
+        .volume-percentage {
+            height: 100%;
+            width: 70%;
+            background: linear-gradient(to right, #4ecca3, #00d4ff);
+            border-radius: 10px;
+        }
+        
+        .visualizer {
+            height: 120px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 4px;
+        }
+        
+        .bar {
+            width: 10px;
+            background: linear-gradient(to top, #4ecca3, #00d4ff);
+            border-radius: 5px 5px 0 0;
+            height: 20%;
+            animation: animate 1.5s infinite ease-in-out;
+        }
+        
+        .bar:nth-child(1) { animation-delay: 0s; height: 30%; }
+        .bar:nth-child(2) { animation-delay: 0.1s; height: 60%; }
+        .bar:nth-child(3) { animation-delay: 0.2s; height: 40%; }
+        .bar:nth-child(4) { animation-delay: 0.3s; height: 80%; }
+        .bar:nth-child(5) { animation-delay: 0.4s; height: 50%; }
+        .bar:nth-child(6) { animation-delay: 0.5s; height: 70%; }
+        .bar:nth-child(7) { animation-delay: 0.6s; height: 60%; }
+        .bar:nth-child(8) { animation-delay: 0.7s; height: 30%; }
+        .bar:nth-child(9) { animation-delay: 0.8s; height: 50%; }
+        .bar:nth-child(10) { animation-delay: 0.9s; height: 70%; }
+        
+        @keyframes animate {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.5); }
+        }
+        
+        /* Playlist Styles */
+        .playlist-card {
+            background: rgba(25, 25, 45, 0.8);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .playlist-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .playlist-header h2 {
+            font-size: 22px;
+            font-weight: 600;
+        }
+        
+        .playlist-header span {
+            background: rgba(78, 204, 163, 0.2);
+            color: #4ecca3;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .playlist {
+            list-style: none;
+            height: 100%;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .playlist::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .playlist::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .playlist::-webkit-scrollbar-thumb {
+            background: rgba(78, 204, 163, 0.5);
+            border-radius: 10px;
+        }
+        
+        .playlist li {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .playlist li:hover {
+            background: rgba(78, 204, 163, 0.1);
+        }
+        
+        .playlist li.active {
+            background: rgba(78, 204, 163, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .playlist li .album-cover {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-right: 15px;
+        }
+        
+        .playlist li .album-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .playlist li .song-info {
+            flex: 1;
+        }
+        
+        .playlist li .song-info h4 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .playlist li .song-info p {
+            font-size: 14px;
+            color: #aaa;
+        }
+        
+        .playlist li .song-duration {
+            color: #aaa;
+            font-size: 14px;
+        }
+        
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .footer a {
+            color: #4ecca3;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 音乐播放器部分 -->
+        <div class="player-card">
+            <div class="header">
+                <div class="logo">
+                    <i class="fas fa-music"></i>
+                    <h1>Softwoatr Music</h1>
+                </div>
+                <div class="settings">
+                    <i class="fas fa-cog"></i>
+                </div>
+            </div>
+            
+            <div class="music-cover">
+                <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Album Cover">
+            </div>
+            
+            <div class="music-info">
+                <h2>Midnight City</h2>
+                <p>M83</p>
+            </div>
+            
+            <div class="progress-area">
+                <div class="progress-bar">
+                    <div class="progress"></div>
+                </div>
+                <div class="timer">
+                    <span class="current-time">0:00</span>
+                    <span class="max-duration">4:32</span>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <i class="fas fa-random"></i>
+                <i class="fas fa-step-backward"></i>
+                <i class="fas fa-play-circle" id="play-btn"></i>
+                <i class="fas fa-step-forward"></i>
+                <i class="fas fa-redo"></i>
+            </div>
+            
+            <div class="volume-area">
+                <i class="fas fa-volume-up"></i>
+                <div class="volume-slider">
+                    <div class="volume-percentage"></div>
+                </div>
+            </div>
+            
+            <div class="visualizer">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+        </div>
+        
+        <!-- 播放列表部分 -->
+        <div class="playlist-card">
+            <div class="playlist-header">
+                <h2>播放列表</h2>
+                <span>9 首歌曲</span>
+            </div>
+            
+            <ul class="playlist">
+                <li class="active">
+                    <div class="album-cover">
+                        <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Cover">
+                    </div>
+                    <div class="song-info">
+                        <h4>Midnight City</h4>
+                        <p>M83</p>
+                    </div>
+                    <div class="song-duration">4:32</div>
+                </li>
+                <li>
+                    <div class="album-cover">
+                        <img src="https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Cover">
+                    </div>
+                    <div class="song-info">
+                        <h4>Blinding Lights</h4>
+                        <p>The Weeknd</p>
+                    </div>
+                    <div class="song-duration">3:22</div>
+                </li>
+                <li>
+                    <div class="album-cover">
+                        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Cover">
+                    </div>
+                    <div class="song-info">
+                        <h4>Starboy</h4>
+                        <p>The Weeknd, Daft Punk</p>
+                    </div>
+                    <div class="song-duration">3:50</div>
+                </li>
+                <li>
+                    <div class="album-cover">
+                        <img src="https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Cover">
+                    </div>
+                    <div class="song-info">
+                        <h4>Save Your Tears</h4>
+                        <p>The Weeknd</p>
+                    </div>
+                    <div class="song-duration">3:35</div>
+                </li>
+                <li>
+                    <div class="album-cover">
+                        <img src="https://images.unsplash.com/photo-1507838153414-b4b713384a76?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Cover">
+                    </div>
+                    <div class="song-info">
+                        <h4>Levitating</h4>
+                        <p>Dua Lipa</p>
+                    </div>
+                    <div class="song-duration">3:23</div>
+                </li>
+                <li>
+                    <div class="album-cover">
+                        <img src="https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Cover">
+                    </div>
+                    <div class="song-info">
+                        <h4>Don't Start Now</h4>
+                        <p>Dua Lipa</p>
+                    </div>
+                    <div class="song-duration">3:03</div>
+                </li>
+                <li>
+                    <div class="album-cover">
+                        <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Cover">
+                    </div>
+                    <div class="song-info">
+                        <h4>Cold Heart</h4>
+                        <p>Elton John, Dua Lipa</p>
+                    </div>
+                    <div class="song-duration">3:22</div>
+                </li>
+                <li>
+                    <div class="album-cover">
+                        <img src="https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Cover">
+                    </div>
+                    <div class="song-info">
+                        <h4>Shape of You</h4>
+                        <p>Ed Sheeran</p>
+                    </div>
+                    <div class="song-duration">3:53</div>
+                </li>
+                <li>
+                    <div class="album-cover">
+                        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Cover">
+                    </div>
+                    <div class="song-info">
+                        <h4>Bad Guy</h4>
+                        <p>Billie Eilish</p>
+                    </div>
+                    <div class="song-duration">3:14</div>
+                </li>
+            </ul>
+            
+            <div class="footer">
+                <p>© 2023 Softwoatr Music Player | 设计灵感来自 <a href="#" target="_blank">Modern UI</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <audio id="main-audio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const playBtn = document.getElementById('play-btn');
+            const audio = document.getElementById('main-audio');
+            const progressBar = document.querySelector('.progress');
+            const currentTimeEl = document.querySelector('.current-time');
+            const maxDurationEl = document.querySelector('.max-duration');
+            const playlistItems = document.querySelectorAll('.playlist li');
+            const songTitles = document.querySelectorAll('.song-info h4');
+            const artists = document.querySelectorAll('.song-info p');
+            const covers = document.querySelectorAll('.album-cover img');
+            const mainCover = document.querySelector('.music-cover img');
+            const mainTitle = document.querySelector('.music-info h2');
+            const mainArtist = document.querySelector('.music-info p');
+            const prevBtn = document.querySelector('.fa-step-backward');
+            const nextBtn = document.querySelector('.fa-step-forward');
+            
+            // 初始化当前歌曲索引
+            let currentSongIndex = 0;
+            
+            // 播放/暂停功能
+            playBtn.addEventListener('click', () => {
+                if (audio.paused) {
+                    audio.play();
+                    playBtn.classList.remove('fa-play-circle');
+                    playBtn.classList.add('fa-pause-circle');
+                } else {
+                    audio.pause();
+                    playBtn.classList.remove('fa-pause-circle');
+                    playBtn.classList.add('fa-play-circle');
+                }
+            });
+            
+            // 更新进度条
+            audio.addEventListener('timeupdate', () => {
+                const currentTime = audio.currentTime;
+                const duration = audio.duration;
+                
+                // 更新进度条宽度
+                const progressPercent = (currentTime / duration) * 100;
+                progressBar.style.width = `${progressPercent}%`;
+                
+                // 更新时间显示
+                currentTimeEl.textContent = formatTime(currentTime);
+                maxDurationEl.textContent = formatTime(duration);
+            });
+            
+            // 点击进度条跳转
+            const progressArea = document.querySelector('.progress-bar');
+            progressArea.addEventListener('click', (e) => {
+                const progressWidth = progressArea.clientWidth;
+                const clickOffsetX = e.offsetX;
+                const duration = audio.duration;
+                
+                audio.currentTime = (clickOffsetX / progressWidth) * duration;
+            });
+            
+            // 音量控制
+            const volumeSlider = document.querySelector('.volume-slider');
+            volumeSlider.addEventListener('click', (e) => {
+                const sliderWidth = volumeSlider.clientWidth;
+                const clickOffsetX = e.offsetX;
+                const volume = clickOffsetX / sliderWidth;
+                
+                audio.volume = volume;
+                document.querySelector('.volume-percentage').style.width = `${volume * 100}%`;
+            });
+            
+            // 设置初始音量
+            audio.volume = 0.7;
+            
+            // 播放列表项点击
+            playlistItems.forEach((item, index) => {
+                item.addEventListener('click', () => {
+                    // 更新活动状态
+                    playlistItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    // 更新当前歌曲索引
+                    currentSongIndex = index;
+                    
+                    // 更新主播放器信息
+                    updatePlayerInfo();
+                    
+                    // 播放歌曲
+                    audio.src = `https://www.soundhelix.com/examples/mp3/SoundHelix-Song-${index + 1}.mp3`;
+                    audio.play();
+                    playBtn.classList.remove('fa-play-circle');
+                    playBtn.classList.add('fa-pause-circle');
+                });
+            });
+            
+            // 上一首
+            prevBtn.addEventListener('click', () => {
+                currentSongIndex--;
+                if (currentSongIndex < 0) {
+                    currentSongIndex = playlistItems.length - 1;
+                }
+                changeSong(currentSongIndex);
+            });
+            
+            // 下一首
+            nextBtn.addEventListener('click', () => {
+                currentSongIndex++;
+                if (currentSongIndex >= playlistItems.length) {
+                    currentSongIndex = 0;
+                }
+                changeSong(currentSongIndex);
+            });
+            
+            // 歌曲结束时自动播放下一首
+            audio.addEventListener('ended', () => {
+                nextBtn.click();
+            });
+            
+            // 格式化时间函数
+            function formatTime(time) {
+                const minutes = Math.floor(time / 60);
+                const seconds = Math.floor(time % 60);
+                return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            }
+            
+            // 更新播放器信息
+            function updatePlayerInfo() {
+                mainTitle.textContent = songTitles[currentSongIndex].textContent;
+                mainArtist.textContent = artists[currentSongIndex].textContent;
+                mainCover.src = covers[currentSongIndex].src;
+                
+                // 更新播放列表活动状态
+                playlistItems.forEach((item, index) => {
+                    if (index === currentSongIndex) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+            }
+            
+            // 切换歌曲
+            function changeSong(index) {
+                currentSongIndex = index;
+                updatePlayerInfo();
+                audio.src = `https://www.soundhelix.com/examples/mp3/SoundHelix-Song-${index + 1}.mp3`;
+                audio.play();
+                playBtn.classList.remove('fa-play-circle');
+                playBtn.classList.add('fa-pause-circle');
+            }
+            
+            // 模拟音频可视化
+            const bars = document.querySelectorAll('.bar');
+            function animateBars() {
+                bars.forEach(bar => {
+                    const randomHeight = Math.floor(Math.random() * 100) + 10;
+                    bar.style.height = `${randomHeight}%`;
+                });
+                
+                requestAnimationFrame(animateBars);
+            }
+            
+            animateBars();
+        });
+    </script>
+</body>
+</html>

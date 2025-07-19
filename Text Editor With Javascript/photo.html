@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoftErwt Photo Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .editor-header {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .editor-header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .editor-header .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+        }
+
+        .editor-body {
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .image-section {
+            flex: 1;
+            min-width: 300px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            border: 2px dashed #c0c0c0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background: white;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #preview-img {
+            max-width: 100%;
+            max-height: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .placeholder-text {
+            color: #6c757d;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .controls-section {
+            flex: 1;
+            min-width: 300px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: #e9ecef;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: #4b6cb7;
+            color: white;
+        }
+
+        .tab-btn:hover {
+            background: #dee2e6;
+        }
+
+        .tab-btn.active:hover {
+            background: #3a5795;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .filter-control {
+            margin-bottom: 20px;
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .slider-container input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: #dee2e6;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4b6cb7;
+            cursor: pointer;
+        }
+
+        .value-display {
+            width: 50px;
+            text-align: center;
+            font-weight: 600;
+            color: #4b6cb7;
+        }
+
+        .transform-controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .transform-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #e9ecef;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .transform-btn:hover {
+            background: #dee2e6;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .primary-btn {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+            color: white;
+        }
+
+        .secondary-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .reset-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .preset-filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .preset-btn {
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: #e9ecef;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .preset-btn:hover {
+            background: #dee2e6;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            font-size: 0.9rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        @media (max-width: 768px) {
+            .editor-body {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="editor-header">
+            <h1>SoftErwt Photo Editor</h1>
+            <div class="logo">
+                <i class="fas fa-camera-retro"></i>
+                <span>Pure JavaScript Editor</span>
+            </div>
+        </div>
+        
+        <div class="editor-body">
+            <div class="image-section">
+                <div class="preview-container">
+                    <div class="placeholder-text" id="placeholder">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                        <h3>No Image Selected</h3>
+                        <p>Choose an image to start editing</p>
+                    </div>
+                    <img id="preview-img" alt="Preview" style="display: none;">
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn primary-btn" id="choose-btn">
+                        <i class="fas fa-folder-open"></i> Choose Image
+                    </button>
+                    <input type="file" id="file-input" class="file-input" accept="image/*">
+                    <button class="action-btn secondary-btn" id="save-btn">
+                        <i class="fas fa-download"></i> Save Image
+                    </button>
+                    <button class="action-btn reset-btn" id="reset-btn">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+            </div>
+            
+            <div class="controls-section">
+                <div class="controls-tabs">
+                    <button class="tab-btn active" data-tab="filters">Filters</button>
+                    <button class="tab-btn" data-tab="adjust">Adjust</button>
+                    <button class="tab-btn" data-tab="transform">Transform</button>
+                </div>
+                
+                <div id="filters-tab" class="tab-content active">
+                    <h3>Filter Presets</h3>
+                    <div class="preset-filters">
+                        <button class="preset-btn" data-preset="normal">Normal</button>
+                        <button class="preset-btn" data-preset="vintage">Vintage</button>
+                        <button class="preset-btn" data-preset="blackWhite">B&W</button>
+                        <button class="preset-btn" data-preset="warm">Warm</button>
+                        <button class="preset-btn" data-preset="cool">Cool</button>
+                        <button class="preset-btn" data-preset="invert">Invert</button>
+                        <button class="preset-btn" data-preset="sepia">Sepia</button>
+                        <button class="preset-btn" data-preset="clarendon">Clarendon</button>
+                    </div>
+                    
+                    <h3 style="margin-top: 25px;">Custom Filters</h3>
+                    <div class="filter-control">
+                        <div class="filter-header">
+                            <span>Brightness</span>
+                            <span class="value-display" id="brightness-value">100%</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" min="0" max="200" value="100" class="filter-slider" id="brightness">
+                        </div>
+                    </div>
+                    
+                    <div class="filter-control">
+                        <div class="filter-header">
+                            <span>Contrast</span>
+                            <span class="value-display" id="contrast-value">100%</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" min="0" max="200" value="100" class="filter-slider" id="contrast">
+                        </div>
+                    </div>
+                    
+                    <div class="filter-control">
+                        <div class="filter-header">
+                            <span>Saturation</span>
+                            <span class="value-display" id="saturation-value">100%</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" min="0" max="200" value="100" class="filter-slider" id="saturation">
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="adjust-tab" class="tab-content">
+                    <div class="filter-control">
+                        <div class="filter-header">
+                            <span>Grayscale</span>
+                            <span class="value-display" id="grayscale-value">0%</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" min="0" max="100" value="0" class="filter-slider" id="grayscale">
+                        </div>
+                    </div>
+                    
+                    <div class="filter-control">
+                        <div class="filter-header">
+                            <span>Blur</span>
+                            <span class="value-display" id="blur-value">0px</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" min="0" max="20" value="0" class="filter-slider" id="blur">
+                        </div>
+                    </div>
+                    
+                    <div class="filter-control">
+                        <div class="filter-header">
+                            <span>Opacity</span>
+                            <span class="value-display" id="opacity-value">100%</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" min="0" max="100" value="100" class="filter-slider" id="opacity">
+                        </div>
+                    </div>
+                    
+                    <div class="filter-control">
+                        <div class="filter-header">
+                            <span>Hue Rotation</span>
+                            <span class="value-display" id="hue-value">0deg</span>
+                        </div>
+                        <div class="slider-container">
+                            <input type="range" min="0" max="360" value="0" class="filter-slider" id="hue">
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="transform-tab" class="tab-content">
+                    <div class="transform-controls">
+                        <button class="transform-btn" id="rotate-left">
+                            <i class="fas fa-undo"></i> Rotate Left
+                        </button>
+                        <button class="transform-btn" id="rotate-right">
+                            <i class="fas fa-redo"></i> Rotate Right
+                        </button>
+                        <button class="transform-btn" id="flip-horizontal">
+                            <i class="fas fa-arrows-alt-h"></i> Flip Horizontal
+                        </button>
+                        <button class="transform-btn" id="flip-vertical">
+                            <i class="fas fa-arrows-alt-v"></i> Flip Vertical
+                        </button>
+                    </div>
+                    
+                    <h3 style="margin-top: 25px;">Crop Image</h3>
+                    <div class="action-buttons">
+                        <button class="action-btn secondary-btn" id="crop-btn">
+                            <i class="fas fa-crop-alt"></i> Crop Selection
+                        </button>
+                        <button class="action-btn reset-btn" id="cancel-crop">
+                            <i class="fas fa-times"></i> Cancel Crop
+                        </button>
+                    </div>
+                    <div id="crop-instructions" style="margin-top: 15px; color: #6c757d; font-size: 0.9rem;">
+                        <p>Drag on the image to select crop area. Adjust corners to refine selection.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>SoftErwt Photo Editor | Pure HTML, CSS & JavaScript | No external libraries used</p>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const fileInput = document.getElementById('file-input');
+        const chooseBtn = document.getElementById('choose-btn');
+        const saveBtn = document.getElementById('save-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const previewImg = document.getElementById('preview-img');
+        const placeholder = document.getElementById('placeholder');
+        const filterSliders = document.querySelectorAll('.filter-slider');
+        const presetBtns = document.querySelectorAll('.preset-btn');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const transformBtns = document.querySelectorAll('.transform-btn');
+        
+        // Edit state
+        let editState = {
+            brightness: 100,
+            contrast: 100,
+            saturation: 100,
+            grayscale: 0,
+            blur: 0,
+            opacity: 100,
+            hue: 0,
+            rotate: 0,
+            scaleX: 1,
+            scaleY: 1
+        };
+        
+        let originalImage = null;
+        let isCropping = false;
+        
+        // Initialize the editor
+        function initEditor() {
+            // Event listeners
+            chooseBtn.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', loadImage);
+            saveBtn.addEventListener('click', saveImage);
+            resetBtn.addEventListener('click', resetImage);
+            
+            // Filter sliders
+            filterSliders.forEach(slider => {
+                slider.addEventListener('input', updateFilter);
+                updateValueDisplay(slider.id, slider.value);
+            });
+            
+            // Preset filters
+            presetBtns.forEach(btn => {
+                btn.addEventListener('click', applyPreset);
+            });
+            
+            // Tab switching
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', switchTab);
+            });
+            
+            // Transform buttons
+            transformBtns.forEach(btn => {
+                btn.addEventListener('click', applyTransform);
+            });
+            
+            // Crop buttons
+            document.getElementById('crop-btn').addEventListener('click', startCrop);
+            document.getElementById('cancel-crop').addEventListener('click', cancelCrop);
+        }
+        
+        // Load image from file input
+        function loadImage(e) {
+            const file = e.target.files[0];
+            if (!file || !file.type.match('image.*')) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImg.src = e.target.result;
+                previewImg.style.display = 'block';
+                placeholder.style.display = 'none';
+                originalImage = e.target.result;
+                resetEditState();
+                applyFilters();
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Update filter value and apply
+        function updateFilter(e) {
+            const filter = e.target.id;
+            const value = e.target.value;
+            
+            editState[filter] = value;
+            applyFilters();
+            updateValueDisplay(filter, value);
+        }
+        
+        // Update value display
+        function updateValueDisplay(filter, value) {
+            const displayElement = document.getElementById(`${filter}-value`);
+            if (!displayElement) return;
+            
+            if (filter === 'blur') {
+                displayElement.textContent = `${value}px`;
+            } else if (filter === 'hue') {
+                displayElement.textContent = `${value}°`;
+            } else {
+                displayElement.textContent = `${value}%`;
+            }
+        }
+        
+        // Apply all filters to image
+        function applyFilters() {
+            const { brightness, contrast, saturation, grayscale, 
+                    blur, opacity, hue, rotate, scaleX, scaleY } = editState;
+            
+            previewImg.style.filter = `
+                brightness(${brightness}%) 
+                contrast(${contrast}%) 
+                saturate(${saturation}%) 
+                grayscale(${grayscale}%) 
+                blur(${blur}px) 
+                opacity(${opacity}%) 
+                hue-rotate(${hue}deg)
+            `;
+            
+            previewImg.style.transform = `
+                rotate(${rotate}deg) 
+                scaleX(${scaleX}) 
+                scaleY(${scaleY})
+            `;
+        }
+        
+        // Apply preset filter
+        function applyPreset(e) {
+            const preset = e.target.dataset.preset;
+            
+            switch(preset) {
+                case 'normal':
+                    editState = { ...editState, brightness: 100, contrast: 100, saturation: 100, 
+                                grayscale: 0, blur: 0, opacity: 100, hue: 0 };
+                    break;
+                case 'vintage':
+                    editState = { ...editState, brightness: 110, contrast: 90, saturation: 85, 
+                                grayscale: 0, blur: 0, opacity: 100, hue: -10 };
+                    break;
+                case 'blackWhite':
+                    editState = { ...editState, grayscale: 100, saturation: 0 };
+                    break;
+                case 'warm':
+                    editState = { ...editState, hue: 30, saturation: 120, contrast: 110 };
+                    break;
+                case 'cool':
+                    editState = { ...editState, hue: 180, saturation: 120, brightness: 110 };
+                    break;
+                case 'invert':
+                    previewImg.style.filter += 'invert(100%)';
+                    break;
+                case 'sepia':
+                    previewImg.style.filter += 'sepia(100%)';
+                    break;
+                case 'clarendon':
+                    editState = { ...editState, contrast: 130, saturation: 120, brightness: 110 };
+                    break;
+            }
+            
+            // Update sliders to match preset
+            Object.keys(editState).forEach(key => {
+                const slider = document.getElementById(key);
+                if (slider) {
+                    slider.value = editState[key];
+                    updateValueDisplay(key, editState[key]);
+                }
+            });
+            
+            applyFilters();
+        }
+        
+        // Apply transform (rotate/flip)
+        function applyTransform(e) {
+            const transform = e.target.id;
+            
+            switch(transform) {
+                case 'rotate-left':
+                    editState.rotate -= 90;
+                    break;
+                case 'rotate-right':
+                    editState.rotate += 90;
+                    break;
+                case 'flip-horizontal':
+                    editState.scaleX = editState.scaleX === 1 ? -1 : 1;
+                    break;
+                case 'flip-vertical':
+                    editState.scaleY = editState.scaleY === 1 ? -1 : 1;
+                    break;
+            }
+            
+            applyFilters();
+        }
+        
+        // Start cropping
+        function startCrop() {
+            isCropping = true;
+            // In a real implementation, we would add cropping functionality here
+            alert("Crop functionality would be implemented with canvas in a complete version");
+        }
+        
+        // Cancel cropping
+        function cancelCrop() {
+            isCropping = false;
+        }
+        
+        // Switch tabs
+        function switchTab(e) {
+            const tabId = e.target.dataset.tab;
+            
+            // Update active tab button
+            tabBtns.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabId);
+            });
+            
+            // Show active tab content
+            tabContents.forEach(content => {
+                content.classList.toggle('active', content.id === `${tabId}-tab`);
+            });
+        }
+        
+        // Save edited image
+        function saveImage() {
+            if (!previewImg.src || previewImg.src === window.location.href) {
+                alert("Please load an image first");
+                return;
+            }
+            
+            // In a real implementation, we would use canvas to save with filters applied
+            alert("In a complete implementation, this would save the edited image with all filters applied");
+            
+            // For demonstration, we create a temporary link
+            const link = document.createElement('a');
+            link.href = previewImg.src;
+            link.download = 'edited-image.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Reset image to original
+        function resetImage() {
+            if (originalImage) {
+                previewImg.src = originalImage;
+                resetEditState();
+                applyFilters();
+                
+                // Reset sliders
+                Object.keys(editState).forEach(key => {
+                    const slider = document.getElementById(key);
+                    if (slider) {
+                        slider.value = editState[key];
+                        updateValueDisplay(key, editState[key]);
+                    }
+                });
+            }
+        }
+        
+        // Reset edit state to default
+        function resetEditState() {
+            editState = {
+                brightness: 100,
+                contrast: 100,
+                saturation: 100,
+                grayscale: 0,
+                blur: 0,
+                opacity: 100,
+                hue: 0,
+                rotate: 0,
+                scaleX: 1,
+                scaleY: 1
+            };
+        }
+        
+        // Initialize the editor when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initEditor);
+    </script>
+</body>
+</html>

@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoftPhone - Web-Based Phone System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            padding: 20px;
+        }
+        
+        .phone-container {
+            width: 100%;
+            max-width: 380px;
+            background: #fff;
+            border-radius: 25px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+        
+        .phone-header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .phone-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        
+        .phone-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 15px;
+            opacity: 0.7;
+        }
+        
+        .display-area {
+            background: #0d1b2a;
+            padding: 25px 20px;
+            color: #fff;
+            text-align: center;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .number-display {
+            font-size: 2.8rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin: 10px 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .call-status {
+            font-size: 1.1rem;
+            color: #4ade80;
+            height: 25px;
+        }
+        
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 25px;
+            background: #f5f7fa;
+        }
+        
+        .key {
+            background: white;
+            border: none;
+            border-radius: 50%;
+            aspect-ratio: 1/1;
+            font-size: 1.8rem;
+            font-weight: 300;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .key:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .key:active {
+            transform: translateY(1px);
+        }
+        
+        .key .sub-label {
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: #7f8c8d;
+            position: absolute;
+            bottom: 8px;
+        }
+        
+        .call-controls {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background: #ecf0f1;
+        }
+        
+        .control-btn {
+            background: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .call-btn {
+            background: #2ecc71;
+            color: white;
+            width: 70px;
+            height: 70px;
+        }
+        
+        .end-btn {
+            background: #e74c3c;
+            color: white;
+            width: 70px;
+            height: 70px;
+        }
+        
+        .control-btn i {
+            font-size: 1.5rem;
+        }
+        
+        .call-btn:hover {
+            background: #27ae60;
+            transform: scale(1.05);
+        }
+        
+        .end-btn:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+        
+        .mute-btn.active, .hold-btn.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .recent-calls {
+            background: #fff;
+            padding: 15px 25px;
+            border-top: 1px solid #eee;
+        }
+        
+        .recent-title {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .call-list {
+            list-style: none;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .call-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .call-item:last-child {
+            border-bottom: none;
+        }
+        
+        .call-number {
+            font-weight: 500;
+        }
+        
+        .call-time {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .auto-dial-controls {
+            display: flex;
+            padding: 15px 25px;
+            background: #ecf0f1;
+            gap: 10px;
+        }
+        
+        .number-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 30px;
+            font-size: 1rem;
+            outline: none;
+            transition: border 0.3s;
+        }
+        
+        .number-input:focus {
+            border-color: #3498db;
+        }
+        
+        .auto-dial-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 0 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .auto-dial-btn:hover {
+            background: #2980b9;
+        }
+        
+        .footer {
+            padding: 15px;
+            text-align: center;
+            background: #2c3e50;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+        }
+        
+        @media (max-width: 480px) {
+            .phone-container {
+                max-width: 100%;
+                border-radius: 20px;
+            }
+            
+            .number-display {
+                font-size: 2.2rem;
+            }
+            
+            .key {
+                font-size: 1.5rem;
+            }
+            
+            .control-btn {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .call-btn, .end-btn {
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-header">
+            <div class="status-bar">
+                <span>SoftPhone</span>
+                <span>5G</span>
+                <span>100% <i class="fas fa-battery-full"></i></span>
+            </div>
+            <h1 class="phone-title">SoftPhone</h1>
+            <p class="phone-subtitle">Web-Based Phone System</p>
+        </div>
+        
+        <div class="display-area">
+            <div class="call-status" id="callStatus">Ready to call</div>
+            <div class="number-display" id="numberDisplay">Enter number</div>
+        </div>
+        
+        <div class="keypad">
+            <button class="key" data-value="1"><span>1</span><span class="sub-label"></span></button>
+            <button class="key" data-value="2"><span>2</span><span class="sub-label">ABC</span></button>
+            <button class="key" data-value="3"><span>3</span><span class="sub-label">DEF</span></button>
+            <button class="key" data-value="4"><span>4</span><span class="sub-label">GHI</span></button>
+            <button class="key" data-value="5"><span>5</span><span class="sub-label">JKL</span></button>
+            <button class="key" data-value="6"><span>6</span><span class="sub-label">MNO</span></button>
+            <button class="key" data-value="7"><span>7</span><span class="sub-label">PQRS</span></button>
+            <button class="key" data-value="8"><span>8</span><span class="sub-label">TUV</span></button>
+            <button class="key" data-value="9"><span>9</span><span class="sub-label">WXYZ</span></button>
+            <button class="key" data-value="*"><span>*</span></button>
+            <button class="key" data-value="0"><span>0</span><span class="sub-label">+</span></button>
+            <button class="key" data-value="#"><span>#</span></button>
+        </div>
+        
+        <div class="auto-dial-controls">
+            <input type="text" class="number-input" id="autoDialInput" placeholder="Enter number to dial automatically">
+            <button class="auto-dial-btn" id="autoDialBtn">Auto Dial</button>
+        </div>
+        
+        <div class="call-controls">
+            <button class="control-btn mute-btn" id="muteBtn" title="Mute">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button class="control-btn call-btn" id="callBtn" title="Call">
+                <i class="fas fa-phone"></i>
+            </button>
+            <button class="control-btn end-btn" id="endBtn" title="End Call">
+                <i class="fas fa-phone-slash"></i>
+            </button>
+            <button class="control-btn hold-btn" id="holdBtn" title="Hold">
+                <i class="fas fa-pause"></i>
+            </button>
+            <button class="control-btn" id="clearBtn" title="Clear">
+                <i class="fas fa-backspace"></i>
+            </button>
+        </div>
+        
+        <div class="recent-calls">
+            <div class="recent-title">
+                <span>Recent Calls</span>
+                <span><i class="fas fa-history"></i></span>
+            </div>
+            <ul class="call-list" id="callList">
+                <li class="call-item">
+                    <span class="call-number">+1 (555) 123-4567</span>
+                    <span class="call-time">Today, 10:30 AM</span>
+                </li>
+                <li class="call-item">
+                    <span class="call-number">+1 (555) 987-6543</span>
+                    <span class="call-time">Yesterday, 3:45 PM</span>
+                </li>
+                <li class="call-item">
+                    <span class="call-number">+1 (555) 234-5678</span>
+                    <span class="call-time">Yesterday, 11:20 AM</span>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="footer">
+            SoftPhone v2.0 &copy; 2023 | Web-Based Phone System
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const numberDisplay = document.getElementById('numberDisplay');
+            const callStatus = document.getElementById('callStatus');
+            const callBtn = document.getElementById('callBtn');
+            const endBtn = document.getElementById('endBtn');
+            const muteBtn = document.getElementById('muteBtn');
+            const holdBtn = document.getElementById('holdBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const autoDialInput = document.getElementById('autoDialInput');
+            const autoDialBtn = document.getElementById('autoDialBtn');
+            const keypadKeys = document.querySelectorAll('.key');
+            
+            // State variables
+            let currentNumber = '';
+            let callActive = false;
+            let muted = false;
+            let held = false;
+            
+            // Keypad functionality
+            keypadKeys.forEach(key => {
+                key.addEventListener('click', () => {
+                    const value = key.getAttribute('data-value');
+                    
+                    if (currentNumber === 'Enter number') {
+                        currentNumber = '';
+                    }
+                    
+                    currentNumber += value;
+                    numberDisplay.textContent = formatPhoneNumber(currentNumber);
+                });
+            });
+            
+            // Call button
+            callBtn.addEventListener('click', () => {
+                if (currentNumber && currentNumber !== 'Enter number' && !callActive) {
+                    initiateCall();
+                }
+            });
+            
+            // End call button
+            endBtn.addEventListener('click', () => {
+                if (callActive) {
+                    endCall();
+                }
+            });
+            
+            // Mute button
+            muteBtn.addEventListener('click', () => {
+                muted = !muted;
+                muteBtn.classList.toggle('active', muted);
+                callStatus.textContent = muted ? 'Call muted' : 'Call active';
+            });
+            
+            // Hold button
+            holdBtn.addEventListener('click', () => {
+                held = !held;
+                holdBtn.classList.toggle('active', held);
+                callStatus.textContent = held ? 'Call on hold' : 'Call active';
+            });
+            
+            // Clear button
+            clearBtn.addEventListener('click', () => {
+                if (!callActive) {
+                    currentNumber = 'Enter number';
+                    numberDisplay.textContent = currentNumber;
+                }
+            });
+            
+            // Auto dial button
+            autoDialBtn.addEventListener('click', () => {
+                const number = autoDialInput.value.trim();
+                if (number) {
+                    currentNumber = number.replace(/\D/g, '');
+                    numberDisplay.textContent = formatPhoneNumber(currentNumber);
+                    autoDialInput.value = '';
+                    
+                    // Auto initiate call after 1 second
+                    setTimeout(() => {
+                        if (!callActive) {
+                            initiateCall();
+                        }
+                    }, 1000);
+                }
+            });
+            
+            // Format phone number for display
+            function formatPhoneNumber(number) {
+                // Simple formatting for demo purposes
+                if (number.length <= 3) {
+                    return number;
+                } else if (number.length <= 6) {
+                    return `(${number.substring(0, 3)}) ${number.substring(3)}`;
+                } else {
+                    return `(${number.substring(0, 3)}) ${number.substring(3, 6)}-${number.substring(6, 10)}`;
+                }
+            }
+            
+            // Initiate call function
+            function initiateCall() {
+                callActive = true;
+                callStatus.textContent = 'Calling...';
+                callStatus.style.color = '#fbbf24';
+                
+                // Simulate call connection
+                setTimeout(() => {
+                    callStatus.textContent = 'Call active';
+                    callStatus.style.color = '#4ade80';
+                    
+                    // Add to recent calls
+                    addToRecentCalls(currentNumber);
+                }, 2000);
+                
+                // Update UI
+                callBtn.disabled = true;
+                endBtn.disabled = false;
+            }
+            
+            // End call function
+            function endCall() {
+                callActive = false;
+                muted = false;
+                held = false;
+                
+                callStatus.textContent = 'Call ended';
+                callStatus.style.color = '#ef4444';
+                
+                // Reset after delay
+                setTimeout(() => {
+                    callStatus.textContent = 'Ready to call';
+                    callStatus.style.color = '#4ade80';
+                    currentNumber = 'Enter number';
+                    numberDisplay.textContent = currentNumber;
+                    
+                    // Reset buttons
+                    muteBtn.classList.remove('active');
+                    holdBtn.classList.remove('active');
+                    callBtn.disabled = false;
+                    endBtn.disabled = true;
+                }, 1500);
+            }
+            
+            // Add to recent calls
+            function addToRecentCalls(number) {
+                const callList = document.getElementById('callList');
+                const now = new Date();
+                
+                // Format time
+                const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const dateString = now.toLocaleDateString([], {month: 'short', day: 'numeric'});
+                
+                const callItem = document.createElement('li');
+                callItem.className = 'call-item';
+                callItem.innerHTML = `
+                    <span class="call-number">${formatPhoneNumber(number)}</span>
+                    <span class="call-time">Today, ${timeString}</span>
+                `;
+                
+                callList.insertBefore(callItem, callList.firstChild);
+                
+                // Limit to 5 items
+                if (callList.children.length > 5) {
+                    callList.removeChild(callList.lastChild);
+                }
+            }
+            
+            // Initialize button states
+            endBtn.disabled = true;
+        });
+    </script>
+</body>
+</html>
