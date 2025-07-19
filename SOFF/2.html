@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel Web Editor</title>
+    <style>
+        :root {
+            --primary-color: #217346;
+            --header-bg: #f1f1f1;
+            --border-color: #d4d4d4;
+            --active-cell: #d5e8d4;
+            --toolbar-bg: #f8f8f8;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            font-size: 24px;
+        }
+        
+        .logo h1 {
+            font-size: 22px;
+            font-weight: 500;
+        }
+        
+        .toolbar {
+            background-color: var(--toolbar-bg);
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .toolbar-group {
+            display: flex;
+            gap: 8px;
+            padding: 5px 10px;
+            border-right: 1px solid var(--border-color);
+        }
+        
+        .toolbar-group:last-child {
+            border-right: none;
+        }
+        
+        .toolbar button {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 6px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .toolbar button:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .toolbar button i {
+            font-size: 16px;
+        }
+        
+        .formula-bar {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            padding: 8px 15px;
+            background: white;
+            align-items: center;
+        }
+        
+        .cell-reference {
+            min-width: 60px;
+            padding: 5px 10px;
+            background: var(--header-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .formula-input {
+            flex: 1;
+            margin-left: 10px;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 15px;
+        }
+        
+        .spreadsheet-container {
+            overflow: auto;
+            max-height: 500px;
+            position: relative;
+        }
+        
+        .row-numbers {
+            position: absolute;
+            left: 0;
+            background-color: var(--header-bg);
+            z-index: 10;
+        }
+        
+        .row-number {
+            height: 30px;
+            width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .column-headers {
+            display: flex;
+            margin-left: 40px;
+            background-color: var(--header-bg);
+        }
+        
+        .column-header {
+            width: 100px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .spreadsheet {
+            display: flex;
+            flex-direction: column;
+            margin-left: 40px;
+        }
+        
+        .row {
+            display: flex;
+        }
+        
+        .cell {
+            width: 100px;
+            height: 30px;
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 5px;
+            outline: none;
+            font-size: 14px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        
+        .cell:focus {
+            background-color: var(--active-cell);
+            border: 2px solid var(--primary-color);
+            margin: -1px;
+            z-index: 2;
+        }
+        
+        .footer {
+            padding: 15px 20px;
+            background-color: var(--toolbar-bg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sheet-tabs {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .sheet-tab {
+            padding: 6px 15px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .sheet-tab.active {
+            background-color: white;
+            border-bottom: 3px solid var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .status-bar {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .function-list {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .function-list h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .functions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .function-card {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 15px;
+            background: #fafafa;
+        }
+        
+        .function-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+        
+        .function-card p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        
+        .function-card .example {
+            font-family: monospace;
+            font-size: 13px;
+            background: #f0f0f0;
+            padding: 5px;
+            border-radius: 3px;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .toolbar {
+                gap: 8px;
+            }
+            
+            .toolbar-group {
+                padding: 3px 5px;
+            }
+            
+            .toolbar button span {
+                display: none;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-file-excel"></i>
+                <h1>Excel Web Editor</h1>
+            </div>
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </header>
+        
+        <div class="toolbar">
+            <div class="toolbar-group">
+                <button id="newBtn"><i class="fas fa-file"></i> <span>New</span></button>
+                <button id="openBtn"><i class="fas fa-folder-open"></i> <span>Open</span></button>
+                <button id="saveBtn"><i class="fas fa-save"></i> <span>Save</span></button>
+                <button id="downloadBtn"><i class="fas fa-download"></i> <span>Download</span></button>
+            </div>
+            <div class="toolbar-group">
+                <button><i class="fas fa-undo"></i> <span>Undo</span></button>
+                <button><i class="fas fa-redo"></i> <span>Redo</span></button>
+            </div>
+            <div class="toolbar-group">
+                <button><i class="fas fa-bold"></i></button>
+                <button><i class="fas fa-italic"></i></button>
+                <button><i class="fas fa-underline"></i></button>
+            </div>
+            <div class="toolbar-group">
+                <button><i class="fas fa-align-left"></i></button>
+                <button><i class="fas fa-align-center"></i></button>
+                <button><i class="fas fa-align-right"></i></button>
+            </div>
+            <div class="toolbar-group">
+                <button id="addRowBtn"><i class="fas fa-plus"></i> <span>Add Row</span></button>
+                <button id="addColBtn"><i class="fas fa-plus"></i> <span>Add Column</span></button>
+            </div>
+        </div>
+        
+        <div class="formula-bar">
+            <div class="cell-reference" id="currentCell">A1</div>
+            <input type="text" class="formula-input" id="formulaInput" placeholder="Enter formula or value">
+        </div>
+        
+        <div class="spreadsheet-container">
+            <div class="row-numbers" id="rowNumbers"></div>
+            <div class="column-headers" id="columnHeaders"></div>
+            <div class="spreadsheet" id="spreadsheet"></div>
+        </div>
+        
+        <div class="footer">
+            <div class="sheet-tabs">
+                <div class="sheet-tab active">Sheet1</div>
+                <div class="sheet-tab"><i class="fas fa-plus"></i></div>
+            </div>
+            <div class="status-bar">
+                Ready
+            </div>
+        </div>
+    </div>
+    
+    <div class="function-list">
+        <h2>Available Functions</h2>
+        <div class="functions-grid">
+            <div class="function-card">
+                <h3>SUM</h3>
+                <p>Adds all numbers in a range of cells</p>
+                <div class="example">=SUM(A1:A10)</div>
+            </div>
+            <div class="function-card">
+                <h3>AVERAGE</h3>
+                <p>Calculates the average of numbers</p>
+                <div class="example">=AVERAGE(B2:B8)</div>
+            </div>
+            <div class="function-card">
+                <h3>MAX</h3>
+                <p>Returns the largest value</p>
+                <div class="example">=MAX(C1:C5)</div>
+            </div>
+            <div class="function-card">
+                <h3>MIN</h3>
+                <p>Returns the smallest value</p>
+                <div class="example">=MIN(D3:D9)</div>
+            </div>
+            <div class="function-card">
+                <h3>CONCAT</h3>
+                <p>Combines text from multiple cells</p>
+                <div class="example">=CONCAT(A1, " ", B1)</div>
+            </div>
+            <div class="function-card">
+                <h3>IF</h3>
+                <p>Conditional statement</p>
+                <div class="example">=IF(A1>10, "Yes", "No")</div>
+            </div>
+            <div class="function-card">
+                <h3>TODAY</h3>
+                <p>Returns current date</p>
+                <div class="example">=TODAY()</div>
+            </div>
+            <div class="function-card">
+                <h3>PRODUCT</h3>
+                <p>Multiplies numbers in a range</p>
+                <div class="example">=PRODUCT(A1:A5)</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Spreadsheet dimensions
+        const ROWS = 50;
+        const COLS = 20;
+        let currentCell = null;
+        
+        // Initialize the spreadsheet
+        function initSpreadsheet() {
+            const rowNumbers = document.getElementById('rowNumbers');
+            const columnHeaders = document.getElementById('columnHeaders');
+            const spreadsheet = document.getElementById('spreadsheet');
+            
+            // Create row numbers
+            for (let i = 1; i <= ROWS; i++) {
+                const rowNumber = document.createElement('div');
+                rowNumber.className = 'row-number';
+                rowNumber.textContent = i;
+                rowNumbers.appendChild(rowNumber);
+            }
+            
+            // Create column headers (A, B, C, ...)
+            for (let i = 0; i < COLS; i++) {
+                const colHeader = document.createElement('div');
+                colHeader.className = 'column-header';
+                colHeader.textContent = String.fromCharCode(65 + i);
+                columnHeaders.appendChild(colHeader);
+            }
+            
+            // Create cells
+            for (let i = 0; i < ROWS; i++) {
+                const row = document.createElement('div');
+                row.className = 'row';
+                
+                for (let j = 0; j < COLS; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.contentEditable = true;
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    
+                    // Set cell ID (A1, B2, etc.)
+                    const cellId = String.fromCharCode(65 + j) + (i + 1);
+                    cell.dataset.id = cellId;
+                    
+                    cell.addEventListener('focus', handleCellFocus);
+                    cell.addEventListener('blur', handleCellBlur);
+                    cell.addEventListener('keydown', handleCellKeydown);
+                    
+                    row.appendChild(cell);
+                }
+                
+                spreadsheet.appendChild(row);
+            }
+            
+            // Add event listeners to buttons
+            document.getElementById('downloadBtn').addEventListener('click', downloadSheet);
+            document.getElementById('addRowBtn').addEventListener('click', addRow);
+            document.getElementById('addColBtn').addEventListener('click', addColumn);
+            document.getElementById('formulaInput').addEventListener('keyup', handleFormulaInput);
+        }
+        
+        // Handle cell focus
+        function handleCellFocus(e) {
+            currentCell = e.target;
+            document.getElementById('currentCell').textContent = currentCell.dataset.id;
+            document.getElementById('formulaInput').value = currentCell.textContent;
+            
+            // Highlight the cell
+            e.target.style.backgroundColor = 'var(--active-cell)';
+        }
+        
+        // Handle cell blur
+        function handleCellBlur(e) {
+            e.target.style.backgroundColor = '';
+        }
+        
+        // Handle keydown events in cells
+        function handleCellKeydown(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (e.shiftKey) {
+                    // Move up
+                    moveToCell(-1, 0);
+                } else {
+                    // Move down
+                    moveToCell(1, 0);
+                }
+            } else if (e.key === 'Tab') {
+                e.preventDefault();
+                if (e.shiftKey) {
+                    // Move left
+                    moveToCell(0, -1);
+                } else {
+                    // Move right
+                    moveToCell(0, 1);
+                }
+            }
+        }
+        
+        // Move to adjacent cell
+        function moveToCell(rowOffset, colOffset) {
+            if (!currentCell) return;
+            
+            const row = parseInt(currentCell.dataset.row) + rowOffset;
+            const col = parseInt(currentCell.dataset.col) + colOffset;
+            
+            if (row >= 0 && row < ROWS && col >= 0 && col < COLS) {
+                const nextCell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                if (nextCell) {
+                    nextCell.focus();
+                }
+            }
+        }
+        
+        // Handle formula input
+        function handleFormulaInput(e) {
+            if (!currentCell) return;
+            
+            if (e.key === 'Enter') {
+                currentCell.textContent = e.target.value;
+                currentCell.focus();
+            }
+        }
+        
+        // Download sheet as CSV
+        function downloadSheet() {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            
+            // Add column headers
+            const headers = [];
+            for (let j = 0; j < COLS; j++) {
+                headers.push(String.fromCharCode(65 + j));
+            }
+            csvContent += headers.join(",") + "\n";
+            
+            // Add rows
+            for (let i = 0; i < ROWS; i++) {
+                const row = [];
+                for (let j = 0; j < COLS; j++) {
+                    const cell = document.querySelector(`.cell[data-row="${i}"][data-col="${j}"]`);
+                    row.push(`"${cell.textContent}"`);
+                }
+                csvContent += row.join(",") + "\n";
+            }
+            
+            // Create download link
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "spreadsheet.csv");
+            document.body.appendChild(link);
+            
+            // Trigger download
+            link.click();
+            document.body.removeChild(link);
+            
+            // Show download notification
+            alert("Spreadsheet downloaded as CSV!");
+        }
+        
+        // Add a new row
+        function addRow() {
+            const spreadsheet = document.getElementById('spreadsheet');
+            const row = document.createElement('div');
+            row.className = 'row';
+            
+            for (let j = 0; j < COLS; j++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.contentEditable = true;
+                cell.dataset.row = ROWS; // New row index
+                cell.dataset.col = j;
+                
+                const cellId = String.fromCharCode(65 + j) + (ROWS + 1);
+                cell.dataset.id = cellId;
+                
+                cell.addEventListener('focus', handleCellFocus);
+                cell.addEventListener('blur', handleCellBlur);
+                cell.addEventListener('keydown', handleCellKeydown);
+                
+                row.appendChild(cell);
+            }
+            
+            spreadsheet.appendChild(row);
+            
+            // Update row numbers
+            const rowNumbers = document.getElementById('rowNumbers');
+            const rowNumber = document.createElement('div');
+            rowNumber.className = 'row-number';
+            rowNumber.textContent = ROWS + 1;
+            rowNumbers.appendChild(rowNumber);
+        }
+        
+        // Add a new column
+        function addColumn() {
+            const colIndex = COLS;
+            const colChar = String.fromCharCode(65 + colIndex);
+            
+            // Update column headers
+            const columnHeaders = document.getElementById('columnHeaders');
+            const colHeader = document.createElement('div');
+            colHeader.className = 'column-header';
+            colHeader.textContent = colChar;
+            columnHeaders.appendChild(colHeader);
+            
+            // Add new cell to each row
+            const rows = document.querySelectorAll('.row');
+            rows.forEach((row, i) => {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.contentEditable = true;
+                cell.dataset.row = i;
+                cell.dataset.col = colIndex;
+                cell.dataset.id = colChar + (i + 1);
+                
+                cell.addEventListener('focus', handleCellFocus);
+                cell.addEventListener('blur', handleCellBlur);
+                cell.addEventListener('keydown', handleCellKeydown);
+                
+                row.appendChild(cell);
+            });
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initSpreadsheet);
+    </script>
+</body>
+</html>

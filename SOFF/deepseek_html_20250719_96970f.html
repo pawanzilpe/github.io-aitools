@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel Web Editor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #1a73e8;
+        }
+
+        .logo h1 {
+            font-size: 2.2rem;
+            color: #1a73e8;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .logo span {
+            color: #0d8040;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            background: #0d62c9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn.download {
+            background: #0d8040;
+        }
+
+        .btn.download:hover {
+            background: #0a6b35;
+        }
+
+        .btn.new {
+            background: #9c27b0;
+        }
+
+        .btn.new:hover {
+            background: #7b1fa2;
+        }
+
+        .spreadsheet-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .toolbar {
+            background: #f5f5f5;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .cell-address {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 8px 15px;
+            border-radius: 4px;
+            min-width: 100px;
+            font-weight: 500;
+        }
+
+        .function-selector {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .formula-bar {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .formula-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            background: #f9f9f9;
+        }
+
+        .formula-input:focus {
+            background: white;
+        }
+
+        .grid-container {
+            overflow: auto;
+            max-height: 70vh;
+            position: relative;
+        }
+
+        .row-numbers {
+            position: absolute;
+            left: 0;
+            background: #f5f5f5;
+            z-index: 10;
+        }
+
+        .row-number {
+            height: 30px;
+            width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .column-headers {
+            display: flex;
+            margin-left: 40px;
+            background: #f5f5f5;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .column-header {
+            height: 30px;
+            width: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .grid {
+            display: inline-block;
+            margin-left: 40px;
+        }
+
+        .row {
+            display: flex;
+        }
+
+        .cell {
+            width: 100px;
+            height: 30px;
+            border-right: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            padding: 4px 8px;
+            outline: none;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .cell:focus {
+            border: 2px solid #1a73e8;
+            z-index: 2;
+            position: relative;
+            background: #f0f7ff;
+        }
+
+        .cell.header {
+            background: #f5f5f5;
+            font-weight: bold;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card h3 {
+            color: #1a73e8;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-card ul {
+            padding-left: 20px;
+        }
+
+        .feature-card li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: white;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .controls {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .toolbar {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">📊</div>
+                <h1>Excel <span>Web</span> Editor</h1>
+            </div>
+            <div class="controls">
+                <button class="btn new" id="newSheet">
+                    <span>🗒️</span> New Sheet
+                </button>
+                <button class="btn" id="saveSheet">
+                    <span>💾</span> Save
+                </button>
+                <button class="btn download" id="downloadBtn">
+                    <span>⬇️</span> Download Excel
+                </button>
+            </div>
+        </header>
+        
+        <div class="spreadsheet-container">
+            <div class="toolbar">
+                <div class="cell-address" id="cellAddress">A1</div>
+                <select class="function-selector" id="functionSelector">
+                    <option value="">Select Function</option>
+                    <option value="SUM">SUM</option>
+                    <option value="AVERAGE">AVERAGE</option>
+                    <option value="MAX">MAX</option>
+                    <option value="MIN">MIN</option>
+                    <option value="COUNT">COUNT</option>
+                </select>
+                <button class="btn" id="applyFunction">Apply Function</button>
+            </div>
+            
+            <div class="formula-bar">
+                <input type="text" class="formula-input" id="formulaInput" placeholder="Enter formula or data">
+            </div>
+            
+            <div class="grid-container">
+                <div class="row-numbers" id="rowNumbers"></div>
+                <div class="column-headers" id="columnHeaders"></div>
+                <div class="grid" id="spreadsheet"></div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <h3><span>✨</span> Key Features</h3>
+                <ul>
+                    <li>Edit cells directly like in Excel</li>
+                    <li>Download your sheet as real Excel file</li>
+                    <li>Create new sheets anytime</li>
+                    <li>Formulas: SUM, AVERAGE, MAX, MIN, COUNT</li>
+                    <li>Responsive design works on all devices</li>
+                    <li>Real-time cell reference tracking</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h3><span>🚀</span> How to Use</h3>
+                <ul>
+                    <li><strong>Edit:</strong> Click any cell and start typing</li>
+                    <li><strong>Formulas:</strong> Start with = (e.g., =SUM(A1:A5))</li>
+                    <li><strong>Functions:</strong> Select from dropdown and apply</li>
+                    <li><strong>Download:</strong> Click "Download Excel" button</li>
+                    <li><strong>New Sheet:</strong> Start fresh with "New Sheet"</li>
+                    <li><strong>Navigation:</strong> Use arrow keys or mouse</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h3><span>🔮</span> Coming Soon</h3>
+                <ul>
+                    <li>Chart creation from data</li>
+                    <li>More advanced Excel functions</li>
+                    <li>Cell formatting options</li>
+                    <li>Cloud saving to Google Drive</li>
+                    <li>Collaborative editing</li>
+                    <li>Import existing Excel files</li>
+                </ul>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Excel Web Editor - A powerful spreadsheet solution in your browser | Created with HTML, CSS & JavaScript</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Constants
+            const ROWS = 50;
+            const COLS = 20;
+            const COL_NAMES = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            
+            // State
+            let spreadsheetData = Array(ROWS).fill().map(() => Array(COLS).fill(''));
+            let selectedCell = {row: 0, col: 0};
+            
+            // DOM Elements
+            const spreadsheet = document.getElementById('spreadsheet');
+            const rowNumbers = document.getElementById('rowNumbers');
+            const columnHeaders = document.getElementById('columnHeaders');
+            const cellAddress = document.getElementById('cellAddress');
+            const formulaInput = document.getElementById('formulaInput');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const newSheetBtn = document.getElementById('newSheet');
+            const functionSelector = document.getElementById('functionSelector');
+            const applyFunctionBtn = document.getElementById('applyFunction');
+            
+            // Initialize spreadsheet
+            function initSpreadsheet() {
+                // Create row numbers
+                for (let i = 0; i < ROWS; i++) {
+                    const rowNum = document.createElement('div');
+                    rowNum.className = 'row-number';
+                    rowNum.textContent = i + 1;
+                    rowNumbers.appendChild(rowNum);
+                }
+                
+                // Create column headers
+                for (let i = 0; i < COLS; i++) {
+                    const colHeader = document.createElement('div');
+                    colHeader.className = 'column-header';
+                    colHeader.textContent = COL_NAMES[i];
+                    columnHeaders.appendChild(colHeader);
+                }
+                
+                // Create grid
+                for (let row = 0; row < ROWS; row++) {
+                    const rowElem = document.createElement('div');
+                    rowElem.className = 'row';
+                    
+                    for (let col = 0; col < COLS; col++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        cell.contentEditable = true;
+                        cell.dataset.row = row;
+                        cell.dataset.col = col;
+                        
+                        // Set cell content
+                        cell.textContent = spreadsheetData[row][col];
+                        
+                        // Cell selection
+                        cell.addEventListener('click', () => handleCellSelect(row, col));
+                        cell.addEventListener('input', () => handleCellInput(row, col, cell));
+                        
+                        rowElem.appendChild(cell);
+                    }
+                    
+                    spreadsheet.appendChild(rowElem);
+                }
+                
+                // Select first cell by default
+                selectCell(0, 0);
+            }
+            
+            // Handle cell selection
+            function handleCellSelect(row, col) {
+                selectedCell = {row, col};
+                selectCell(row, col);
+                updateFormulaInput();
+            }
+            
+            // Select a specific cell
+            function selectCell(row, col) {
+                // Remove previous selection
+                const prevSelected = document.querySelector('.cell.selected');
+                if (prevSelected) prevSelected.classList.remove('selected');
+                
+                // Add new selection
+                const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                if (cell) {
+                    cell.classList.add('selected');
+                    cellAddress.textContent = `${COL_NAMES[col]}${row + 1}`;
+                }
+            }
+            
+            // Handle cell input
+            function handleCellInput(row, col, cell) {
+                spreadsheetData[row][col] = cell.textContent;
+            }
+            
+            // Update formula input based on selected cell
+            function updateFormulaInput() {
+                const {row, col} = selectedCell;
+                formulaInput.value = spreadsheetData[row][col];
+            }
+            
+            // Handle formula input
+            formulaInput.addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    const {row, col} = selectedCell;
+                    const value = formulaInput.value;
+                    
+                    spreadsheetData[row][col] = value;
+                    const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                    if (cell) {
+                        cell.textContent = value;
+                        
+                        // If it's a formula, evaluate it
+                        if (value.startsWith('=')) {
+                            evaluateFormula(value, row, col, cell);
+                        }
+                    }
+                }
+            });
+            
+            // Evaluate formula
+            function evaluateFormula(formula, row, col, cell) {
+                try {
+                    // Remove the = sign
+                    const expr = formula.substring(1).toUpperCase();
+                    
+                    // Basic formula evaluation
+                    if (expr.startsWith('SUM')) {
+                        const range = expr.match(/\((.*?)\)/)[1];
+                        const [start, end] = range.split(':');
+                        
+                        const sum = calculateRange(start, end, (a, b) => a + b, 0);
+                        cell.textContent = sum;
+                        spreadsheetData[row][col] = sum;
+                    }
+                    else if (expr.startsWith('AVERAGE')) {
+                        const range = expr.match(/\((.*?)\)/)[1];
+                        const [start, end] = range.split(':');
+                        
+                        const sum = calculateRange(start, end, (a, b) => a + b, 0);
+                        const count = countCellsInRange(start, end);
+                        const avg = count > 0 ? sum / count : 0;
+                        cell.textContent = avg.toFixed(2);
+                        spreadsheetData[row][col] = avg.toFixed(2);
+                    }
+                    else if (expr.startsWith('MAX')) {
+                        const range = expr.match(/\((.*?)\)/)[1];
+                        const [start, end] = range.split(':');
+                        
+                        const max = calculateRange(start, end, (a, b) => Math.max(a, b), -Infinity);
+                        cell.textContent = max;
+                        spreadsheetData[row][col] = max;
+                    }
+                    else if (expr.startsWith('MIN')) {
+                        const range = expr.match(/\((.*?)\)/)[1];
+                        const [start, end] = range.split(':');
+                        
+                        const min = calculateRange(start, end, (a, b) => Math.min(a, b), Infinity);
+                        cell.textContent = min;
+                        spreadsheetData[row][col] = min;
+                    }
+                    else if (expr.startsWith('COUNT')) {
+                        const range = expr.match(/\((.*?)\)/)[1];
+                        const [start, end] = range.split(':');
+                        
+                        const count = countCellsInRange(start, end);
+                        cell.textContent = count;
+                        spreadsheetData[row][col] = count;
+                    }
+                } catch (e) {
+                    cell.textContent = '#ERROR!';
+                    spreadsheetData[row][col] = '#ERROR!';
+                }
+            }
+            
+            // Helper function to calculate values in range
+            function calculateRange(start, end, operation, initialValue) {
+                const [startCol, startRow] = parseCellAddress(start);
+                const [endCol, endRow] = parseCellAddress(end);
+                
+                let result = initialValue;
+                
+                for (let row = startRow; row <= endRow; row++) {
+                    for (let col = startCol; col <= endCol; col++) {
+                        const value = parseFloat(spreadsheetData[row][col]) || 0;
+                        result = operation(result, value);
+                    }
+                }
+                
+                return result;
+            }
+            
+            // Helper function to count cells in range
+            function countCellsInRange(start, end) {
+                const [startCol, startRow] = parseCellAddress(start);
+                const [endCol, endRow] = parseCellAddress(end);
+                
+                let count = 0;
+                
+                for (let row = startRow; row <= endRow; row++) {
+                    for (let col = startCol; col <= endCol; col++) {
+                        if (spreadsheetData[row][col] !== '') {
+                            count++;
+                        }
+                    }
+                }
+                
+                return count;
+            }
+            
+            // Parse cell address to indices
+            function parseCellAddress(address) {
+                const colChar = address.match(/[A-Z]+/)[0];
+                const rowNum = parseInt(address.match(/\d+/)[0]) - 1;
+                
+                let colNum = 0;
+                for (let i = 0; i < colChar.length; i++) {
+                    colNum = colNum * 26 + (colChar.charCodeAt(i) - 65);
+                }
+                
+                return [colNum, rowNum];
+            }
+            
+            // Apply selected function
+            applyFunctionBtn.addEventListener('click', function() {
+                const func = functionSelector.value;
+                if (!func) return;
+                
+                const {row, col} = selectedCell;
+                const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                const cellRef = `${COL_NAMES[col]}${row + 1}`;
+                
+                // For simplicity, we'll just set the formula
+                const formula = `=${func}(${cellRef})`;
+                formulaInput.value = formula;
+                
+                spreadsheetData[row][col] = formula;
+                cell.textContent = formula;
+                
+                // Evaluate immediately
+                evaluateFormula(formula, row, col, cell);
+            });
+            
+            // Download as Excel
+            downloadBtn.addEventListener('click', function() {
+                // Convert our data to worksheet
+                const ws_data = [];
+                
+                // Add header row
+                const headerRow = [''].concat(Array.from(COL_NAMES.substring(0, COLS)));
+                ws_data.push(headerRow);
+                
+                // Add data rows
+                for (let i = 0; i < ROWS; i++) {
+                    const row = [i + 1].concat(spreadsheetData[i]);
+                    ws_data.push(row);
+                }
+                
+                const ws = XLSX.utils.aoa_to_sheet(ws_data);
+                
+                // Create workbook
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+                
+                // Generate and download file
+                XLSX.writeFile(wb, "spreadsheet.xlsx");
+            });
+            
+            // Create new sheet
+            newSheetBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to create a new sheet? All current data will be lost.')) {
+                    spreadsheetData = Array(ROWS).fill().map(() => Array(COLS).fill(''));
+                    
+                    // Clear all cells
+                    document.querySelectorAll('.cell').forEach(cell => {
+                        cell.textContent = '';
+                    });
+                    
+                    // Reset selection
+                    selectCell(0, 0);
+                    formulaInput.value = '';
+                }
+            });
+            
+            // Save sheet (local storage)
+            document.getElementById('saveSheet').addEventListener('click', function() {
+                localStorage.setItem('spreadsheetData', JSON.stringify(spreadsheetData));
+                alert('Spreadsheet saved successfully!');
+            });
+            
+            // Load saved sheet if exists
+            const savedData = localStorage.getItem('spreadsheetData');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                
+                // Only load if dimensions match
+                if (parsedData.length === ROWS && parsedData[0].length === COLS) {
+                    spreadsheetData = parsedData;
+                    
+                    // Update UI
+                    for (let row = 0; row < ROWS; row++) {
+                        for (let col = 0; col < COLS; col++) {
+                            const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+                            if (cell) {
+                                cell.textContent = spreadsheetData[row][col];
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Initialize the spreadsheet
+            initSpreadsheet();
+        });
+    </script>
+</body>
+</html>

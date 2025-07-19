@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerPoint Web Editor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary: #217346;
+            --secondary: #e6f4ea;
+            --dark: #1c3d2c;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --border: #dee2e6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #f0f2f5;
+            overflow: hidden;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .logo-icon {
+            font-size: 1.8rem;
+        }
+        
+        .header-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: white;
+            color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: #f0f0f0;
+            transform: translateY(-1px);
+        }
+        
+        /* Main Container */
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background-color: var(--secondary);
+            border-right: 1px solid var(--border);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .slide-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+        
+        .slide-item {
+            background-color: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .slide-item:hover {
+            border-color: var(--primary);
+        }
+        
+        .slide-item.active {
+            border: 2px solid var(--primary);
+            background-color: #e6f4ea;
+        }
+        
+        .slide-thumbnail {
+            background-color: #f8f9fa;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .slide-thumbnail::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 10px;
+            background-color: var(--primary);
+        }
+        
+        .slide-number {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        .add-slide-btn {
+            background-color: var(--primary);
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.2s;
+        }
+        
+        .add-slide-btn:hover {
+            background-color: var(--dark);
+        }
+        
+        /* Editor Area */
+        .editor-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .tool-btn {
+            padding: 6px 12px;
+            background-color: white;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+        
+        .tool-btn:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .slide-editor {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+        }
+        
+        .slide-container {
+            width: 90%;
+            max-width: 900px;
+            aspect-ratio: 16/9;
+            background-color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .slide-content {
+            height: 100%;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .slide-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            outline: none;
+            border: 2px dashed transparent;
+            padding: 5px;
+        }
+        
+        .slide-title:focus {
+            border-color: var(--primary);
+        }
+        
+        .slide-text {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            outline: none;
+            border: 2px dashed transparent;
+            padding: 5px;
+            flex: 1;
+        }
+        
+        .slide-text:focus {
+            border-color: var(--primary);
+        }
+        
+        .slide-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        /* Footer Styles */
+        footer {
+            background-color: white;
+            padding: 12px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: 200px;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+            
+            .slide-list {
+                display: flex;
+                overflow-x: auto;
+                gap: 10px;
+            }
+            
+            .slide-item {
+                min-width: 150px;
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <span class="logo-icon">📊</span>
+            <span>PowerPoint Web Editor</span>
+        </div>
+        <div class="header-controls">
+            <button class="btn btn-primary" id="newPresentation">
+                <span>+</span> New
+            </button>
+            <button class="btn btn-primary" id="downloadBtn">
+                <span>↓</span> Download PPT
+            </button>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="sidebar">
+            <h3>Slides</h3>
+            <div class="slide-list" id="slideList">
+                <!-- Slides will be added here dynamically -->
+            </div>
+            <div class="add-slide-btn" id="addSlideBtn">
+                + Add Slide
+            </div>
+        </div>
+        
+        <div class="editor-area">
+            <div class="toolbar">
+                <button class="tool-btn" id="textBtn">
+                    <span>T</span> Text
+                </button>
+                <button class="tool-btn" id="imageBtn">
+                    <span>🖼️</span> Image
+                </button>
+                <button class="tool-btn" id="shapeBtn">
+                    <span>⬢</span> Shape
+                </button>
+                <button class="tool-btn" id="themeBtn">
+                    <span>🎨</span> Theme
+                </button>
+                <button class="tool-btn" id="undoBtn">
+                    <span>↩️</span> Undo
+                </button>
+                <button class="tool-btn" id="redoBtn">
+                    <span>↪️</span> Redo
+                </button>
+            </div>
+            
+            <div class="slide-editor">
+                <div class="slide-container">
+                    <div class="slide-content" id="currentSlide">
+                        <div class="slide-title" contenteditable="true">Presentation Title</div>
+                        <div class="slide-text" contenteditable="true">
+                            This is a sample slide. Click to edit text.<br>
+                            Add your content here...
+                        </div>
+                        <div class="slide-footer">Slide 1</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="status">
+            <span>Slide 1 of 1</span>
+            <span>Editing Mode</span>
+        </div>
+        <div>PowerPoint Web Editor v1.0</div>
+    </footer>
+
+    <script>
+        // Presentation data
+        let presentation = {
+            slides: [
+                {
+                    id: 1,
+                    title: "Presentation Title",
+                    content: "This is a sample slide. Click to edit text.<br>Add your content here...",
+                    active: true
+                }
+            ],
+            currentSlideId: 1,
+            theme: "default"
+        };
+        
+        // DOM Elements
+        const slideList = document.getElementById('slideList');
+        const addSlideBtn = document.getElementById('addSlideBtn');
+        const currentSlide = document.getElementById('currentSlide');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const newPresentationBtn = document.getElementById('newPresentation');
+        
+        // Initialize the presentation
+        function initPresentation() {
+            renderSlideList();
+            updateSlideCount();
+        }
+        
+        // Render slide list in sidebar
+        function renderSlideList() {
+            slideList.innerHTML = '';
+            presentation.slides.forEach(slide => {
+                const slideItem = document.createElement('div');
+                slideItem.className = `slide-item ${slide.active ? 'active' : ''}`;
+                slideItem.dataset.id = slide.id;
+                
+                slideItem.innerHTML = `
+                    <div class="slide-thumbnail">
+                        <div>Slide ${slide.id}</div>
+                    </div>
+                    <div class="slide-number">Slide ${slide.id}</div>
+                `;
+                
+                slideItem.addEventListener('click', () => {
+                    selectSlide(slide.id);
+                });
+                
+                slideList.appendChild(slideItem);
+            });
+        }
+        
+        // Add a new slide
+        function addSlide() {
+            const newId = presentation.slides.length + 1;
+            
+            presentation.slides.forEach(slide => slide.active = false);
+            
+            presentation.slides.push({
+                id: newId,
+                title: "New Slide",
+                content: "Add your content here...",
+                active: true
+            });
+            
+            presentation.currentSlideId = newId;
+            
+            renderSlideList();
+            updateCurrentSlide();
+            updateSlideCount();
+        }
+        
+        // Select a slide to edit
+        function selectSlide(slideId) {
+            presentation.slides.forEach(slide => {
+                slide.active = (slide.id === slideId);
+            });
+            
+            presentation.currentSlideId = slideId;
+            
+            renderSlideList();
+            updateCurrentSlide();
+            updateSlideCount();
+        }
+        
+        // Update the current slide in editor
+        function updateCurrentSlide() {
+            const slide = presentation.slides.find(s => s.id === presentation.currentSlideId);
+            
+            if (slide) {
+                const titleElement = currentSlide.querySelector('.slide-title');
+                const contentElement = currentSlide.querySelector('.slide-text');
+                const footerElement = currentSlide.querySelector('.slide-footer');
+                
+                titleElement.textContent = slide.title;
+                contentElement.innerHTML = slide.content;
+                footerElement.textContent = `Slide ${slide.id}`;
+                
+                // Add event listeners to save changes
+                titleElement.addEventListener('blur', () => {
+                    slide.title = titleElement.textContent;
+                });
+                
+                contentElement.addEventListener('blur', () => {
+                    slide.content = contentElement.innerHTML;
+                });
+            }
+        }
+        
+        // Update slide count in footer
+        function updateSlideCount() {
+            const status = document.querySelector('.status span');
+            if (status) {
+                status.textContent = `Slide ${presentation.currentSlideId} of ${presentation.slides.length}`;
+            }
+        }
+        
+        // Create new presentation
+        function newPresentation() {
+            if (confirm("Create a new presentation? All unsaved changes will be lost.")) {
+                presentation = {
+                    slides: [
+                        {
+                            id: 1,
+                            title: "New Presentation",
+                            content: "Add your content here...",
+                            active: true
+                        }
+                    ],
+                    currentSlideId: 1,
+                    theme: "default"
+                };
+                
+                initPresentation();
+            }
+        }
+        
+        // Download as PPT (simulated)
+        function downloadPresentation() {
+            // In a real implementation, you would generate a PPT file
+            // For this demo, we'll simulate the download process
+            downloadBtn.textContent = "Generating...";
+            downloadBtn.disabled = true;
+            
+            setTimeout(() => {
+                // Create a "fake" download
+                const link = document.createElement('a');
+                link.href = '#';
+                link.download = 'presentation.pptx';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                downloadBtn.textContent = "↓ Download PPT";
+                downloadBtn.disabled = false;
+                
+                // Show success message
+                alert("Presentation downloaded successfully!\n\nIn a real implementation, this would generate an actual PowerPoint file.");
+            }, 1500);
+        }
+        
+        // Event Listeners
+        addSlideBtn.addEventListener('click', addSlide);
+        downloadBtn.addEventListener('click', downloadPresentation);
+        newPresentationBtn.addEventListener('click', newPresentation);
+        
+        // Toolbar button events
+        document.getElementById('textBtn').addEventListener('click', () => {
+            alert("Text tool selected. Click on the slide to add text.");
+        });
+        
+        document.getElementById('imageBtn').addEventListener('click', () => {
+            alert("Image tool selected. Click on the slide to add an image.");
+        });
+        
+        document.getElementById('shapeBtn').addEventListener('click', () => {
+            alert("Shape tool selected. Click on the slide to add shapes.");
+        });
+        
+        document.getElementById('themeBtn').addEventListener('click', () => {
+            alert("Theme selector opened. Choose a theme for your presentation.");
+        });
+        
+        // Initialize the presentation
+        initPresentation();
+    </script>
+</body>
+</html>

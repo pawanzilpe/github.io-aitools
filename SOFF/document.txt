@@ -1,0 +1,13 @@
+Welcome to the Simple Text Editor
+
+Start typing here to create your document. You can use the toolbar above to format your text.
+
+Features:
+
+Bold, italic, underline text
+Text alignment options
+Headings and font styles
+Download as text file
+Clear editor with one click
+
+Try it out and create amazing content!

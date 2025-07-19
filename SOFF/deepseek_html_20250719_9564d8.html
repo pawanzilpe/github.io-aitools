@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Editor Pro</title>
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2ecc71;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .video-section {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(44, 62, 80, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .editor-section {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(44, 62, 80, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            background: rgba(0,0,0,0.4);
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            margin-bottom: 20px;
+        }
+        
+        #videoPlayer {
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+        
+        .upload-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 30px;
+            border: 3px dashed var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover {
+            background: rgba(52, 152, 219, 0.2);
+            border-color: var(--secondary);
+        }
+        
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        
+        .upload-text {
+            font-size: 1.2rem;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .btn i {
+            font-size: 1.2rem;
+        }
+        
+        .btn-download {
+            background: var(--secondary);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .control-group {
+            margin-bottom: 25px;
+        }
+        
+        .control-title {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .slider-container {
+            margin-bottom: 15px;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .range-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.1);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+        }
+        
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .filter-btn {
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .text-overlay-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .text-input {
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: none;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .text-input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .color-picker {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .color-label {
+            flex: 0 0 80px;
+        }
+        
+        .color-input {
+            width: 50px;
+            height: 30px;
+            border: none;
+            cursor: pointer;
+            background: transparent;
+        }
+        
+        .timeline {
+            width: 100%;
+            height: 60px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 5px;
+            position: relative;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .timeline-inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .trim-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        
+        .trim-handle {
+            width: 15px;
+            height: 30px;
+            background: var(--secondary);
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .preview-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0,0,0,0.7);
+            z-index: 10;
+        }
+        
+        .overlay-text {
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            max-width: 80%;
+            text-align: center;
+            word-break: break-word;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 40px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Video Editor Pro</h1>
+            <p class="subtitle">Edit, enhance and download your videos directly in your browser</p>
+        </header>
+        
+        <div class="main-content">
+            <section class="video-section">
+                <h2 class="section-title">Video Preview</h2>
+                <div class="video-container">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📁</div>
+                        <p class="upload-text">Drag & drop your video file here<br>or click to browse</p>
+                        <input type="file" id="videoUpload" accept="video/*" hidden>
+                        <button class="btn" id="browseBtn">Browse Files</button>
+                    </div>
+                    <video id="videoPlayer" controls></video>
+                    <div class="preview-overlay" id="previewOverlay">
+                        <div class="overlay-text" id="overlayText">Sample Text</div>
+                    </div>
+                </div>
+                
+                <div class="timeline">
+                    <div class="timeline-inner" id="timelineProgress"></div>
+                </div>
+                
+                <div class="trim-controls">
+                    <div class="trim-handle" id="trimStart"></div>
+                    <div class="trim-handle" id="trimEnd"></div>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn" id="playBtn">▶️ Play</button>
+                    <button class="btn btn-warning" id="pauseBtn">⏸️ Pause</button>
+                    <button class="btn btn-download" id="downloadBtn">💾 Download</button>
+                    <button class="btn btn-danger" id="resetBtn">🔄 Reset</button>
+                </div>
+            </section>
+            
+            <section class="editor-section">
+                <h2 class="section-title">Editing Tools</h2>
+                
+                <div class="control-group">
+                    <h3 class="control-title">✂️ Trim Video</h3>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Start:</span>
+                            <span id="startTime">0:00</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="0" class="range-slider" id="trimStartSlider">
+                    </div>
+                    
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>End:</span>
+                            <span id="endTime">0:00</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="100" class="range-slider" id="trimEndSlider">
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <h3 class="control-title">🎨 Video Filters</h3>
+                    <div class="filters">
+                        <div class="filter-btn active" data-filter="none">Normal</div>
+                        <div class="filter-btn" data-filter="grayscale">Grayscale</div>
+                        <div class="filter-btn" data-filter="sepia">Sepia</div>
+                        <div class="filter-btn" data-filter="invert">Invert</div>
+                        <div class="filter-btn" data-filter="saturate">Saturate</div>
+                        <div class="filter-btn" data-filter="hue">Hue Rotate</div>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <h3 class="control-title">🔊 Volume Control</h3>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Volume:</span>
+                            <span id="volumeValue">100%</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="100" class="range-slider" id="volumeSlider">
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <h3 class="control-title">✏️ Text Overlay</h3>
+                    <div class="text-overlay-controls">
+                        <input type="text" class="text-input" id="textInput" placeholder="Enter text to overlay">
+                        <div class="color-picker">
+                            <span class="color-label">Text Color:</span>
+                            <input type="color" class="color-input" id="textColor" value="#ffffff">
+                        </div>
+                        <div class="slider-container">
+                            <div class="slider-label">
+                                <span>Font Size:</span>
+                                <span id="fontSizeValue">32px</span>
+                            </div>
+                            <input type="range" min="10" max="100" value="32" class="range-slider" id="fontSizeSlider">
+                        </div>
+                        <button class="btn" id="applyTextBtn">Apply Text</button>
+                        <button class="btn btn-danger" id="removeTextBtn">Remove Text</button>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <h3 class="control-title">⚙️ Advanced Settings</h3>
+                    <div class="controls">
+                        <button class="btn" id="rotateBtn">🔄 Rotate Video</button>
+                        <button class="btn" id="speedBtn">⏩ Speed: 1x</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <footer>
+            <p>Video Editor Pro &copy; 2023 | All editing happens in your browser - your videos are never uploaded to any server</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const videoUpload = document.getElementById('videoUpload');
+            const uploadArea = document.getElementById('uploadArea');
+            const browseBtn = document.getElementById('browseBtn');
+            const videoPlayer = document.getElementById('videoPlayer');
+            const playBtn = document.getElementById('playBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const trimStartSlider = document.getElementById('trimStartSlider');
+            const trimEndSlider = document.getElementById('trimEndSlider');
+            const startTime = document.getElementById('startTime');
+            const endTime = document.getElementById('endTime');
+            const volumeSlider = document.getElementById('volumeSlider');
+            const volumeValue = document.getElementById('volumeValue');
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const textInput = document.getElementById('textInput');
+            const textColor = document.getElementById('textColor');
+            const fontSizeSlider = document.getElementById('fontSizeSlider');
+            const fontSizeValue = document.getElementById('fontSizeValue');
+            const applyTextBtn = document.getElementById('applyTextBtn');
+            const removeTextBtn = document.getElementById('removeTextBtn');
+            const overlayText = document.getElementById('overlayText');
+            const previewOverlay = document.getElementById('previewOverlay');
+            const rotateBtn = document.getElementById('rotateBtn');
+            const speedBtn = document.getElementById('speedBtn');
+            const timelineProgress = document.getElementById('timelineProgress');
+            
+            // State variables
+            let currentVideoFile = null;
+            let currentFilter = 'none';
+            let rotation = 0;
+            let playbackRate = 1;
+            let textOverlayActive = false;
+            
+            // Event Listeners
+            browseBtn.addEventListener('click', () => videoUpload.click());
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#2ecc71';
+                uploadArea.style.backgroundColor = 'rgba(46, 204, 113, 0.1)';
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.style.borderColor = '#3498db';
+                uploadArea.style.backgroundColor = '';
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#3498db';
+                uploadArea.style.backgroundColor = '';
+                
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    const file = e.dataTransfer.files[0];
+                    if (file.type.startsWith('video/')) {
+                        loadVideo(file);
+                    } else {
+                        alert('Please upload a valid video file.');
+                    }
+                }
+            });
+            
+            videoUpload.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files[0]) {
+                    loadVideo(e.target.files[0]);
+                }
+            });
+            
+            playBtn.addEventListener('click', () => {
+                if (videoPlayer.src) {
+                    videoPlayer.play();
+                }
+            });
+            
+            pauseBtn.addEventListener('click', () => {
+                videoPlayer.pause();
+            });
+            
+            resetBtn.addEventListener('click', resetEditor);
+            
+            downloadBtn.addEventListener('click', () => {
+                if (videoPlayer.src) {
+                    alert('In a real application, this would process and download your edited video.\nProcessing would include: trimming, filters, text overlay, etc.');
+                    // In a real app, we would use MediaRecorder API to record the edited video
+                } else {
+                    alert('Please upload a video first.');
+                }
+            });
+            
+            // Trim controls
+            trimStartSlider.addEventListener('input', updateTrim);
+            trimEndSlider.addEventListener('input', updateTrim);
+            
+            // Volume control
+            volumeSlider.addEventListener('input', () => {
+                const volume = volumeSlider.value / 100;
+                videoPlayer.volume = volume;
+                volumeValue.textContent = `${volumeSlider.value}%`;
+            });
+            
+            // Filter buttons
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelector('.filter-btn.active').classList.remove('active');
+                    btn.classList.add('active');
+                    currentFilter = btn.dataset.filter;
+                    applyFilter();
+                });
+            });
+            
+            // Text overlay controls
+            applyTextBtn.addEventListener('click', () => {
+                if (textInput.value.trim()) {
+                    overlayText.textContent = textInput.value;
+                    previewOverlay.style.display = 'flex';
+                    textOverlayActive = true;
+                } else {
+                    alert('Please enter some text first.');
+                }
+            });
+            
+            removeTextBtn.addEventListener('click', () => {
+                previewOverlay.style.display = 'none';
+                textOverlayActive = false;
+            });
+            
+            textColor.addEventListener('input', () => {
+                overlayText.style.color = textColor.value;
+            });
+            
+            fontSizeSlider.addEventListener('input', () => {
+                const size = fontSizeSlider.value;
+                fontSizeValue.textContent = `${size}px`;
+                overlayText.style.fontSize = `${size}px`;
+            });
+            
+            // Advanced controls
+            rotateBtn.addEventListener('click', () => {
+                rotation = (rotation + 90) % 360;
+                videoPlayer.style.transform = `rotate(${rotation}deg)`;
+            });
+            
+            speedBtn.addEventListener('click', () => {
+                playbackRate = playbackRate === 2 ? 0.5 : playbackRate + 0.5;
+                videoPlayer.playbackRate = playbackRate;
+                speedBtn.textContent = `⏩ Speed: ${playbackRate}x`;
+            });
+            
+            // Video progress tracking
+            videoPlayer.addEventListener('timeupdate', () => {
+                if (videoPlayer.duration) {
+                    const percent = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+                    timelineProgress.style.width = `${percent}%`;
+                }
+            });
+            
+            // Functions
+            function loadVideo(file) {
+                currentVideoFile = file;
+                const videoURL = URL.createObjectURL(file);
+                videoPlayer.src = videoURL;
+                videoPlayer.style.display = 'block';
+                uploadArea.style.display = 'none';
+                
+                videoPlayer.onloadedmetadata = () => {
+                    endTime.textContent = formatTime(videoPlayer.duration);
+                    trimEndSlider.max = videoPlayer.duration;
+                    trimEndSlider.value = videoPlayer.duration;
+                };
+                
+                videoPlayer.onended = () => {
+                    videoPlayer.currentTime = trimStartSlider.value;
+                };
+            }
+            
+            function updateTrim() {
+                if (!videoPlayer.src) return;
+                
+                const startVal = parseFloat(trimStartSlider.value);
+                const endVal = parseFloat(trimEndSlider.value);
+                
+                startTime.textContent = formatTime(startVal);
+                endTime.textContent = formatTime(endVal);
+                
+                // In a real app, we would set the trim points for processing
+                if (videoPlayer.currentTime < startVal || videoPlayer.currentTime > endVal) {
+                    videoPlayer.currentTime = startVal;
+                }
+                
+                videoPlayer.currentTime = startVal;
+            }
+            
+            function applyFilter() {
+                let filterStyle = '';
+                
+                switch(currentFilter) {
+                    case 'grayscale':
+                        filterStyle = 'grayscale(100%)';
+                        break;
+                    case 'sepia':
+                        filterStyle = 'sepia(100%)';
+                        break;
+                    case 'invert':
+                        filterStyle = 'invert(100%)';
+                        break;
+                    case 'saturate':
+                        filterStyle = 'saturate(200%)';
+                        break;
+                    case 'hue':
+                        filterStyle = 'hue-rotate(90deg)';
+                        break;
+                    default:
+                        filterStyle = 'none';
+                }
+                
+                videoPlayer.style.filter = filterStyle;
+            }
+            
+            function resetEditor() {
+                if (confirm('Are you sure you want to reset all changes?')) {
+                    if (currentVideoFile) {
+                        const videoURL = URL.createObjectURL(currentVideoFile);
+                        videoPlayer.src = videoURL;
+                    }
+                    
+                    // Reset filters
+                    currentFilter = 'none';
+                    videoPlayer.style.filter = 'none';
+                    document.querySelectorAll('.filter-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                        if (btn.dataset.filter === 'none') {
+                            btn.classList.add('active');
+                        }
+                    });
+                    
+                    // Reset trim
+                    trimStartSlider.value = 0;
+                    trimEndSlider.value = videoPlayer.duration || 100;
+                    startTime.textContent = formatTime(0);
+                    endTime.textContent = formatTime(videoPlayer.duration || 0);
+                    
+                    // Reset volume
+                    volumeSlider.value = 100;
+                    videoPlayer.volume = 1;
+                    volumeValue.textContent = '100%';
+                    
+                    // Reset text overlay
+                    textInput.value = '';
+                    textColor.value = '#ffffff';
+                    fontSizeSlider.value = 32;
+                    fontSizeValue.textContent = '32px';
+                    previewOverlay.style.display = 'none';
+                    textOverlayActive = false;
+                    
+                    // Reset rotation and speed
+                    rotation = 0;
+                    videoPlayer.style.transform = 'rotate(0deg)';
+                    playbackRate = 1;
+                    videoPlayer.playbackRate = 1;
+                    speedBtn.textContent = '⏩ Speed: 1x';
+                }
+            }
+            
+            function formatTime(seconds) {
+                if (isNaN(seconds)) return '0:00';
+                
+                const minutes = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple PDF Editor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+        }
+        
+        .panel-title i {
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 5px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #1abc9c, #16a085);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(to right, #f39c12, #d35400);
+        }
+        
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .file-input-container {
+            position: relative;
+            margin: 20px 0;
+        }
+        
+        .file-input-label {
+            display: block;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+        }
+        
+        .file-input-label:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .file-input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .pdf-preview {
+            width: 100%;
+            height: 300px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .pdf-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .pdf-preview canvas {
+            max-width: 100%;
+            max-height: 100%;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .editor-area {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        input::placeholder, textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .status.success {
+            background: rgba(46, 204, 113, 0.3);
+            display: block;
+        }
+        
+        .status.error {
+            background: rgba(231, 76, 60, 0.3);
+            display: block;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .icon {
+            display: inline-block;
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Simple PDF Editor</h1>
+            <p class="subtitle">Edit, create, and download PDF files directly in your browser. Add text, modify content, and save your changes with ease.</p>
+        </header>
+        
+        <div class="app-container">
+            <!-- PDF Editor Panel -->
+            <div class="panel">
+                <h2 class="panel-title">
+                    <span class="icon">📝</span> PDF Editor
+                </h2>
+                
+                <div class="file-input-container">
+                    <label class="file-input-label" id="file-input-label">
+                        <span class="icon">📁</span> Choose a PDF file to edit
+                    </label>
+                    <input type="file" id="pdf-file" class="file-input" accept=".pdf">
+                </div>
+                
+                <div id="status" class="status"></div>
+                
+                <div class="pdf-preview" id="pdf-preview">
+                    <p>PDF preview will appear here</p>
+                </div>
+                
+                <div class="editor-area">
+                    <div class="form-group">
+                        <label for="text-to-add">
+                            <span class="icon">✏️</span> Text to Add
+                        </label>
+                        <textarea id="text-to-add" placeholder="Enter text to add to your PDF..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="position-x">
+                            <span class="icon">📍</span> Text Position
+                        </label>
+                        <div style="display: flex; gap: 10px;">
+                            <div style="flex: 1;">
+                                <label for="position-x">X Position:</label>
+                                <input type="number" id="position-x" value="50">
+                            </div>
+                            <div style="flex: 1;">
+                                <label for="position-y">Y Position:</label>
+                                <input type="number" id="position-y" value="500">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="font-size">
+                            <span class="icon">🔤</span> Font Size
+                        </label>
+                        <input type="number" id="font-size" min="8" max="72" value="18">
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button id="add-text-btn" class="btn btn-primary">
+                        <span class="icon">➕</span> Add Text
+                    </button>
+                    <button id="download-btn" class="btn">
+                        <span class="icon">💾</span> Download PDF
+                    </button>
+                    <button id="reset-btn" class="btn btn-danger">
+                        <span class="icon">🔄</span> Reset
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Create New PDF Panel -->
+            <div class="panel">
+                <h2 class="panel-title">
+                    <span class="icon">🆕</span> Create New PDF
+                </h2>
+                
+                <div class="editor-area">
+                    <div class="form-group">
+                        <label for="pdf-title">
+                            <span class="icon">📌</span> Document Title
+                        </label>
+                        <input type="text" id="pdf-title" placeholder="Enter document title...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pdf-content">
+                            <span class="icon">📄</span> Document Content
+                        </label>
+                        <textarea id="pdf-content" placeholder="Enter content for your new PDF...">This is a new PDF document created with Simple PDF Editor. You can add as much text as you want. This tool makes it easy to create and edit PDF files without any special software.</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pdf-author">
+                            <span class="icon">👤</span> Author
+                        </label>
+                        <input type="text" id="pdf-author" placeholder="Enter author name...">
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button id="create-pdf-btn" class="btn btn-primary">
+                        <span class="icon">✨</span> Create PDF
+                    </button>
+                    <button id="download-new-btn" class="btn btn-warning">
+                        <span class="icon">💾</span> Download New PDF
+                    </button>
+                </div>
+                
+                <div id="new-pdf-status" class="status"></div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2023 Simple PDF Editor | All your PDF editing needs in one place</p>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentPdfBytes = null;
+        let pdfDoc = null;
+        
+        // DOM Elements
+        const pdfFileInput = document.getElementById('pdf-file');
+        const fileInputLabel = document.getElementById('file-input-label');
+        const pdfPreview = document.getElementById('pdf-preview');
+        const addTextBtn = document.getElementById('add-text-btn');
+        const downloadBtn = document.getElementById('download-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const createPdfBtn = document.getElementById('create-pdf-btn');
+        const downloadNewBtn = document.getElementById('download-new-btn');
+        const statusDiv = document.getElementById('status');
+        const newPdfStatusDiv = document.getElementById('new-pdf-status');
+        
+        // Event Listeners
+        pdfFileInput.addEventListener('change', handleFileSelect);
+        addTextBtn.addEventListener('click', addTextToPdf);
+        downloadBtn.addEventListener('click', downloadEditedPdf);
+        resetBtn.addEventListener('click', resetEditor);
+        createPdfBtn.addEventListener('click', createNewPdf);
+        downloadNewBtn.addEventListener('click', downloadNewPdf);
+        
+        // Handle file selection
+        async function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file || file.type !== 'application/pdf') {
+                showStatus('Please select a valid PDF file', 'error');
+                return;
+            }
+            
+            try {
+                fileInputLabel.textContent = `Selected: ${file.name}`;
+                showStatus('Loading PDF...');
+                
+                const arrayBuffer = await file.arrayBuffer();
+                currentPdfBytes = new Uint8Array(arrayBuffer);
+                
+                // Render PDF preview
+                await renderPdfPreview(currentPdfBytes);
+                
+                showStatus('PDF loaded successfully!', 'success');
+            } catch (error) {
+                console.error('Error loading PDF:', error);
+                showStatus('Error loading PDF. Please try again.', 'error');
+            }
+        }
+        
+        // Render PDF preview
+        async function renderPdfPreview(pdfBytes) {
+            try {
+                pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
+                const pages = pdfDoc.getPages();
+                const firstPage = pages[0];
+                
+                // Create a canvas for rendering
+                const canvas = document.createElement('canvas');
+                const viewport = firstPage.getViewport({ scale: 1.5 });
+                
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                
+                const ctx = canvas.getContext('2d');
+                await firstPage.render({
+                    canvasContext: ctx,
+                    viewport: viewport
+                }).promise;
+                
+                // Clear preview and add canvas
+                pdfPreview.innerHTML = '';
+                pdfPreview.appendChild(canvas);
+            } catch (error) {
+                console.error('Error rendering PDF:', error);
+                pdfPreview.innerHTML = '<p>Error rendering PDF preview</p>';
+            }
+        }
+        
+        // Add text to PDF
+        async function addTextToPdf() {
+            if (!pdfDoc) {
+                showStatus('Please load a PDF first', 'error');
+                return;
+            }
+            
+            const textToAdd = document.getElementById('text-to-add').value;
+            if (!textToAdd.trim()) {
+                showStatus('Please enter some text to add', 'error');
+                return;
+            }
+            
+            try {
+                const pages = pdfDoc.getPages();
+                const firstPage = pages[0];
+                const { width, height } = firstPage.getSize();
+                
+                const x = parseInt(document.getElementById('position-x').value);
+                const y = parseInt(document.getElementById('position-y').value);
+                const fontSize = parseInt(document.getElementById('font-size').value);
+                
+                firstPage.drawText(textToAdd, {
+                    x: x,
+                    y: height - y, // PDF coordinates start from bottom-left
+                    size: fontSize,
+                    color: PDFLib.rgb(0, 0, 0),
+                });
+                
+                // Update the preview
+                await renderPdfPreview(await pdfDoc.save());
+                
+                showStatus('Text added successfully!', 'success');
+            } catch (error) {
+                console.error('Error adding text:', error);
+                showStatus('Error adding text. Please try again.', 'error');
+            }
+        }
+        
+        // Download edited PDF
+        async function downloadEditedPdf() {
+            if (!pdfDoc) {
+                showStatus('No PDF to download', 'error');
+                return;
+            }
+            
+            try {
+                const pdfBytes = await pdfDoc.save();
+                downloadPdf(pdfBytes, 'edited-document.pdf');
+                showStatus('PDF downloaded successfully!', 'success');
+            } catch (error) {
+                console.error('Error downloading PDF:', error);
+                showStatus('Error downloading PDF. Please try again.', 'error');
+            }
+        }
+        
+        // Create new PDF
+        async function createNewPdf() {
+            try {
+                const title = document.getElementById('pdf-title').value || 'New Document';
+                const content = document.getElementById('pdf-content').value || 'This is a new PDF document.';
+                const author = document.getElementById('pdf-author').value || 'Simple PDF Editor';
+                
+                // Create a new PDF document
+                pdfDoc = await PDFLib.PDFDocument.create();
+                
+                // Add a new page
+                const page = pdfDoc.addPage([595, 842]); // A4 size
+                
+                // Set document metadata
+                pdfDoc.setTitle(title);
+                pdfDoc.setAuthor(author);
+                pdfDoc.setCreationDate(new Date());
+                
+                // Add content
+                const fontSize = 16;
+                const margin = 50;
+                const maxWidth = 495; // 595 - 2*50
+                
+                page.drawText(content, {
+                    x: margin,
+                    y: 792 - margin, // Start from top (842 - 50 = 792)
+                    size: fontSize,
+                    maxWidth: maxWidth,
+                    lineHeight: fontSize * 1.2,
+                    color: PDFLib.rgb(0, 0, 0),
+                });
+                
+                // Render preview
+                await renderPdfPreview(await pdfDoc.save());
+                
+                showStatus('New PDF created successfully!', 'success');
+                newPdfStatusDiv.textContent = 'New PDF created successfully!';
+                newPdfStatusDiv.className = 'status success';
+                
+                // Update file input label
+                fileInputLabel.textContent = 'Choose a PDF file to edit';
+            } catch (error) {
+                console.error('Error creating PDF:', error);
+                newPdfStatusDiv.textContent = 'Error creating PDF. Please try again.';
+                newPdfStatusDiv.className = 'status error';
+            }
+        }
+        
+        // Download new PDF
+        async function downloadNewPdf() {
+            if (!pdfDoc) {
+                newPdfStatusDiv.textContent = 'No PDF to download';
+                newPdfStatusDiv.className = 'status error';
+                return;
+            }
+            
+            try {
+                const title = document.getElementById('pdf-title').value || 'new-document';
+                const pdfBytes = await pdfDoc.save();
+                downloadPdf(pdfBytes, `${title}.pdf`);
+                
+                newPdfStatusDiv.textContent = 'PDF downloaded successfully!';
+                newPdfStatusDiv.className = 'status success';
+            } catch (error) {
+                console.error('Error downloading PDF:', error);
+                newPdfStatusDiv.textContent = 'Error downloading PDF. Please try again.';
+                newPdfStatusDiv.className = 'status error';
+            }
+        }
+        
+        // Reset editor
+        function resetEditor() {
+            pdfFileInput.value = '';
+            fileInputLabel.innerHTML = '<span class="icon">📁</span> Choose a PDF file to edit';
+            pdfPreview.innerHTML = '<p>PDF preview will appear here</p>';
+            document.getElementById('text-to-add').value = '';
+            document.getElementById('position-x').value = '50';
+            document.getElementById('position-y').value = '500';
+            document.getElementById('font-size').value = '18';
+            statusDiv.textContent = '';
+            statusDiv.className = 'status';
+            pdfDoc = null;
+            currentPdfBytes = null;
+        }
+        
+        // Download PDF helper
+        function downloadPdf(pdfBytes, fileName) {
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // Show status message
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = 'status';
+            
+            if (type === 'success') {
+                statusDiv.classList.add('success');
+            } else if (type === 'error') {
+                statusDiv.classList.add('error');
+            }
+            
+            // Clear status after 5 seconds
+            if (type) {
+                setTimeout(() => {
+                    statusDiv.textContent = '';
+                    statusDiv.className = 'status';
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>

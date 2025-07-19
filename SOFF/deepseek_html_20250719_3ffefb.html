@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VidEdit Pro - Online Video Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .logo i {
+            font-size: 2.8rem;
+            color: #4facfe;
+        }
+        
+        .logo h1 {
+            font-size: 2.8rem;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 25px;
+        }
+        
+        .video-container {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .video-player {
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        #videoElement {
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+        
+        .upload-area {
+            border: 3px dashed #4facfe;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .upload-area:hover {
+            background: rgba(79, 172, 254, 0.1);
+        }
+        
+        .upload-area i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #4facfe;
+        }
+        
+        .upload-area h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .upload-area p {
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.4);
+        }
+        
+        .btn i {
+            font-size: 1.2rem;
+        }
+        
+        .player-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .player-controls button {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .player-controls button:hover {
+            background: rgba(79, 172, 254, 0.5);
+            transform: scale(1.1);
+        }
+        
+        .tools-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4facfe;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tool-section {
+            margin-bottom: 25px;
+        }
+        
+        .tool-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tool-section h3 i {
+            color: #4facfe;
+        }
+        
+        .slider-container {
+            margin-bottom: 15px;
+        }
+        
+        .slider-container label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            outline: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4facfe;
+            cursor: pointer;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .checkbox-item input {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .trim-section {
+            background: rgba(79, 172, 254, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 25px;
+        }
+        
+        .trim-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .trim-controls input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            color: white;
+        }
+        
+        .download-section {
+            margin-top: 30px;
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+        
+        .download-btn {
+            background: linear-gradient(to right, #00c853, #64dd17);
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, #00c853, #64dd17);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .video-player {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-film"></i>
+                <h1>VidEdit Pro</h1>
+            </div>
+            <p class="tagline">Edit, enhance and download your videos directly in your browser - no installation required!</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="video-container">
+                <div class="video-player">
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3>Upload Your Video</h3>
+                        <p>Drag & drop your video file here or click to browse</p>
+                        <button class="btn" id="browseBtn"><i class="fas fa-folder-open"></i> Browse Files</button>
+                        <input type="file" id="videoUpload" accept="video/*" style="display: none;">
+                    </div>
+                    <video id="videoElement" controls></video>
+                </div>
+                
+                <div class="player-controls">
+                    <button id="playBtn"><i class="fas fa-play"></i></button>
+                    <button id="pauseBtn"><i class="fas fa-pause"></i></button>
+                    <button id="stopBtn"><i class="fas fa-stop"></i></button>
+                    <button id="rewindBtn"><i class="fas fa-backward"></i></button>
+                    <button id="forwardBtn"><i class="fas fa-forward"></i></button>
+                    <button id="volumeUpBtn"><i class="fas fa-volume-up"></i></button>
+                    <button id="volumeDownBtn"><i class="fas fa-volume-down"></i></button>
+                    <button id="fullscreenBtn"><i class="fas fa-expand"></i></button>
+                </div>
+            </div>
+            
+            <div class="tools-panel">
+                <h2 class="panel-title"><i class="fas fa-tools"></i> Editing Tools</h2>
+                
+                <div class="tool-section">
+                    <h3><i class="fas fa-sliders-h"></i> Adjustments</h3>
+                    <div class="slider-container">
+                        <label for="brightness">Brightness: <span id="brightnessValue">100%</span></label>
+                        <input type="range" min="0" max="200" value="100" class="slider" id="brightness">
+                    </div>
+                    
+                    <div class="slider-container">
+                        <label for="contrast">Contrast: <span id="contrastValue">100%</span></label>
+                        <input type="range" min="0" max="200" value="100" class="slider" id="contrast">
+                    </div>
+                    
+                    <div class="slider-container">
+                        <label for="saturation">Saturation: <span id="saturationValue">100%</span></label>
+                        <input type="range" min="0" max="200" value="100" class="slider" id="saturation">
+                    </div>
+                </div>
+                
+                <div class="tool-section">
+                    <h3><i class="fas fa-crop-alt"></i> Transform</h3>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="flipHorizontal">
+                            <label for="flipHorizontal">Flip Horizontal</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="flipVertical">
+                            <label for="flipVertical">Flip Vertical</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="grayscale">
+                            <label for="grayscale">Grayscale</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="sepia">
+                            <label for="sepia">Sepia Effect</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tool-section trim-section">
+                    <h3><i class="fas fa-cut"></i> Trim Video</h3>
+                    <div class="trim-controls">
+                        <input type="text" id="startTime" placeholder="Start time (HH:MM:SS)">
+                        <input type="text" id="endTime" placeholder="End time (HH:MM:SS)">
+                    </div>
+                    <button class="btn" id="applyTrimBtn" style="margin-top: 15px; width: 100%;">
+                        <i class="fas fa-scissors"></i> Apply Trim
+                    </button>
+                </div>
+                
+                <div class="download-section">
+                    <h3><i class="fas fa-download"></i> Export Video</h3>
+                    <button class="btn download-btn" id="downloadBtn">
+                        <i class="fas fa-download"></i> Download Edited Video
+                    </button>
+                    <div class="progress-bar">
+                        <div class="progress" id="downloadProgress"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>VidEdit Pro &copy; 2023 | Browser-based Video Editor | All processing happens locally on your device</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const uploadArea = document.getElementById('uploadArea');
+            const browseBtn = document.getElementById('browseBtn');
+            const videoUpload = document.getElementById('videoUpload');
+            const videoElement = document.getElementById('videoElement');
+            const playBtn = document.getElementById('playBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const rewindBtn = document.getElementById('rewindBtn');
+            const forwardBtn = document.getElementById('forwardBtn');
+            const volumeUpBtn = document.getElementById('volumeUpBtn');
+            const volumeDownBtn = document.getElementById('volumeDownBtn');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const brightnessSlider = document.getElementById('brightness');
+            const contrastSlider = document.getElementById('contrast');
+            const saturationSlider = document.getElementById('saturation');
+            const brightnessValue = document.getElementById('brightnessValue');
+            const contrastValue = document.getElementById('contrastValue');
+            const saturationValue = document.getElementById('saturationValue');
+            const downloadProgress = document.getElementById('downloadProgress');
+            
+            // Event Listeners
+            uploadArea.addEventListener('click', () => videoUpload.click());
+            browseBtn.addEventListener('click', () => videoUpload.click());
+            
+            videoUpload.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const file = e.target.files[0];
+                    const videoURL = URL.createObjectURL(file);
+                    
+                    videoElement.src = videoURL;
+                    videoElement.style.display = 'block';
+                    uploadArea.style.display = 'none';
+                    
+                    // Reset video filters
+                    videoElement.style.filter = 'none';
+                    brightnessSlider.value = 100;
+                    contrastSlider.value = 100;
+                    saturationSlider.value = 100;
+                    brightnessValue.textContent = '100%';
+                    contrastValue.textContent = '100%';
+                    saturationValue.textContent = '100%';
+                    
+                    // Reset checkboxes
+                    document.getElementById('flipHorizontal').checked = false;
+                    document.getElementById('flipVertical').checked = false;
+                    document.getElementById('grayscale').checked = false;
+                    document.getElementById('sepia').checked = false;
+                }
+            });
+            
+            // Player Controls
+            playBtn.addEventListener('click', () => videoElement.play());
+            pauseBtn.addEventListener('click', () => videoElement.pause());
+            stopBtn.addEventListener('click', () => {
+                videoElement.pause();
+                videoElement.currentTime = 0;
+            });
+            rewindBtn.addEventListener('click', () => {
+                videoElement.currentTime = Math.max(0, videoElement.currentTime - 10);
+            });
+            forwardBtn.addEventListener('click', () => {
+                videoElement.currentTime = Math.min(videoElement.duration, videoElement.currentTime + 10);
+            });
+            volumeUpBtn.addEventListener('click', () => {
+                videoElement.volume = Math.min(1, videoElement.volume + 0.1);
+            });
+            volumeDownBtn.addEventListener('click', () => {
+                videoElement.volume = Math.max(0, videoElement.volume - 0.1);
+            });
+            fullscreenBtn.addEventListener('click', () => {
+                if (videoElement.requestFullscreen) {
+                    videoElement.requestFullscreen();
+                } else if (videoElement.mozRequestFullScreen) {
+                    videoElement.mozRequestFullScreen();
+                } else if (videoElement.webkitRequestFullscreen) {
+                    videoElement.webkitRequestFullscreen();
+                } else if (videoElement.msRequestFullscreen) {
+                    videoElement.msRequestFullscreen();
+                }
+            });
+            
+            // Video Filters
+            function updateVideoFilter() {
+                const brightness = brightnessSlider.value;
+                const contrast = contrastSlider.value;
+                const saturation = saturationSlider.value;
+                const flipHorizontal = document.getElementById('flipHorizontal').checked ? -1 : 1;
+                const flipVertical = document.getElementById('flipVertical').checked ? -1 : 1;
+                const grayscale = document.getElementById('grayscale').checked ? 1 : 0;
+                const sepia = document.getElementById('sepia').checked ? 1 : 0;
+                
+                const filter = `
+                    brightness(${brightness}%) 
+                    contrast(${contrast}%) 
+                    saturate(${saturation}%) 
+                    scaleX(${flipHorizontal}) 
+                    scaleY(${flipVertical})
+                    grayscale(${grayscale})
+                    sepia(${sepia})
+                `;
+                
+                videoElement.style.filter = filter;
+                brightnessValue.textContent = `${brightness}%`;
+                contrastValue.textContent = `${contrast}%`;
+                saturationValue.textContent = `${saturation}%`;
+            }
+            
+            brightnessSlider.addEventListener('input', updateVideoFilter);
+            contrastSlider.addEventListener('input', updateVideoFilter);
+            saturationSlider.addEventListener('input', updateVideoFilter);
+            document.getElementById('flipHorizontal').addEventListener('change', updateVideoFilter);
+            document.getElementById('flipVertical').addEventListener('change', updateVideoFilter);
+            document.getElementById('grayscale').addEventListener('change', updateVideoFilter);
+            document.getElementById('sepia').addEventListener('change', updateVideoFilter);
+            
+            // Apply Trim
+            document.getElementById('applyTrimBtn').addEventListener('click', function() {
+                alert('Trim functionality would be applied here. In a real app, this would use the MediaRecorder API to trim the video.');
+            });
+            
+            // Download Button
+            downloadBtn.addEventListener('click', function() {
+                // Simulate download progress
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 5;
+                    downloadProgress.style.width = `${progress}%`;
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        
+                        // Create a simulated download
+                        const link = document.createElement('a');
+                        link.href = '#';
+                        link.download = 'edited-video.mp4';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        
+                        // Reset progress bar after 2 seconds
+                        setTimeout(() => {
+                            downloadProgress.style.width = '0%';
+                        }, 2000);
+                    }
+                }, 100);
+            });
+            
+            // Drag and drop support
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadArea.style.background = 'rgba(79, 172, 254, 0.2)';
+            });
+            
+            uploadArea.addEventListener('dragleave', function() {
+                uploadArea.style.background = '';
+            });
+            
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadArea.style.background = '';
+                
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    videoUpload.files = e.dataTransfer.files;
+                    const event = new Event('change', { bubbles: true });
+                    videoUpload.dispatchEvent(event);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

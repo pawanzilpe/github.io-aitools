@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Editor Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --dark: #1e1e2c;
+            --light: #f8f9fa;
+            --success: #4cc9f0;
+            --warning: #f72585;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1e1e2c, #2d2d44);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--success), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        header p {
+            color: #a0a0c0;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 25px;
+        }
+        
+        .video-section {
+            background: rgba(30, 30, 44, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .video-preview {
+            background: #151521;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            position: relative;
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .video-preview video {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+        }
+        
+        .upload-area {
+            border: 3px dashed var(--primary);
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .upload-area:hover {
+            background: rgba(67, 97, 238, 0.1);
+        }
+        
+        .upload-area i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        
+        .upload-area h3 {
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .upload-area p {
+            color: #a0a0c0;
+            margin-bottom: 20px;
+        }
+        
+        .upload-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .upload-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+        }
+        
+        .controls-section {
+            background: rgba(30, 30, 44, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            color: var(--success);
+        }
+        
+        .control-group {
+            margin-bottom: 25px;
+        }
+        
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #c0c0e0;
+            font-weight: 500;
+        }
+        
+        .slider-container {
+            background: rgba(20, 20, 35, 0.6);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            outline: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+        }
+        
+        .value-display {
+            text-align: right;
+            font-size: 0.9rem;
+            color: var(--success);
+            margin-top: 5px;
+        }
+        
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .control-btn {
+            background: rgba(20, 20, 35, 0.6);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .control-btn i {
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .control-btn:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        .download-btn {
+            background: var(--success);
+            color: var(--dark);
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-top: 15px;
+        }
+        
+        .download-btn i {
+            margin-right: 10px;
+        }
+        
+        .download-btn:hover {
+            background: #3bb1d8;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(76, 201, 240, 0.4);
+        }
+        
+        .effect-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .effect-btn {
+            background: rgba(20, 20, 35, 0.6);
+            border: none;
+            color: white;
+            padding: 15px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .effect-btn:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        .effect-btn.active {
+            background: var(--primary);
+            border: 2px solid var(--success);
+        }
+        
+        .timeline {
+            background: rgba(20, 20, 35, 0.6);
+            height: 80px;
+            border-radius: 10px;
+            margin-top: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .timeline-inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 200%;
+            background: repeating-linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.1),
+                rgba(255, 255, 255, 0.1) 10px,
+                rgba(255, 255, 255, 0.05) 10px,
+                rgba(255, 255, 255, 0.05) 20px
+            );
+            animation: timelineScroll 20s linear infinite;
+        }
+        
+        @keyframes timelineScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        
+        .playhead {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 4px;
+            height: 100%;
+            background: var(--warning);
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+        
+        .playhead::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -8px;
+            width: 20px;
+            height: 20px;
+            background: var(--warning);
+            border-radius: 50%;
+        }
+        
+        .processing {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 5px solid var(--success);
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .processing p {
+            font-size: 1.2rem;
+            color: white;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: var(--dark);
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: 500;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.5s;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        @media (max-width: 900px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-video"></i> Video Editor Pro</h1>
+            <p>Edit, enhance and download your videos with our powerful online editor. No installation required!</p>
+        </header>
+        
+        <div class="app-container">
+            <div class="video-section">
+                <div class="video-preview">
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3>Upload Your Video</h3>
+                        <p>Drag & drop your video file here or click to browse</p>
+                        <button class="upload-btn" id="uploadBtn">Choose File</button>
+                        <input type="file" id="fileInput" accept="video/*" style="display: none;">
+                    </div>
+                    <video id="videoPlayer" controls></video>
+                </div>
+                
+                <div class="timeline">
+                    <div class="timeline-inner"></div>
+                    <div class="playhead"></div>
+                </div>
+            </div>
+            
+            <div class="controls-section">
+                <h2 class="section-title"><i class="fas fa-sliders-h"></i> Editing Controls</h2>
+                
+                <div class="control-group">
+                    <label class="control-label">Trim Video</label>
+                    <div class="slider-container">
+                        <input type="range" class="slider" id="startTrim" min="0" max="100" value="0">
+                        <div class="value-display">Start: <span id="startValue">0s</span></div>
+                    </div>
+                    <div class="slider-container">
+                        <input type="range" class="slider" id="endTrim" min="0" max="100" value="100">
+                        <div class="value-display">End: <span id="endValue">100s</span></div>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label">Adjustments</label>
+                    <div class="slider-container">
+                        <input type="range" class="slider" id="brightness" min="0" max="200" value="100">
+                        <div class="value-display">Brightness: <span id="brightnessValue">100%</span></div>
+                    </div>
+                    <div class="slider-container">
+                        <input type="range" class="slider" id="contrast" min="0" max="200" value="100">
+                        <div class="value-display">Contrast: <span id="contrastValue">100%</span></div>
+                    </div>
+                    <div class="slider-container">
+                        <input type="range" class="slider" id="saturation" min="0" max="200" value="100">
+                        <div class="value-display">Saturation: <span id="saturationValue">100%</span></div>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label">Video Effects</label>
+                    <div class="effect-grid">
+                        <button class="effect-btn" data-effect="none">None</button>
+                        <button class="effect-btn" data-effect="grayscale">Grayscale</button>
+                        <button class="effect-btn" data-effect="sepia">Sepia</button>
+                        <button class="effect-btn" data-effect="invert">Invert</button>
+                        <button class="effect-btn" data-effect="vintage">Vintage</button>
+                        <button class="effect-btn" data-effect="cold">Cold</button>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label">Actions</label>
+                    <div class="btn-group">
+                        <button class="control-btn" id="playBtn"><i class="fas fa-play"></i> Play</button>
+                        <button class="control-btn" id="pauseBtn"><i class="fas fa-pause"></i> Pause</button>
+                        <button class="control-btn" id="resetBtn"><i class="fas fa-redo"></i> Reset</button>
+                        <button class="control-btn" id="muteBtn"><i class="fas fa-volume-up"></i> Mute</button>
+                    </div>
+                </div>
+                
+                <button class="download-btn" id="downloadBtn">
+                    <i class="fas fa-download"></i> Download Edited Video
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="processing" id="processing">
+        <div class="spinner"></div>
+        <p>Processing your video...</p>
+    </div>
+    
+    <div class="notification" id="notification">Video downloaded successfully!</div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const uploadArea = document.getElementById('uploadArea');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const fileInput = document.getElementById('fileInput');
+            const videoPlayer = document.getElementById('videoPlayer');
+            const playBtn = document.getElementById('playBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const muteBtn = document.getElementById('muteBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const processingScreen = document.getElementById('processing');
+            const notification = document.getElementById('notification');
+            
+            // Slider elements
+            const startTrim = document.getElementById('startTrim');
+            const endTrim = document.getElementById('endTrim');
+            const brightness = document.getElementById('brightness');
+            const contrast = document.getElementById('contrast');
+            const saturation = document.getElementById('saturation');
+            
+            // Value displays
+            const startValue = document.getElementById('startValue');
+            const endValue = document.getElementById('endValue');
+            const brightnessValue = document.getElementById('brightnessValue');
+            const contrastValue = document.getElementById('contrastValue');
+            const saturationValue = document.getElementById('saturationValue');
+            
+            // Effect buttons
+            const effectButtons = document.querySelectorAll('.effect-btn');
+            
+            // Video state
+            let currentEffect = 'none';
+            let isMuted = false;
+            
+            // Event Listeners
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadBtn.addEventListener('click', () => fileInput.click());
+            
+            fileInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    
+                    // Check if file is a video
+                    if (!file.type.match('video.*')) {
+                        showNotification('Please select a video file');
+                        return;
+                    }
+                    
+                    const videoURL = URL.createObjectURL(file);
+                    videoPlayer.src = videoURL;
+                    videoPlayer.style.display = 'block';
+                    uploadArea.style.display = 'none';
+                    
+                    // Set video duration for trim sliders
+                    videoPlayer.onloadedmetadata = function() {
+                        startTrim.max = Math.floor(videoPlayer.duration);
+                        endTrim.max = Math.floor(videoPlayer.duration);
+                        endTrim.value = Math.floor(videoPlayer.duration);
+                        
+                        startValue.textContent = "0s";
+                        endValue.textContent = Math.floor(videoPlayer.duration) + "s";
+                    };
+                }
+            });
+            
+            // Playback controls
+            playBtn.addEventListener('click', () => {
+                videoPlayer.play();
+                playBtn.disabled = true;
+                pauseBtn.disabled = false;
+            });
+            
+            pauseBtn.addEventListener('click', () => {
+                videoPlayer.pause();
+                playBtn.disabled = false;
+                pauseBtn.disabled = true;
+            });
+            
+            resetBtn.addEventListener('click', () => {
+                videoPlayer.currentTime = 0;
+                if (videoPlayer.paused) {
+                    playBtn.disabled = false;
+                    pauseBtn.disabled = true;
+                }
+            });
+            
+            muteBtn.addEventListener('click', () => {
+                isMuted = !isMuted;
+                videoPlayer.muted = isMuted;
+                muteBtn.innerHTML = isMuted ? 
+                    '<i class="fas fa-volume-mute"></i> Unmute' : 
+                    '<i class="fas fa-volume-up"></i> Mute';
+            });
+            
+            // Slider updates
+            startTrim.addEventListener('input', function() {
+                startValue.textContent = this.value + "s";
+                if (parseInt(this.value) > parseInt(endTrim.value)) {
+                    endTrim.value = this.value;
+                    endValue.textContent = this.value + "s";
+                }
+                videoPlayer.currentTime = this.value;
+            });
+            
+            endTrim.addEventListener('input', function() {
+                endValue.textContent = this.value + "s";
+                if (parseInt(this.value) < parseInt(startTrim.value)) {
+                    startTrim.value = this.value;
+                    startValue.textContent = this.value + "s";
+                }
+            });
+            
+            brightness.addEventListener('input', function() {
+                brightnessValue.textContent = this.value + "%";
+                applyFilters();
+            });
+            
+            contrast.addEventListener('input', function() {
+                contrastValue.textContent = this.value + "%";
+                applyFilters();
+            });
+            
+            saturation.addEventListener('input', function() {
+                saturationValue.textContent = this.value + "%";
+                applyFilters();
+            });
+            
+            // Effect buttons
+            effectButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    effectButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    currentEffect = this.getAttribute('data-effect');
+                    applyFilters();
+                });
+            });
+            
+            // Download button
+            downloadBtn.addEventListener('click', function() {
+                if (!videoPlayer.src) {
+                    showNotification('Please upload a video first');
+                    return;
+                }
+                
+                processingScreen.style.display = 'flex';
+                
+                // Simulate processing delay
+                setTimeout(() => {
+                    processingScreen.style.display = 'none';
+                    showNotification('Video downloaded successfully!');
+                    
+                    // Create a temporary download link
+                    const a = document.createElement('a');
+                    a.href = videoPlayer.src;
+                    a.download = 'edited-video.mp4';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }, 3000);
+            });
+            
+            // Apply CSS filters to video
+            function applyFilters() {
+                let filterString = '';
+                
+                // Brightness
+                filterString += `brightness(${brightness.value}%) `;
+                
+                // Contrast
+                filterString += `contrast(${contrast.value}%) `;
+                
+                // Saturation
+                filterString += `saturate(${saturation.value}%) `;
+                
+                // Effects
+                switch(currentEffect) {
+                    case 'grayscale':
+                        filterString += 'grayscale(100%)';
+                        break;
+                    case 'sepia':
+                        filterString += 'sepia(100%)';
+                        break;
+                    case 'invert':
+                        filterString += 'invert(100%)';
+                        break;
+                    case 'vintage':
+                        filterString += 'sepia(70%) brightness(90%) contrast(120%)';
+                        break;
+                    case 'cold':
+                        filterString += 'hue-rotate(180deg) contrast(110%)';
+                        break;
+                    default:
+                        // No additional effect
+                        break;
+                }
+                
+                videoPlayer.style.filter = filterString.trim();
+            }
+            
+            // Show notification
+            function showNotification(message) {
+                notification.textContent = message;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Initialize button states
+            pauseBtn.disabled = true;
+        });
+    </script>
+</body>
+</html>

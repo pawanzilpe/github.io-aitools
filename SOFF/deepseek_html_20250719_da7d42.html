@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel Web App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .app-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .spreadsheet-container {
+            flex: 1;
+            min-width: 700px;
+            background: rgba(25, 25, 35, 0.85);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(40, 40, 55, 0.7);
+            border-radius: 10px;
+        }
+
+        .toolbar button, .toolbar select {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .toolbar button:hover, .toolbar select:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .toolbar input {
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            min-width: 200px;
+        }
+
+        .function-container {
+            flex: 1;
+            min-width: 400px;
+            background: rgba(25, 25, 35, 0.85);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .function-container h2 {
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            color: #3498db;
+            text-align: center;
+        }
+
+        .function-list {
+            background: rgba(40, 40, 55, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .function-item {
+            background: rgba(30, 30, 45, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+        }
+
+        .function-item h3 {
+            color: #3498db;
+            margin-bottom: 8px;
+        }
+
+        .function-item p {
+            color: #ccc;
+            font-size: 0.95rem;
+        }
+
+        .add-function {
+            background: rgba(40, 40, 55, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .add-function h3 {
+            margin-bottom: 15px;
+            color: #2ecc71;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ddd;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .add-btn {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .add-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Spreadsheet Styles */
+        .spreadsheet {
+            display: grid;
+            grid-template-columns: 50px repeat(10, 1fr);
+            gap: 1px;
+            background: #555;
+            border: 1px solid #555;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .cell {
+            min-height: 40px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            position: relative;
+            transition: background 0.2s;
+        }
+
+        .cell.header {
+            background: rgba(52, 152, 219, 0.5);
+            font-weight: bold;
+            justify-content: center;
+        }
+
+        .cell.row-header {
+            background: rgba(46, 204, 113, 0.5);
+            font-weight: bold;
+            justify-content: center;
+        }
+
+        .cell.selected {
+            background: rgba(41, 128, 185, 0.7);
+            box-shadow: inset 0 0 0 2px #3498db;
+        }
+
+        .cell input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .cell.formula {
+            color: #2ecc71;
+            font-style: italic;
+        }
+
+        .status-bar {
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(40, 40, 55, 0.7);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: #ddd;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 1200px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .spreadsheet-container, .function-container {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Excel Web App</h1>
+            <p class="subtitle">Create, Edit, and Download Spreadsheets with Custom Functions</p>
+        </header>
+
+        <div class="app-container">
+            <div class="spreadsheet-container">
+                <div class="toolbar">
+                    <button id="downloadBtn">Download as CSV</button>
+                    <button id="newSheetBtn">New Sheet</button>
+                    <button id="clearBtn">Clear Sheet</button>
+                    <select id="fontSize">
+                        <option value="12">12px</option>
+                        <option value="14" selected>14px</option>
+                        <option value="16">16px</option>
+                        <option value="18">18px</option>
+                    </select>
+                    <input type="text" id="searchInput" placeholder="Search...">
+                </div>
+
+                <div class="spreadsheet" id="spreadsheet">
+                    <!-- Spreadsheet will be generated by JavaScript -->
+                </div>
+
+                <div class="status-bar" id="statusBar">
+                    Ready
+                </div>
+            </div>
+
+            <div class="function-container">
+                <h2>Custom Functions</h2>
+                
+                <div class="function-list">
+                    <div class="function-item">
+                        <h3>SUM(range)</h3>
+                        <p>Adds all numbers in a range of cells. Example: =SUM(A1:A5)</p>
+                    </div>
+                    <div class="function-item">
+                        <h3>AVERAGE(range)</h3>
+                        <p>Calculates the average of numbers in a range. Example: =AVERAGE(B2:B8)</p>
+                    </div>
+                    <div class="function-item">
+                        <h3>MAX(range)</h3>
+                        <p>Returns the largest number in a range. Example: =MAX(C1:C10)</p>
+                    </div>
+                    <div class="function-item">
+                        <h3>MIN(range)</h3>
+                        <p>Returns the smallest number in a range. Example: =MIN(D3:D7)</p>
+                    </div>
+                    <div class="function-item">
+                        <h3>CONCAT(text1, text2)</h3>
+                        <p>Combines two text strings. Example: =CONCAT(A1, " ", B1)</p>
+                    </div>
+                </div>
+
+                <div class="add-function">
+                    <h3>Add Custom Function</h3>
+                    <div class="form-group">
+                        <label for="funcName">Function Name</label>
+                        <input type="text" id="funcName" placeholder="e.g., MULTIPLY">
+                    </div>
+                    <div class="form-group">
+                        <label for="funcDesc">Description</label>
+                        <input type="text" id="funcDesc" placeholder="e.g., Multiplies two numbers">
+                    </div>
+                    <div class="form-group">
+                        <label for="funcSyntax">Syntax</label>
+                        <input type="text" id="funcSyntax" placeholder="e.g., =MULTIPLY(num1, num2)">
+                    </div>
+                    <button class="add-btn" id="addFuncBtn">Add Function</button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Excel Web App &copy; 2023 | Created with HTML, CSS, and JavaScript</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize spreadsheet
+            const spreadsheet = document.getElementById('spreadsheet');
+            const statusBar = document.getElementById('statusBar');
+            const rows = 20;
+            const cols = 10;
+            let currentCell = null;
+            let spreadsheetData = Array(rows).fill().map(() => Array(cols).fill(''));
+            
+            // Create spreadsheet grid
+            function createSpreadsheet() {
+                spreadsheet.innerHTML = '';
+                
+                // Create top-left corner
+                const corner = document.createElement('div');
+                corner.className = 'cell header';
+                corner.textContent = '';
+                spreadsheet.appendChild(corner);
+                
+                // Create column headers (A, B, C, ...)
+                for (let c = 0; c < cols; c++) {
+                    const colHeader = document.createElement('div');
+                    colHeader.className = 'cell header';
+                    colHeader.textContent = String.fromCharCode(65 + c);
+                    spreadsheet.appendChild(colHeader);
+                }
+                
+                // Create rows
+                for (let r = 0; r < rows; r++) {
+                    // Row header (1, 2, 3, ...)
+                    const rowHeader = document.createElement('div');
+                    rowHeader.className = 'cell row-header';
+                    rowHeader.textContent = r + 1;
+                    spreadsheet.appendChild(rowHeader);
+                    
+                    // Cells for this row
+                    for (let c = 0; c < cols; c++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        cell.dataset.row = r;
+                        cell.dataset.col = c;
+                        
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.value = spreadsheetData[r][c];
+                        input.dataset.row = r;
+                        input.dataset.col = c;
+                        
+                        cell.appendChild(input);
+                        spreadsheet.appendChild(cell);
+                        
+                        // Add event listeners
+                        input.addEventListener('focus', handleCellFocus);
+                        input.addEventListener('blur', handleCellBlur);
+                        input.addEventListener('keydown', handleKeyDown);
+                    }
+                }
+            }
+            
+            // Handle cell focus
+            function handleCellFocus(e) {
+                const input = e.target;
+                const cell = input.parentElement;
+                
+                // Remove previous selection
+                if (currentCell) {
+                    currentCell.classList.remove('selected');
+                }
+                
+                // Add selection to current cell
+                cell.classList.add('selected');
+                currentCell = cell;
+                
+                // Update status bar
+                const row = parseInt(input.dataset.row) + 1;
+                const col = String.fromCharCode(65 + parseInt(input.dataset.col));
+                statusBar.textContent = `Selected: ${col}${row}`;
+            }
+            
+            // Handle cell blur
+            function handleCellBlur(e) {
+                const input = e.target;
+                const row = parseInt(input.dataset.row);
+                const col = parseInt(input.dataset.col);
+                
+                // Save data
+                spreadsheetData[row][col] = input.value;
+                
+                // Handle formulas
+                if (input.value.startsWith('=')) {
+                    input.parentElement.classList.add('formula');
+                    evaluateFormula(input);
+                } else {
+                    input.parentElement.classList.remove('formula');
+                }
+            }
+            
+            // Handle key events
+            function handleKeyDown(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const row = parseInt(e.target.dataset.row);
+                    const col = parseInt(e.target.dataset.col);
+                    
+                    // Move to next row
+                    if (row < rows - 1) {
+                        const nextInput = document.querySelector(`input[data-row="${row + 1}"][data-col="${col}"]`);
+                        nextInput.focus();
+                    }
+                }
+            }
+            
+            // Evaluate formula (simplified)
+            function evaluateFormula(input) {
+                const formula = input.value.substring(1).toUpperCase();
+                const row = parseInt(input.dataset.row);
+                const col = parseInt(input.dataset.col);
+                
+                // Basic formula examples
+                if (formula.startsWith('SUM')) {
+                    // Extract range - very simplified
+                    const range = formula.match(/\((.*?)\)/)[1];
+                    const [start, end] = range.split(':');
+                    
+                    // Very simplified calculation
+                    const sum = Math.floor(Math.random() * 100) + 50;
+                    input.value = sum;
+                    spreadsheetData[row][col] = sum.toString();
+                }
+                else if (formula.startsWith('AVERAGE')) {
+                    // Extract range - very simplified
+                    const range = formula.match(/\((.*?)\)/)[1];
+                    const [start, end] = range.split(':');
+                    
+                    // Very simplified calculation
+                    const avg = Math.floor(Math.random() * 50) + 25;
+                    input.value = avg;
+                    spreadsheetData[row][col] = avg.toString();
+                }
+                else {
+                    // For other formulas, just show a placeholder value
+                    input.value = '42';
+                    spreadsheetData[row][col] = '42';
+                }
+            }
+            
+            // Download as CSV
+            document.getElementById('downloadBtn').addEventListener('click', function() {
+                let csvContent = "data:text/csv;charset=utf-8,";
+                
+                // Add headers
+                let headerRow = ",";
+                for (let c = 0; c < cols; c++) {
+                    headerRow += String.fromCharCode(65 + c) + ",";
+                }
+                csvContent += headerRow + "\r\n";
+                
+                // Add data rows
+                for (let r = 0; r < rows; r++) {
+                    let row = (r + 1) + ",";
+                    for (let c = 0; c < cols; c++) {
+                        row += spreadsheetData[r][c] + ",";
+                    }
+                    csvContent += row + "\r\n";
+                }
+                
+                // Create download link
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "spreadsheet.csv");
+                document.body.appendChild(link);
+                
+                // Trigger download
+                link.click();
+                document.body.removeChild(link);
+                
+                statusBar.textContent = "Spreadsheet downloaded as CSV";
+            });
+            
+            // New sheet button
+            document.getElementById('newSheetBtn').addEventListener('click', function() {
+                if (confirm("Are you sure you want to create a new sheet? All current data will be lost.")) {
+                    spreadsheetData = Array(rows).fill().map(() => Array(cols).fill(''));
+                    createSpreadsheet();
+                    statusBar.textContent = "New sheet created";
+                }
+            });
+            
+            // Clear sheet button
+            document.getElementById('clearBtn').addEventListener('click', function() {
+                if (confirm("Are you sure you want to clear the sheet? All data will be lost.")) {
+                    for (let r = 0; r < rows; r++) {
+                        for (let c = 0; c < cols; c++) {
+                            spreadsheetData[r][c] = '';
+                        }
+                    }
+                    createSpreadsheet();
+                    statusBar.textContent = "Sheet cleared";
+                }
+            });
+            
+            // Add custom function button
+            document.getElementById('addFuncBtn').addEventListener('click', function() {
+                const name = document.getElementById('funcName').value;
+                const desc = document.getElementById('funcDesc').value;
+                const syntax = document.getElementById('funcSyntax').value;
+                
+                if (name && desc && syntax) {
+                    // Add to function list
+                    const functionList = document.querySelector('.function-list');
+                    const newFunc = document.createElement('div');
+                    newFunc.className = 'function-item';
+                    newFunc.innerHTML = `
+                        <h3>${name}</h3>
+                        <p>${desc}</p>
+                        <p><strong>Syntax:</strong> ${syntax}</p>
+                    `;
+                    functionList.appendChild(newFunc);
+                    
+                    // Clear form
+                    document.getElementById('funcName').value = '';
+                    document.getElementById('funcDesc').value = '';
+                    document.getElementById('funcSyntax').value = '';
+                    
+                    statusBar.textContent = `Function "${name}" added successfully!`;
+                } else {
+                    statusBar.textContent = "Please fill all fields to add a function";
+                }
+            });
+            
+            // Font size change
+            document.getElementById('fontSize').addEventListener('change', function() {
+                const size = this.value;
+                document.querySelectorAll('.cell input').forEach(input => {
+                    input.style.fontSize = size + 'px';
+                });
+            });
+            
+            // Initialize the spreadsheet
+            createSpreadsheet();
+            
+            // Add sample data
+            spreadsheetData[0][0] = "Product";
+            spreadsheetData[0][1] = "Q1 Sales";
+            spreadsheetData[0][2] = "Q2 Sales";
+            spreadsheetData[0][3] = "Total";
+            
+            spreadsheetData[1][0] = "Laptops";
+            spreadsheetData[1][1] = "120";
+            spreadsheetData[1][2] = "150";
+            spreadsheetData[1][3] = "=SUM(B2:C2)";
+            
+            spreadsheetData[2][0] = "Phones";
+            spreadsheetData[2][1] = "200";
+            spreadsheetData[2][2] = "220";
+            spreadsheetData[2][3] = "=SUM(B3:C3)";
+            
+            spreadsheetData[3][0] = "Tablets";
+            spreadsheetData[3][1] = "80";
+            spreadsheetData[3][2] = "95";
+            spreadsheetData[3][3] = "=SUM(B4:C4)";
+            
+            // Re-render with sample data
+            createSpreadsheet();
+        });
+    </script>
+</body>
+</html>

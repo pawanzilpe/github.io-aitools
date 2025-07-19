@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple PowerPoint Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 40px);
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo i {
+            color: #ffd700;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: var(--light);
+            padding: 15px;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sidebar-title {
+            font-weight: 600;
+            color: var(--primary);
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .slide-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .slide-item {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .slide-item.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+
+        .slide-item:hover {
+            background: #f0f5ff;
+        }
+
+        .slide-number {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: var(--primary);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .editor {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background: #f9f9f9;
+            overflow: hidden;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tool-group {
+            display: flex;
+            gap: 5px;
+            border-right: 1px solid #ddd;
+            padding-right: 10px;
+        }
+
+        .tool-group:last-child {
+            border: none;
+        }
+
+        .tool-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .tool-btn:hover {
+            background: #e9ecef;
+        }
+
+        .theme-select {
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+        }
+
+        .slide-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+        }
+
+        .slide {
+            width: 90%;
+            max-width: 800px;
+            height: 450px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slide-header {
+            padding: 20px;
+            background: var(--primary);
+            color: white;
+            text-align: center;
+        }
+
+        .slide-content {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+        }
+
+        .editable {
+            min-height: 40px;
+            padding: 8px;
+            border: 1px dashed transparent;
+            transition: all 0.2s;
+        }
+
+        .editable:hover {
+            border-color: #ddd;
+        }
+
+        .editable:focus {
+            outline: none;
+            border: 1px dashed var(--primary);
+            background: #f0f8ff;
+        }
+
+        .slide-title {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .slide-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+
+        .slide-footer {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .properties {
+            width: 250px;
+            background: var(--light);
+            padding: 15px;
+            border-left: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .property-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .property-label {
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .color-option.active {
+            border-color: var(--dark);
+        }
+
+        .footer {
+            padding: 15px;
+            text-align: center;
+            background: var(--light);
+            border-top: 1px solid #ddd;
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Slide themes */
+        .theme-blue .slide-header {
+            background: #4a6fa5;
+        }
+
+        .theme-green .slide-header {
+            background: #28a745;
+        }
+
+        .theme-purple .slide-header {
+            background: #764ba2;
+        }
+
+        .theme-red .slide-header {
+            background: #dc3545;
+        }
+
+        .theme-orange .slide-header {
+            background: #fd7e14;
+        }
+
+        /* Responsive design */
+        @media (max-width: 992px) {
+            .sidebar, .properties {
+                width: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar, .properties {
+                display: none;
+            }
+            
+            .toolbar {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-project-diagram"></i>
+                <span>Simple PowerPoint</span>
+            </div>
+            <div class="controls">
+                <button class="btn btn-primary" id="newSlideBtn">
+                    <i class="fas fa-plus"></i> New Slide
+                </button>
+                <button class="btn btn-success" id="downloadBtn">
+                    <i class="fas fa-download"></i> Download
+                </button>
+                <button class="btn btn-danger" id="resetBtn">
+                    <i class="fas fa-trash"></i> Reset
+                </button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <h3 class="sidebar-title">Slides</h3>
+                <div class="slide-list" id="slideList">
+                    <!-- Slides will be added here dynamically -->
+                </div>
+            </div>
+
+            <div class="editor">
+                <div class="toolbar">
+                    <div class="tool-group">
+                        <button class="tool-btn" id="boldBtn" title="Bold"><i class="fas fa-bold"></i></button>
+                        <button class="tool-btn" id="italicBtn" title="Italic"><i class="fas fa-italic"></i></button>
+                        <button class="tool-btn" id="underlineBtn" title="Underline"><i class="fas fa-underline"></i></button>
+                    </div>
+                    <div class="tool-group">
+                        <button class="tool-btn" id="alignLeftBtn" title="Align Left"><i class="fas fa-align-left"></i></button>
+                        <button class="tool-btn" id="alignCenterBtn" title="Align Center"><i class="fas fa-align-center"></i></button>
+                        <button class="tool-btn" id="alignRightBtn" title="Align Right"><i class="fas fa-align-right"></i></button>
+                    </div>
+                    <div class="tool-group">
+                        <button class="tool-btn" id="listBulletBtn" title="Bullet List"><i class="fas fa-list-ul"></i></button>
+                        <button class="tool-btn" id="listNumberBtn" title="Numbered List"><i class="fas fa-list-ol"></i></button>
+                    </div>
+                    <div class="tool-group">
+                        <select class="theme-select" id="themeSelect">
+                            <option value="blue">Blue Theme</option>
+                            <option value="green">Green Theme</option>
+                            <option value="purple">Purple Theme</option>
+                            <option value="red">Red Theme</option>
+                            <option value="orange">Orange Theme</option>
+                        </select>
+                    </div>
+                    <div class="tool-group">
+                        <button class="tool-btn" id="addImageBtn" title="Add Image"><i class="fas fa-image"></i></button>
+                    </div>
+                </div>
+
+                <div class="slide-container">
+                    <div class="slide theme-blue" id="currentSlide">
+                        <div class="slide-header">
+                            <div class="editable slide-title" contenteditable="true" id="slideTitle">Presentation Title</div>
+                        </div>
+                        <div class="slide-content">
+                            <div class="editable slide-text" contenteditable="true" id="slideContent1">
+                                Welcome to Simple PowerPoint Editor
+                            </div>
+                            <div class="editable slide-text" contenteditable="true" id="slideContent2">
+                                • Create professional presentations<br>
+                                • Edit content directly on slides<br>
+                                • Change themes with one click<br>
+                                • Download as PDF when finished
+                            </div>
+                        </div>
+                        <div class="slide-footer">
+                            <div class="editable" contenteditable="true" id="slideFooter">Footer Text</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="properties">
+                <h3 class="sidebar-title">Properties</h3>
+                <div class="property-group">
+                    <div class="property-label">Background Color</div>
+                    <div class="color-picker">
+                        <div class="color-option active" style="background-color: #ffffff;" data-color="#ffffff"></div>
+                        <div class="color-option" style="background-color: #f0f8ff;" data-color="#f0f8ff"></div>
+                        <div class="color-option" style="background-color: #fff0f5;" data-color="#fff0f5"></div>
+                        <div class="color-option" style="background-color: #f0fff0;" data-color="#f0fff0"></div>
+                        <div class="color-option" style="background-color: #fff8dc;" data-color="#fff8dc"></div>
+                    </div>
+                </div>
+                <div class="property-group">
+                    <div class="property-label">Text Color</div>
+                    <div class="color-picker">
+                        <div class="color-option active" style="background-color: #000000;" data-text-color="#000000"></div>
+                        <div class="color-option" style="background-color: #4a6fa5;" data-text-color="#4a6fa5"></div>
+                        <div class="color-option" style="background-color: #28a745;" data-text-color="#28a745"></div>
+                        <div class="color-option" style="background-color: #dc3545;" data-text-color="#dc3545"></div>
+                        <div class="color-option" style="background-color: #6f42c1;" data-text-color="#6f42c1"></div>
+                    </div>
+                </div>
+                <div class="property-group">
+                    <div class="property-label">Font Size</div>
+                    <select class="theme-select" id="fontSizeSelect">
+                        <option value="14px">Small</option>
+                        <option value="16px" selected>Medium</option>
+                        <option value="18px">Large</option>
+                        <option value="20px">X-Large</option>
+                    </select>
+                </div>
+                <div class="property-group">
+                    <div class="property-label">Font Family</div>
+                    <select class="theme-select" id="fontFamilySelect">
+                        <option value="Arial, sans-serif">Arial</option>
+                        <option value="'Times New Roman', serif">Times New Roman</option>
+                        <option value="'Courier New', monospace">Courier New</option>
+                        <option value="'Georgia', serif">Georgia</option>
+                        <option value="'Verdana', sans-serif">Verdana</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Simple PowerPoint Editor &copy; 2023 | Create, Edit, and Download Presentations</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Current slide state
+            let currentSlideIndex = 0;
+            const slides = [
+                {
+                    title: 'Presentation Title',
+                    content: [
+                        'Welcome to Simple PowerPoint Editor',
+                        '• Create professional presentations<br>• Edit content directly on slides<br>• Change themes with one click<br>• Download as PDF when finished'
+                    ],
+                    footer: 'Footer Text',
+                    theme: 'blue',
+                    bgColor: '#ffffff',
+                    textColor: '#000000',
+                    fontSize: '16px',
+                    fontFamily: 'Arial, sans-serif'
+                }
+            ];
+
+            // DOM Elements
+            const slideList = document.getElementById('slideList');
+            const currentSlide = document.getElementById('currentSlide');
+            const slideTitle = document.getElementById('slideTitle');
+            const slideContent1 = document.getElementById('slideContent1');
+            const slideContent2 = document.getElementById('slideContent2');
+            const slideFooter = document.getElementById('slideFooter');
+            const themeSelect = document.getElementById('themeSelect');
+            const fontSizeSelect = document.getElementById('fontSizeSelect');
+            const fontFamilySelect = document.getElementById('fontFamilySelect');
+            const newSlideBtn = document.getElementById('newSlideBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const colorOptions = document.querySelectorAll('.color-option');
+            const textColorOptions = document.querySelectorAll('[data-text-color]');
+            
+            // Initialize the editor
+            function initEditor() {
+                renderSlideList();
+                updateSlidePreview();
+                setupEventListeners();
+            }
+
+            // Render slide list in sidebar
+            function renderSlideList() {
+                slideList.innerHTML = '';
+                slides.forEach((slide, index) => {
+                    const slideItem = document.createElement('div');
+                    slideItem.className = `slide-item ${index === currentSlideIndex ? 'active' : ''}`;
+                    slideItem.innerHTML = `
+                        <div class="slide-number">${index + 1}</div>
+                        <div>${slide.title.substring(0, 30)}${slide.title.length > 30 ? '...' : ''}</div>
+                    `;
+                    slideItem.addEventListener('click', () => {
+                        currentSlideIndex = index;
+                        updateSlidePreview();
+                        renderSlideList();
+                    });
+                    slideList.appendChild(slideItem);
+                });
+            }
+
+            // Update the slide preview with current slide data
+            function updateSlidePreview() {
+                const slide = slides[currentSlideIndex];
+                
+                // Update content
+                slideTitle.innerHTML = slide.title;
+                slideContent1.innerHTML = slide.content[0] || '';
+                slideContent2.innerHTML = slide.content[1] || '';
+                slideFooter.innerHTML = slide.footer;
+                
+                // Update theme
+                currentSlide.className = `slide theme-${slide.theme}`;
+                themeSelect.value = slide.theme;
+                
+                // Update styles
+                currentSlide.style.backgroundColor = slide.bgColor;
+                slideTitle.style.color = slide.textColor;
+                slideContent1.style.color = slide.textColor;
+                slideContent2.style.color = slide.textColor;
+                slideFooter.style.color = slide.textColor;
+                
+                // Update fonts
+                const contentElements = document.querySelectorAll('.slide-content > div');
+                contentElements.forEach(el => {
+                    el.style.fontSize = slide.fontSize;
+                    el.style.fontFamily = slide.fontFamily;
+                });
+                
+                // Update color pickers
+                document.querySelectorAll('.color-option').forEach(option => {
+                    option.classList.remove('active');
+                    if (option.getAttribute('data-color') === slide.bgColor) {
+                        option.classList.add('active');
+                    }
+                });
+                
+                document.querySelectorAll('[data-text-color]').forEach(option => {
+                    option.classList.remove('active');
+                    if (option.getAttribute('data-text-color') === slide.textColor) {
+                        option.classList.add('active');
+                    }
+                });
+                
+                // Update font selects
+                fontSizeSelect.value = slide.fontSize;
+                fontFamilySelect.value = slide.fontFamily;
+            }
+
+            // Save content when editing
+            function saveContent() {
+                const slide = slides[currentSlideIndex];
+                slide.title = slideTitle.innerHTML;
+                slide.content = [
+                    slideContent1.innerHTML,
+                    slideContent2.innerHTML
+                ];
+                slide.footer = slideFooter.innerHTML;
+            }
+
+            // Setup event listeners
+            function setupEventListeners() {
+                // Content editing
+                [slideTitle, slideContent1, slideContent2, slideFooter].forEach(el => {
+                    el.addEventListener('input', saveContent);
+                });
+                
+                // Theme change
+                themeSelect.addEventListener('change', function() {
+                    slides[currentSlideIndex].theme = this.value;
+                    updateSlidePreview();
+                });
+                
+                // Font size change
+                fontSizeSelect.addEventListener('change', function() {
+                    slides[currentSlideIndex].fontSize = this.value;
+                    updateSlidePreview();
+                });
+                
+                // Font family change
+                fontFamilySelect.addEventListener('change', function() {
+                    slides[currentSlideIndex].fontFamily = this.value;
+                    updateSlidePreview();
+                });
+                
+                // Background color change
+                colorOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        const color = this.getAttribute('data-color');
+                        slides[currentSlideIndex].bgColor = color;
+                        updateSlidePreview();
+                    });
+                });
+                
+                // Text color change
+                textColorOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        const color = this.getAttribute('data-text-color');
+                        slides[currentSlideIndex].textColor = color;
+                        updateSlidePreview();
+                    });
+                });
+                
+                // New slide button
+                newSlideBtn.addEventListener('click', function() {
+                    const newSlide = {
+                        title: 'New Slide',
+                        content: ['Enter your content here', ''],
+                        footer: 'Footer Text',
+                        theme: 'blue',
+                        bgColor: '#ffffff',
+                        textColor: '#000000',
+                        fontSize: '16px',
+                        fontFamily: 'Arial, sans-serif'
+                    };
+                    slides.push(newSlide);
+                    currentSlideIndex = slides.length - 1;
+                    renderSlideList();
+                    updateSlidePreview();
+                });
+                
+                // Download button
+                downloadBtn.addEventListener('click', function() {
+                    const element = document.getElementById('currentSlide');
+                    
+                    // Temporarily remove editable attributes for PDF generation
+                    const editables = element.querySelectorAll('[contenteditable="true"]');
+                    editables.forEach(el => {
+                        el.removeAttribute('contenteditable');
+                    });
+                    
+                    // Generate PDF
+                    const options = {
+                        margin: 10,
+                        filename: 'presentation.pdf',
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2 },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    };
+                    
+                    html2pdf().set(options).from(element).save().then(() => {
+                        // Restore editable attributes
+                        editables.forEach(el => {
+                            el.setAttribute('contenteditable', 'true');
+                        });
+                    });
+                });
+                
+                // Reset button
+                resetBtn.addEventListener('click', function() {
+                    if (confirm('Are you sure you want to reset all slides? This cannot be undone.')) {
+                        slides.length = 0;
+                        slides.push({
+                            title: 'Presentation Title',
+                            content: [
+                                'Welcome to Simple PowerPoint Editor',
+                                '• Create professional presentations<br>• Edit content directly on slides<br>• Change themes with one click<br>• Download as PDF when finished'
+                            ],
+                            footer: 'Footer Text',
+                            theme: 'blue',
+                            bgColor: '#ffffff',
+                            textColor: '#000000',
+                            fontSize: '16px',
+                            fontFamily: 'Arial, sans-serif'
+                        });
+                        currentSlideIndex = 0;
+                        renderSlideList();
+                        updateSlidePreview();
+                    }
+                });
+                
+                // Formatting buttons
+                document.getElementById('boldBtn').addEventListener('click', function() {
+                    document.execCommand('bold', false, null);
+                    saveContent();
+                });
+                
+                document.getElementById('italicBtn').addEventListener('click', function() {
+                    document.execCommand('italic', false, null);
+                    saveContent();
+                });
+                
+                document.getElementById('underlineBtn').addEventListener('click', function() {
+                    document.execCommand('underline', false, null);
+                    saveContent();
+                });
+                
+                document.getElementById('alignLeftBtn').addEventListener('click', function() {
+                    document.execCommand('justifyLeft', false, null);
+                    saveContent();
+                });
+                
+                document.getElementById('alignCenterBtn').addEventListener('click', function() {
+                    document.execCommand('justifyCenter', false, null);
+                    saveContent();
+                });
+                
+                document.getElementById('alignRightBtn').addEventListener('click', function() {
+                    document.execCommand('justifyRight', false, null);
+                    saveContent();
+                });
+                
+                document.getElementById('listBulletBtn').addEventListener('click', function() {
+                    document.execCommand('insertUnorderedList', false, null);
+                    saveContent();
+                });
+                
+                document.getElementById('listNumberBtn').addEventListener('click', function() {
+                    document.execCommand('insertOrderedList', false, null);
+                    saveContent();
+                });
+                
+                document.getElementById('addImageBtn').addEventListener('click', function() {
+                    const url = prompt('Enter image URL:');
+                    if (url) {
+                        const img = document.createElement('img');
+                        img.src = url;
+                        img.style.maxWidth = '100%';
+                        img.style.maxHeight = '200px';
+                        img.style.display = 'block';
+                        img.style.margin = '10px auto';
+                        
+                        const contentDiv = document.querySelector('.slide-content');
+                        contentDiv.appendChild(img);
+                        slides[currentSlideIndex].content.push(`<img src="${url}" style="max-width:100%; max-height:200px; display:block; margin:10px auto;">`);
+                    }
+                });
+            }
+
+            // Initialize the editor
+            initEditor();
+        });
+    </script>
+</body>
+</html>

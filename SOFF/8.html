@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Banner & Video Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+        
+        .tab-btn {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+        
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(45deg, #ff7e5f, #feb47b);
+            box-shadow: 0 5px 20px rgba(255, 126, 95, 0.4);
+        }
+        
+        .editor-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .editor-panel {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 25px;
+            flex: 1;
+            min-width: 300px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .preview-panel {
+            background: rgba(0,0,0,0.2);
+            border-radius: 20px;
+            padding: 25px;
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .panel-title i {
+            color: #ff7e5f;
+        }
+        
+        .control-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input[type="text"], input[type="color"], input[type="range"], select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(0,0,0,0.2);
+            color: white;
+            font-size: 1rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        input[type="color"] {
+            height: 50px;
+            cursor: pointer;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        
+        .btn-download {
+            background: linear-gradient(45deg, #ff7e5f, #feb47b);
+            margin-top: 20px;
+        }
+        
+        .btn-add-element {
+            background: linear-gradient(45deg, #42e695, #3bb2b8);
+        }
+        
+        .preview-area {
+            width: 100%;
+            height: 350px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 20px;
+            position: relative;
+            border: 2px dashed rgba(255,255,255,0.2);
+        }
+        
+        #banner-preview {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-size: cover;
+            background-position: center;
+            transition: all 0.3s ease;
+        }
+        
+        .banner-text {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            padding: 20px;
+            max-width: 90%;
+            word-wrap: break-word;
+        }
+        
+        .video-preview {
+            width: 100%;
+            height: 300px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 2px dashed rgba(255,255,255,0.2);
+        }
+        
+        .video-preview video {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+        
+        .feature-card {
+            background: rgba(255,255,255,0.08);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .feature-card i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #4facfe;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #ff7e5f;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .editor-container {
+                flex-direction: column;
+            }
+            
+            .tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .tab-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Pro Banner & Video Editor</h1>
+            <p class="subtitle">Create stunning banners and edit videos with our all-in-one online editor. Export your creations with one click!</p>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="banner-editor">
+                <i class="fas fa-image"></i> Banner Editor
+            </button>
+            <button class="tab-btn" data-tab="video-editor">
+                <i class="fas fa-video"></i> Video Editor
+            </button>
+        </div>
+        
+        <!-- Banner Editor Section -->
+        <div id="banner-editor" class="editor-section">
+            <div class="editor-container">
+                <div class="editor-panel">
+                    <h2 class="panel-title"><i class="fas fa-sliders-h"></i> Banner Controls</h2>
+                    
+                    <div class="control-group">
+                        <label for="banner-text">Banner Text</label>
+                        <input type="text" id="banner-text" placeholder="Enter your banner text" value="SALE 50% OFF">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="text-color">Text Color</label>
+                        <input type="color" id="text-color" value="#ffffff">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="font-size">Font Size (px)</label>
+                        <input type="range" id="font-size" min="20" max="100" value="48">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="bg-color">Background Color</label>
+                        <input type="color" id="bg-color" value="#ff6b6b">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="font-family">Font Family</label>
+                        <select id="font-family">
+                            <option value="Arial, sans-serif">Arial</option>
+                            <option value="'Times New Roman', serif">Times New Roman</option>
+                            <option value="'Courier New', monospace">Courier New</option>
+                            <option value="'Comic Sans MS', cursive">Comic Sans</option>
+                            <option value="'Impact', fantasy">Impact</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn-add-element">
+                        <i class="fas fa-plus-circle"></i> Add Shape
+                    </button>
+                </div>
+                
+                <div class="preview-panel">
+                    <h2 class="panel-title"><i class="fas fa-eye"></i> Banner Preview</h2>
+                    
+                    <div class="preview-area">
+                        <div id="banner-preview">
+                            <div class="banner-text">SALE 50% OFF</div>
+                        </div>
+                    </div>
+                    
+                    <button id="download-banner" class="btn btn-download">
+                        <i class="fas fa-download"></i> Download Banner
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Video Editor Section -->
+        <div id="video-editor" class="editor-section hidden">
+            <div class="editor-container">
+                <div class="editor-panel">
+                    <h2 class="panel-title"><i class="fas fa-sliders-h"></i> Video Controls</h2>
+                    
+                    <div class="control-group">
+                        <label for="video-upload">Upload Video</label>
+                        <input type="file" id="video-upload" accept="video/*">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="start-time">Start Time (sec)</label>
+                        <input type="range" id="start-time" min="0" max="60" value="0">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="end-time">End Time (sec)</label>
+                        <input type="range" id="end-time" min="0" max="60" value="30">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="brightness">Brightness</label>
+                        <input type="range" id="brightness" min="50" max="150" value="100">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="contrast">Contrast</label>
+                        <input type="range" id="contrast" min="50" max="150" value="100">
+                    </div>
+                    
+                    <button class="btn">
+                        <i class="fas fa-music"></i> Add Background Music
+                    </button>
+                </div>
+                
+                <div class="preview-panel">
+                    <h2 class="panel-title"><i class="fas fa-eye"></i> Video Preview</h2>
+                    
+                    <div class="video-preview">
+                        <video id="video-preview" controls>
+                            <source src="" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <p id="video-placeholder">Upload a video to preview</p>
+                    </div>
+                    
+                    <button id="download-video" class="btn btn-download">
+                        <i class="fas fa-download"></i> Download Video
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Features Section -->
+        <div class="features">
+            <div class="feature-card">
+                <i class="fas fa-bolt"></i>
+                <h3>Fast Processing</h3>
+                <p>Edit and export your banners and videos in seconds with our optimized engine</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-cloud-download-alt"></i>
+                <h3>One-Click Download</h3>
+                <p>Download your creations in high quality with a single click</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Privacy First</h3>
+                <p>All processing happens in your browser - your files never leave your computer</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-sync-alt"></i>
+                <h3>Real-Time Preview</h3>
+                <p>See changes instantly as you adjust settings</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const editorSections = document.querySelectorAll('.editor-section');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // Add active class to clicked button
+                button.classList.add('active');
+                
+                // Hide all sections
+                editorSections.forEach(section => section.classList.add('hidden'));
+                
+                // Show the selected section
+                const tabName = button.getAttribute('data-tab');
+                document.getElementById(tabName).classList.remove('hidden');
+            });
+        });
+        
+        // Banner Editor Functionality
+        const bannerText = document.getElementById('banner-text');
+        const textColor = document.getElementById('text-color');
+        const fontSize = document.getElementById('font-size');
+        const bgColor = document.getElementById('bg-color');
+        const fontFamily = document.getElementById('font-family');
+        const bannerPreview = document.getElementById('banner-preview');
+        const bannerPreviewText = document.querySelector('.banner-text');
+        
+        // Update banner preview
+        function updateBannerPreview() {
+            bannerPreviewText.textContent = bannerText.value;
+            bannerPreviewText.style.color = textColor.value;
+            bannerPreviewText.style.fontSize = `${fontSize.value}px`;
+            bannerPreviewText.style.fontFamily = fontFamily.value;
+            bannerPreview.style.backgroundColor = bgColor.value;
+        }
+        
+        // Add event listeners for banner controls
+        bannerText.addEventListener('input', updateBannerPreview);
+        textColor.addEventListener('input', updateBannerPreview);
+        fontSize.addEventListener('input', updateBannerPreview);
+        bgColor.addEventListener('input', updateBannerPreview);
+        fontFamily.addEventListener('change', updateBannerPreview);
+        
+        // Download banner functionality
+        document.getElementById('download-banner').addEventListener('click', () => {
+            html2canvas(bannerPreview).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'my-banner.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                // Show success message
+                alert('Banner downloaded successfully!');
+            });
+        });
+        
+        // Video Editor Functionality
+        const videoUpload = document.getElementById('video-upload');
+        const videoPreview = document.getElementById('video-preview');
+        const videoPlaceholder = document.getElementById('video-placeholder');
+        
+        videoUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const videoURL = URL.createObjectURL(file);
+                videoPreview.src = videoURL;
+                videoPlaceholder.style.display = 'none';
+                videoPreview.style.display = 'block';
+            }
+        });
+        
+        // Simulate video download
+        document.getElementById('download-video').addEventListener('click', () => {
+            if (!videoPreview.src) {
+                alert('Please upload a video first');
+                return;
+            }
+            
+            // In a real app, this would process and download the video
+            // For this demo, we'll just show a success message
+            alert('Video processing complete! Download would start now in a real application.');
+        });
+        
+        // Initialize banner preview
+        updateBannerPreview();
+    </script>
+</body>
+</html>

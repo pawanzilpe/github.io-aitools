@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Video Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        header {
+            text-align: center;
+            padding: 25px 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-bottom: 2px solid #ff9800;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #ff9800;
+            text-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+            gap: 20px;
+        }
+        
+        .upload-section {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(30, 30, 40, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .editor-section {
+            flex: 2;
+            min-width: 300px;
+            background: rgba(30, 30, 40, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .section-title {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ff9800;
+            color: #ff9800;
+        }
+        
+        .file-upload {
+            text-align: center;
+            padding: 40px 20px;
+            border: 2px dashed #ff9800;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .file-upload:hover {
+            background: rgba(255, 152, 0, 0.1);
+        }
+        
+        .file-upload i {
+            font-size: 3rem;
+            color: #ff9800;
+            margin-bottom: 15px;
+        }
+        
+        .upload-btn {
+            background: #ff9800;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .upload-btn:hover {
+            background: #e68900;
+            transform: scale(1.05);
+        }
+        
+        .video-preview {
+            width: 100%;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        #preview-video {
+            width: 100%;
+            display: block;
+        }
+        
+        .controls {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .control-group {
+            margin-bottom: 15px;
+        }
+        
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #ff9800;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        input[type="range"] {
+            flex: 1;
+            height: 5px;
+            -webkit-appearance: none;
+            background: #444;
+            border-radius: 5px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #ff9800;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .time-display {
+            min-width: 100px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .filter-option {
+            border: 2px solid #444;
+            border-radius: 5px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .filter-option:hover {
+            transform: scale(1.05);
+            border-color: #ff9800;
+        }
+        
+        .filter-option.active {
+            border-color: #ff9800;
+            box-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+        }
+        
+        .filter-preview {
+            height: 70px;
+            background: linear-gradient(45deg, #ff0000, #ff9900, #ffff00, #00ff00, #00ffff, #0000ff, #9900ff);
+        }
+        
+        .filter-name {
+            text-align: center;
+            padding: 5px;
+            font-size: 0.8rem;
+            background: rgba(0, 0, 0, 0.7);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn i {
+            font-size: 1.2rem;
+        }
+        
+        .btn-primary {
+            background: #ff9800;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #e68900;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #43a047;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+        
+        .status {
+            text-align: center;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: #444;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: #ff9800;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-top: 2px solid #ff9800;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .filter-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-film"></i> Simple Video Editor</h1>
+            <p class="subtitle">Edit, apply filters, and download your videos - all in your browser!</p>
+        </header>
+        
+        <div class="main-content">
+            <section class="upload-section">
+                <h2 class="section-title"><i class="fas fa-upload"></i> Upload Video</h2>
+                <div class="file-upload" id="drop-area">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Drag & drop your video file here</p>
+                    <p>OR</p>
+                    <button class="upload-btn" id="browse-btn">Browse Files</button>
+                    <input type="file" id="file-input" accept="video/*" style="display: none;">
+                </div>
+                <div class="video-info">
+                    <h3>Supported Formats</h3>
+                    <p>MP4, MOV, AVI, MKV, WEBM (Max 100MB)</p>
+                </div>
+            </section>
+            
+            <section class="editor-section">
+                <h2 class="section-title"><i class="fas fa-edit"></i> Edit Video</h2>
+                
+                <div class="video-preview">
+                    <video id="preview-video" controls></video>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <h3><i class="fas fa-cut"></i> Trim Video</h3>
+                        <div class="slider-container">
+                            <span class="time-display" id="start-time">0:00</span>
+                            <input type="range" id="trim-start" min="0" max="100" value="0">
+                            <input type="range" id="trim-end" min="0" max="100" value="100">
+                            <span class="time-display" id="end-time">0:00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h3><i class="fas fa-adjust"></i> Adjustments</h3>
+                        <div class="slider-container">
+                            <span>Brightness</span>
+                            <input type="range" id="brightness" min="0" max="200" value="100">
+                        </div>
+                        <div class="slider-container">
+                            <span>Contrast</span>
+                            <input type="range" id="contrast" min="0" max="200" value="100">
+                        </div>
+                        <div class="slider-container">
+                            <span>Saturation</span>
+                            <input type="range" id="saturation" min="0" max="200" value="100">
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h3><i class="fas fa-paint-brush"></i> Filters</h3>
+                        <div class="filter-grid">
+                            <div class="filter-option active" data-filter="none">
+                                <div class="filter-preview" style="filter: none;"></div>
+                                <div class="filter-name">None</div>
+                            </div>
+                            <div class="filter-option" data-filter="grayscale">
+                                <div class="filter-preview" style="filter: grayscale(100%);"></div>
+                                <div class="filter-name">Grayscale</div>
+                            </div>
+                            <div class="filter-option" data-filter="sepia">
+                                <div class="filter-preview" style="filter: sepia(100%);"></div>
+                                <div class="filter-name">Sepia</div>
+                            </div>
+                            <div class="filter-option" data-filter="invert">
+                                <div class="filter-preview" style="filter: invert(100%);"></div>
+                                <div class="filter-name">Invert</div>
+                            </div>
+                            <div class="filter-option" data-filter="hue">
+                                <div class="filter-preview" style="filter: hue-rotate(90deg);"></div>
+                                <div class="filter-name">Hue Shift</div>
+                            </div>
+                            <div class="filter-option" data-filter="vintage">
+                                <div class="filter-preview" style="filter: contrast(1.4) sepia(0.4);"></div>
+                                <div class="filter-name">Vintage</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="apply-btn">
+                        <i class="fas fa-play-circle"></i> Apply Changes
+                    </button>
+                    <button class="btn btn-secondary" id="download-btn">
+                        <i class="fas fa-download"></i> Download Video
+                    </button>
+                </div>
+                
+                <div class="status" id="status">
+                    <p>Processing your video...</p>
+                    <div class="progress-bar">
+                        <div class="progress" id="progress"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <footer>
+            <p>Created with HTML, CSS & JavaScript | Works entirely in your browser - no server uploads!</p>
+        </footer>
+    </div>
+
+    <script>
+        // DOM Elements
+        const fileInput = document.getElementById('file-input');
+        const browseBtn = document.getElementById('browse-btn');
+        const dropArea = document.getElementById('drop-area');
+        const previewVideo = document.getElementById('preview-video');
+        const trimStart = document.getElementById('trim-start');
+        const trimEnd = document.getElementById('trim-end');
+        const startTime = document.getElementById('start-time');
+        const endTime = document.getElementById('end-time');
+        const brightness = document.getElementById('brightness');
+        const contrast = document.getElementById('contrast');
+        const saturation = document.getElementById('saturation');
+        const filterOptions = document.querySelectorAll('.filter-option');
+        const applyBtn = document.getElementById('apply-btn');
+        const downloadBtn = document.getElementById('download-btn');
+        const status = document.getElementById('status');
+        const progress = document.getElementById('progress');
+        
+        // Variables
+        let currentVideo = null;
+        let selectedFilter = 'none';
+        let videoDuration = 0;
+        
+        // Event Listeners
+        browseBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFileSelect);
+        
+        // Drag and drop functionality
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+            dropArea.style.backgroundColor = 'rgba(255, 152, 0, 0.2)';
+        }
+        
+        function unhighlight() {
+            dropArea.style.backgroundColor = '';
+        }
+        
+        dropArea.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+        
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            handleFiles(files);
+        }
+        
+        function handleFiles(files) {
+            if (files.length === 0) return;
+            
+            const file = files[0];
+            if (!file.type.startsWith('video/')) {
+                alert('Please select a video file!');
+                return;
+            }
+            
+            if (file.size > 100 * 1024 * 1024) {
+                alert('File size exceeds 100MB limit!');
+                return;
+            }
+            
+            const videoURL = URL.createObjectURL(file);
+            previewVideo.src = videoURL;
+            currentVideo = file;
+            
+            previewVideo.onloadedmetadata = function() {
+                videoDuration = previewVideo.duration;
+                trimStart.max = Math.floor(videoDuration);
+                trimEnd.max = Math.floor(videoDuration);
+                trimEnd.value = Math.floor(videoDuration);
+                updateTimeDisplay();
+            };
+        }
+        
+        // Trim controls
+        trimStart.addEventListener('input', function() {
+            if (parseFloat(trimStart.value) >= parseFloat(trimEnd.value)) {
+                trimStart.value = parseFloat(trimEnd.value) - 1;
+            }
+            updateTimeDisplay();
+        });
+        
+        trimEnd.addEventListener('input', function() {
+            if (parseFloat(trimEnd.value) <= parseFloat(trimStart.value)) {
+                trimEnd.value = parseFloat(trimStart.value) + 1;
+            }
+            updateTimeDisplay();
+        });
+        
+        function updateTimeDisplay() {
+            const startSeconds = parseFloat(trimStart.value);
+            const endSeconds = parseFloat(trimEnd.value);
+            
+            startTime.textContent = formatTime(startSeconds);
+            endTime.textContent = formatTime(endSeconds);
+        }
+        
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+        
+        // Filter selection
+        filterOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                filterOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                selectedFilter = this.dataset.filter;
+            });
+        });
+        
+        // Apply adjustments to video preview
+        function applyAdjustments() {
+            let filterValue = '';
+            
+            // Apply color adjustments
+            filterValue += `brightness(${brightness.value}%) `;
+            filterValue += `contrast(${contrast.value}%) `;
+            filterValue += `saturate(${saturation.value}%) `;
+            
+            // Apply selected filter
+            switch(selectedFilter) {
+                case 'grayscale':
+                    filterValue += 'grayscale(100%)';
+                    break;
+                case 'sepia':
+                    filterValue += 'sepia(100%)';
+                    break;
+                case 'invert':
+                    filterValue += 'invert(100%)';
+                    break;
+                case 'hue':
+                    filterValue += 'hue-rotate(90deg)';
+                    break;
+                case 'vintage':
+                    filterValue += 'contrast(1.4) sepia(0.4)';
+                    break;
+                default:
+                    // No additional filter
+            }
+            
+            previewVideo.style.filter = filterValue;
+        }
+        
+        // Event listeners for adjustments
+        brightness.addEventListener('input', applyAdjustments);
+        contrast.addEventListener('input', applyAdjustments);
+        saturation.addEventListener('input', applyAdjustments);
+        
+        // Apply changes button
+        applyBtn.addEventListener('click', function() {
+            previewVideo.currentTime = parseFloat(trimStart.value);
+            previewVideo.play();
+            
+            // Set a timeout to pause at the end of the trim
+            const trimDuration = parseFloat(trimEnd.value) - parseFloat(trimStart.value);
+            setTimeout(() => {
+                previewVideo.pause();
+            }, trimDuration * 1000);
+            
+            applyAdjustments();
+        });
+        
+        // Download button
+        downloadBtn.addEventListener('click', function() {
+            if (!currentVideo) {
+                alert('Please upload a video first!');
+                return;
+            }
+            
+            status.style.display = 'block';
+            progress.style.width = '0%';
+            
+            // Simulate processing (in a real app, this would process the video)
+            let progressValue = 0;
+            const interval = setInterval(() => {
+                progressValue += 5;
+                progress.style.width = `${progressValue}%`;
+                
+                if (progressValue >= 100) {
+                    clearInterval(interval);
+                    
+                    // Create a download link
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = URL.createObjectURL(currentVideo);
+                    downloadLink.download = 'edited-video.mp4';
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                    
+                    // Hide status after a delay
+                    setTimeout(() => {
+                        status.style.display = 'none';
+                    }, 2000);
+                }
+            }, 100);
+        });
+        
+        // Initialize
+        updateTimeDisplay();
+    </script>
+</body>
+</html>
