@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vacancy Code Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        .voice-controls {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 50px;
+            padding: 20px;
+            margin: 25px auto;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .mic-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            font-size: 2.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .mic-btn:hover {
+            background: #ff5252;
+            transform: scale(1.05);
+        }
+        
+        .mic-btn.listening {
+            background: #4CAF50;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        }
+        
+        .command-text {
+            font-size: 1.4rem;
+            background: white;
+            color: #333;
+            padding: 15px 30px;
+            border-radius: 50px;
+            min-height: 60px;
+            min-width: 80%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .content {
+            display: flex;
+            min-height: 600px;
+        }
+        
+        .code-panel {
+            flex: 1;
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 2px solid #444;
+        }
+        
+        .output-panel {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ff6b6b;
+            color: #ff6b6b;
+        }
+        
+        pre {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .vacancy-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            padding: 20px;
+        }
+        
+        .vacancy-card {
+            background: linear-gradient(135deg, #ffffff, #f9f9f9);
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            border: 1px solid #eee;
+        }
+        
+        .vacancy-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .vacancy-header {
+            background: linear-gradient(90deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 20px;
+        }
+        
+        .vacancy-title {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .vacancy-company {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .vacancy-body {
+            padding: 20px;
+        }
+        
+        .vacancy-detail {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .detail-icon {
+            margin-right: 12px;
+            color: #1e3c72;
+            font-size: 1.2rem;
+            min-width: 24px;
+        }
+        
+        .vacancy-description {
+            margin: 15px 0;
+            line-height: 1.6;
+            color: #555;
+        }
+        
+        .vacancy-footer {
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .vacancy-salary {
+            font-weight: bold;
+            color: #2a5298;
+            font-size: 1.2rem;
+        }
+        
+        .apply-btn {
+            background: linear-gradient(90deg, #ff6b6b, #ff8e53);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
+        }
+        
+        .apply-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .instructions {
+            background: #f8f9fa;
+            border-left: 5px solid #1e3c72;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 15px;
+            color: #1e3c72;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 1200px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .code-panel {
+                border-right: none;
+                border-bottom: 2px solid #444;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .vacancy-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Job Vacancy Code Generator</h1>
+            <p class="subtitle">Speak your requirements and instantly generate job vacancy listings with HTML, CSS, and JavaScript code</p>
+            
+            <div class="voice-controls">
+                <button id="micButton" class="mic-btn">🎤</button>
+                <div id="commandDisplay" class="command-text">Click the microphone and say "Generate vacancy code"</div>
+            </div>
+        </header>
+        
+        <div class="content">
+            <div class="code-panel">
+                <h2 class="panel-title">Generated Code</h2>
+                <div id="htmlCode">
+                    <h3>HTML</h3>
+                    <pre id="htmlPre"><code class="language-html">&lt;!-- HTML will be generated here --&gt;</code></pre>
+                </div>
+                <div id="cssCode">
+                    <h3>CSS</h3>
+                    <pre id="cssPre"><code class="language-css">/* CSS will be generated here */</code></pre>
+                </div>
+                <div id="jsCode">
+                    <h3>JavaScript</h3>
+                    <pre id="jsPre"><code class="language-js">// JavaScript will be generated here</code></pre>
+                </div>
+            </div>
+            
+            <div class="output-panel">
+                <h2 class="panel-title">Live Preview</h2>
+                <div id="outputContainer">
+                    <!-- Vacancy output will be displayed here -->
+                </div>
+                
+                <div class="instructions">
+                    <h3>How to Use This Generator</h3>
+                    <ul>
+                        <li>Click the microphone button and say "Generate vacancy code"</li>
+                        <li>The system will generate job listings with HTML, CSS, and JavaScript</li>
+                        <li>You can copy the code to use in your own projects</li>
+                        <li>Try saying "Add more jobs" to generate additional listings</li>
+                        <li>Say "Change design" to modify the visual appearance</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Voice recognition setup
+        const micButton = document.getElementById('micButton');
+        const commandDisplay = document.getElementById('commandDisplay');
+        const htmlPre = document.getElementById('htmlPre');
+        const cssPre = document.getElementById('cssPre');
+        const jsPre = document.getElementById('jsPre');
+        const outputContainer = document.getElementById('outputContainer');
+        
+        // Check for browser support
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition;
+        
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.lang = 'en-US';
+            
+            recognition.onstart = function() {
+                micButton.classList.add('listening');
+                commandDisplay.textContent = "Listening... Speak now";
+            };
+            
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript.toLowerCase();
+                commandDisplay.textContent = `You said: "${transcript}"`;
+                
+                // Process the command
+                setTimeout(() => {
+                    if (transcript.includes('generate') || transcript.includes('vacancy') || transcript.includes('code')) {
+                        generateVacancyCode();
+                    } else if (transcript.includes('add') || transcript.includes('more')) {
+                        addMoreJobs();
+                    } else if (transcript.includes('change') || transcript.includes('design')) {
+                        changeDesign();
+                    } else {
+                        commandDisplay.textContent = "Command not recognized. Try saying 'Generate vacancy code'";
+                    }
+                }, 1000);
+            };
+            
+            recognition.onerror = function(event) {
+                micButton.classList.remove('listening');
+                commandDisplay.textContent = "Error occurred in recognition: " + event.error;
+            };
+            
+            recognition.onend = function() {
+                micButton.classList.remove('listening');
+            };
+            
+            micButton.addEventListener('click', function() {
+                try {
+                    recognition.start();
+                } catch (error) {
+                    commandDisplay.textContent = "Error: " + error.message;
+                }
+            });
+        } else {
+            micButton.disabled = true;
+            commandDisplay.textContent = "Speech recognition not supported in your browser. Try Chrome or Edge.";
+        }
+        
+        // Job data
+        const jobTitles = [
+            "Senior Frontend Developer", 
+            "UX/UI Designer", 
+            "Full Stack Engineer",
+            "DevOps Specialist",
+            "Data Scientist",
+            "Product Manager",
+            "Mobile App Developer",
+            "Cloud Solutions Architect"
+        ];
+        
+        const companies = [
+            "Tech Innovations Inc.", 
+            "Digital Solutions Co.", 
+            "Global Software Ltd.",
+            "Future Technologies",
+            "Innovate Labs",
+            "Nexus Systems",
+            "Alpha Development",
+            "Prime Tech Group"
+        ];
+        
+        const locations = [
+            "San Francisco, CA", 
+            "Remote", 
+            "New York, NY",
+            "Austin, TX",
+            "London, UK",
+            "Berlin, Germany",
+            "Tokyo, Japan",
+            "Sydney, Australia"
+        ];
+        
+        const jobTypes = ["Full-time", "Part-time", "Contract", "Freelance"];
+        
+        // Generate initial vacancy code
+        function generateVacancyCode() {
+            // Generate new HTML
+            const htmlCode = generateHTML();
+            htmlPre.querySelector('code').textContent = htmlCode;
+            
+            // Generate CSS
+            const cssCode = generateCSS();
+            cssPre.querySelector('code').textContent = cssCode;
+            
+            // Generate JS
+            const jsCode = generateJS();
+            jsPre.querySelector('code').textContent = jsCode;
+            
+            // Update output
+            outputContainer.innerHTML = htmlCode;
+            
+            // Add CSS to the output
+            const style = document.createElement('style');
+            style.textContent = cssCode;
+            document.head.appendChild(style);
+            
+            // Execute JS
+            try {
+                eval(jsCode);
+            } catch (e) {
+                console.error("JS execution error:", e);
+            }
+            
+            commandDisplay.textContent = "Vacancy code generated successfully!";
+        }
+        
+        // Add more jobs
+        function addMoreJobs() {
+            const newJobHTML = generateJobHTML();
+            outputContainer.innerHTML += newJobHTML;
+            
+            // Update HTML code display
+            const currentHTML = htmlPre.querySelector('code').textContent;
+            htmlPre.querySelector('code').textContent = currentHTML + newJobHTML;
+            
+            commandDisplay.textContent = "Additional job added!";
+        }
+        
+        // Change design
+        function changeDesign() {
+            const cssCode = generateCSS(true); // Alternate design
+            cssPre.querySelector('code').textContent = cssCode;
+            
+            // Update CSS
+            const style = document.querySelector('style');
+            if (style) {
+                style.textContent = cssCode;
+            }
+            
+            commandDisplay.textContent = "Design updated!";
+        }
+        
+        // Generate HTML code
+        function generateHTML() {
+            let html = `
+            <div class="vacancy-container">
+                <h2 style="text-align: center; grid-column: 1/-1; margin-bottom: 20px; color: #1e3c72;">Current Job Openings</h2>
+            `;
+            
+            // Generate 3 initial jobs
+            for (let i = 0; i < 3; i++) {
+                html += generateJobHTML();
+            }
+            
+            html += `</div>`;
+            return html;
+        }
+        
+        // Generate a single job HTML
+        function generateJobHTML() {
+            const title = jobTitles[Math.floor(Math.random() * jobTitles.length)];
+            const company = companies[Math.floor(Math.random() * companies.length)];
+            const location = locations[Math.floor(Math.random() * locations.length)];
+            const type = jobTypes[Math.floor(Math.random() * jobTypes.length)];
+            const salary = `$${(Math.floor(Math.random() * 80) + 70)},000 - $${(Math.floor(Math.random() * 100) + 100)},000`;
+            
+            return `
+            <div class="vacancy-card">
+                <div class="vacancy-header">
+                    <h3 class="vacancy-title">${title}</h3>
+                    <div class="vacancy-company">${company}</div>
+                </div>
+                <div class="vacancy-body">
+                    <div class="vacancy-detail">
+                        <span class="detail-icon">📍</span>
+                        <span>${location}</span>
+                    </div>
+                    <div class="vacancy-detail">
+                        <span class="detail-icon">🕒</span>
+                        <span>${type}</span>
+                    </div>
+                    <div class="vacancy-detail">
+                        <span class="detail-icon">💼</span>
+                        <span>${Math.floor(Math.random() * 5) + 3}+ years experience</span>
+                    </div>
+                    <p class="vacancy-description">
+                        We're looking for a skilled ${title.split(' ')[1]} to join our team. You'll be responsible for developing innovative solutions and collaborating with cross-functional teams to deliver exceptional products.
+                    </p>
+                </div>
+                <div class="vacancy-footer">
+                    <div class="vacancy-salary">${salary}</div>
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+            `;
+        }
+        
+        // Generate CSS code
+        function generateCSS(alternate = false) {
+            if (alternate) {
+                // Alternate design
+                return `
+                .vacancy-container {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+                    gap: 25px;
+                    padding: 20px;
+                    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+                    border-radius: 15px;
+                }
+                
+                .vacancy-card {
+                    background: white;
+                    border-radius: 15px;
+                    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+                    overflow: hidden;
+                    transition: all 0.3s ease;
+                    border: 1px solid #e0e0e0;
+                }
+                
+                .vacancy-header {
+                    background: linear-gradient(90deg, #ff6b6b, #ff8e53);
+                    color: white;
+                    padding: 20px;
+                }
+                
+                .vacancy-footer {
+                    background-color: #ffffff;
+                    border-top: 1px solid #eee;
+                }
+                
+                .apply-btn {
+                    background: linear-gradient(90deg, #1e3c72, #2a5298);
+                    box-shadow: 0 4px 10px rgba(30, 60, 114, 0.3);
+                }
+                
+                .apply-btn:hover {
+                    box-shadow: 0 6px 15px rgba(30, 60, 114, 0.4);
+                }
+                
+                .vacancy-salary {
+                    color: #ff6b6b;
+                }
+                `;
+            }
+            
+            // Default design
+            return `
+            .vacancy-container {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+                gap: 25px;
+                padding: 20px;
+            }
+            
+            .vacancy-card {
+                background: linear-gradient(135deg, #ffffff, #f9f9f9);
+                border-radius: 15px;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+                transition: transform 0.3s ease;
+                border: 1px solid #eee;
+            }
+            
+            .vacancy-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+            }
+            
+            .vacancy-header {
+                background: linear-gradient(90deg, #1e3c72, #2a5298);
+                color: white;
+                padding: 20px;
+            }
+            
+            .vacancy-title {
+                font-size: 1.5rem;
+                margin-bottom: 5px;
+            }
+            
+            .vacancy-company {
+                font-size: 1.1rem;
+                opacity: 0.9;
+            }
+            
+            .vacancy-body {
+                padding: 20px;
+            }
+            
+            .vacancy-detail {
+                margin-bottom: 15px;
+                display: flex;
+                align-items: flex-start;
+            }
+            
+            .detail-icon {
+                margin-right: 12px;
+                color: #1e3c72;
+                font-size: 1.2rem;
+                min-width: 24px;
+            }
+            
+            .vacancy-description {
+                margin: 15px 0;
+                line-height: 1.6;
+                color: #555;
+            }
+            
+            .vacancy-footer {
+                padding: 15px 20px;
+                background-color: #f8f9fa;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .vacancy-salary {
+                font-weight: bold;
+                color: #2a5298;
+                font-size: 1.2rem;
+            }
+            
+            .apply-btn {
+                background: linear-gradient(90deg, #ff6b6b, #ff8e53);
+                color: white;
+                border: none;
+                padding: 10px 25px;
+                border-radius: 50px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
+            }
+            
+            .apply-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
+            }
+            `;
+        }
+        
+        // Generate JavaScript code
+        function generateJS() {
+            return `
+            // Add event listeners to apply buttons
+            document.querySelectorAll('.apply-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const jobTitle = this.closest('.vacancy-card').querySelector('.vacancy-title').textContent;
+                    alert(\`Applying for: \${jobTitle}\\n\\n(Simulated application action)\`);
+                });
+            });
+            
+            // Animation for job cards when they come into view
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            document.querySelectorAll('.vacancy-card').forEach(card => {
+                card.style.opacity = 0;
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+            `;
+        }
+        
+        // Initialize with some content
+        window.onload = function() {
+            generateVacancyCode();
+        };
+    </script>
+</body>
+</html>

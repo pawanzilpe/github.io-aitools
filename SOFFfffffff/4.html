@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Email Agent</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+        }
+        
+        header {
+            background: #4a6cf7;
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            font-size: 28px;
+            background: #2a4bcc;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .ai-tag {
+            background: #ff6b6b;
+            font-size: 14px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin-left: 10px;
+        }
+        
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 300px;
+            background: #f8f9ff;
+            padding: 25px 20px;
+            border-right: 1px solid #e6e9ff;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar h2 {
+            margin-bottom: 20px;
+            color: #3a4b8d;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .recipients-box {
+            background: white;
+            border: 1px solid #dce1ff;
+            border-radius: 12px;
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .recipients-list {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        
+        .recipient {
+            background: #f0f3ff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .recipient-email {
+            font-weight: 500;
+            color: #3a4b8d;
+        }
+        
+        .recipient-remove {
+            color: #ff6b6b;
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .recipient-remove:hover {
+            background: rgba(255, 107, 107, 0.1);
+        }
+        
+        .recipient-input {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .recipient-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #dce1ff;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .add-recipient {
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .email-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 25px 30px;
+            overflow: hidden;
+        }
+        
+        .email-header {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .email-header input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 1px solid #dce1ff;
+            border-radius: 12px;
+            font-size: 16px;
+        }
+        
+        .email-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #dce1ff;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+        
+        .toolbar {
+            background: #f8f9ff;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            border-bottom: 1px solid #dce1ff;
+        }
+        
+        .toolbar button {
+            background: white;
+            border: 1px solid #dce1ff;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #4a6cf7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+        }
+        
+        .toolbar button:hover {
+            background: #eef1ff;
+        }
+        
+        .editor {
+            flex: 1;
+            padding: 20px;
+            font-size: 16px;
+            outline: none;
+            overflow-y: auto;
+        }
+        
+        .editor:focus {
+            background: #fcfdff;
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .action-btn {
+            padding: 15px 30px;
+            border-radius: 12px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .preview-btn {
+            background: #eef1ff;
+            color: #4a6cf7;
+        }
+        
+        .preview-btn:hover {
+            background: #e2e7ff;
+        }
+        
+        .send-btn {
+            background: linear-gradient(90deg, #4a6cf7, #6e8efb);
+            color: white;
+            box-shadow: 0 5px 15px rgba(74, 108, 247, 0.4);
+        }
+        
+        .send-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(74, 108, 247, 0.6);
+        }
+        
+        .preview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .preview-modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .preview-content {
+            background: white;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        
+        .preview-header {
+            background: #4a6cf7;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .preview-body {
+            padding: 30px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .close-preview {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .status-bar {
+            padding: 15px 30px;
+            background: #f8f9ff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #5c6bc0;
+            font-size: 14px;
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4caf50;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e6e9ff;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+                <h1>AI Email Agent <span class="ai-tag">AI Powered</span></h1>
+            </div>
+            <div class="user">
+                <i class="fas fa-user-circle fa-2x"></i>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <h2><i class="fas fa-users"></i> Recipients</h2>
+                <div class="recipients-box">
+                    <div class="recipients-list" id="recipientsList">
+                        <div class="recipient">
+                            <span class="recipient-email">john.doe@example.com</span>
+                            <div class="recipient-remove">
+                                <i class="fas fa-times"></i>
+                            </div>
+                        </div>
+                        <div class="recipient">
+                            <span class="recipient-email">sarah.smith@company.com</span>
+                            <div class="recipient-remove">
+                                <i class="fas fa-times"></i>
+                            </div>
+                        </div>
+                        <div class="recipient">
+                            <span class="recipient-email">mike.johnson@business.org</span>
+                            <div class="recipient-remove">
+                                <i class="fas fa-times"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="recipient-input">
+                        <input type="email" id="newRecipient" placeholder="Add new recipient email">
+                        <button class="add-recipient" id="addRecipient">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="email-section">
+                <div class="email-header">
+                    <input type="text" id="emailSubject" placeholder="Email Subject">
+                </div>
+                
+                <div class="email-body">
+                    <div class="toolbar">
+                        <button title="Bold"><i class="fas fa-bold"></i></button>
+                        <button title="Italic"><i class="fas fa-italic"></i></button>
+                        <button title="Underline"><i class="fas fa-underline"></i></button>
+                        <button title="List"><i class="fas fa-list-ul"></i></button>
+                        <button title="Link"><i class="fas fa-link"></i></button>
+                        <button title="Attachment"><i class="fas fa-paperclip"></i></button>
+                        <button title="AI Enhance" style="margin-left: auto; background: #e6f7ff; color: #1890ff;">
+                            <i class="fas fa-magic"></i> Enhance with AI
+                        </button>
+                    </div>
+                    <div class="editor" id="emailEditor" contenteditable="true">
+                        <p>Hello Team,</p>
+                        <p><br></p>
+                        <p>I hope this message finds you well. I wanted to share some important updates regarding our upcoming project deadline.</p>
+                        <p><br></p>
+                        <p>Please review the attached documents and provide your feedback by Friday.</p>
+                        <p><br></p>
+                        <p>Best regards,</p>
+                        <p>AI Email Agent</p>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button class="action-btn preview-btn" id="previewBtn">
+                        <i class="far fa-eye"></i> Preview Email
+                    </button>
+                    <button class="action-btn send-btn" id="sendBtn">
+                        <i class="fas fa-paper-plane"></i> Send to All Recipients
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="status-bar">
+            <div class="status">
+                <div class="status-dot"></div>
+                <span>AI Assistant: Ready to send emails</span>
+            </div>
+            <div class="recipient-count">
+                <i class="fas fa-users"></i> <span id="recipientCount">3</span> recipients
+            </div>
+        </div>
+    </div>
+    
+    <div class="preview-modal" id="previewModal">
+        <div class="preview-content">
+            <div class="preview-header">
+                <h2>Email Preview</h2>
+                <button class="close-preview" id="closePreview">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="preview-body" id="previewBody">
+                <!-- Preview content will be inserted here -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const recipientsList = document.getElementById('recipientsList');
+            const newRecipient = document.getElementById('newRecipient');
+            const addRecipient = document.getElementById('addRecipient');
+            const recipientCount = document.getElementById('recipientCount');
+            const emailSubject = document.getElementById('emailSubject');
+            const emailEditor = document.getElementById('emailEditor');
+            const previewBtn = document.getElementById('previewBtn');
+            const sendBtn = document.getElementById('sendBtn');
+            const previewModal = document.getElementById('previewModal');
+            const closePreview = document.getElementById('closePreview');
+            const previewBody = document.getElementById('previewBody');
+            
+            let recipients = [
+                'john.doe@example.com',
+                'sarah.smith@company.com',
+                'mike.johnson@business.org'
+            ];
+            
+            // Add recipient function
+            addRecipient.addEventListener('click', function() {
+                const email = newRecipient.value.trim();
+                if (email && validateEmail(email)) {
+                    if (!recipients.includes(email)) {
+                        recipients.push(email);
+                        updateRecipientsList();
+                        newRecipient.value = '';
+                    } else {
+                        alert('This email is already in the recipient list.');
+                    }
+                } else {
+                    alert('Please enter a valid email address.');
+                }
+            });
+            
+            // Enter key for adding recipient
+            newRecipient.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addRecipient.click();
+                }
+            });
+            
+            // Remove recipient
+            recipientsList.addEventListener('click', function(e) {
+                if (e.target.closest('.recipient-remove')) {
+                    const recipientElement = e.target.closest('.recipient');
+                    const email = recipientElement.querySelector('.recipient-email').textContent;
+                    recipients = recipients.filter(recip => recip !== email);
+                    updateRecipientsList();
+                }
+            });
+            
+            // Update recipients list
+            function updateRecipientsList() {
+                recipientsList.innerHTML = '';
+                recipients.forEach(email => {
+                    const recipientElement = document.createElement('div');
+                    recipientElement.className = 'recipient';
+                    recipientElement.innerHTML = `
+                        <span class="recipient-email">${email}</span>
+                        <div class="recipient-remove">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    `;
+                    recipientsList.appendChild(recipientElement);
+                });
+                recipientCount.textContent = recipients.length;
+            }
+            
+            // Preview email
+            previewBtn.addEventListener('click', function() {
+                const subject = emailSubject.value || 'No Subject';
+                const content = emailEditor.innerHTML;
+                
+                previewBody.innerHTML = `
+                    <h3>${subject}</h3>
+                    <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px;">
+                        ${content}
+                    </div>
+                    <div style="margin-top: 30px; color: #777; font-size: 14px;">
+                        <p><strong>Recipients:</strong> ${recipients.join(', ')}</p>
+                    </div>
+                `;
+                
+                previewModal.classList.add('active');
+            });
+            
+            // Close preview
+            closePreview.addEventListener('click', function() {
+                previewModal.classList.remove('active');
+            });
+            
+            // Send email
+            sendBtn.addEventListener('click', function() {
+                if (recipients.length === 0) {
+                    alert('Please add at least one recipient.');
+                    return;
+                }
+                
+                const subject = emailSubject.value || 'No Subject';
+                const content = emailEditor.innerHTML;
+                
+                // Simulate sending
+                const sendBtnText = sendBtn.innerHTML;
+                sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                sendBtn.disabled = true;
+                
+                setTimeout(function() {
+                    sendBtn.innerHTML = sendBtnText;
+                    sendBtn.disabled = false;
+                    
+                    alert(`Email successfully sent to ${recipients.length} recipients!`);
+                    
+                    // Reset form
+                    emailSubject.value = '';
+                    emailEditor.innerHTML = `
+                        <p>Hello Team,</p>
+                        <p><br></p>
+                        <p>I hope this message finds you well.</p>
+                        <p><br></p>
+                        <p>Best regards,</p>
+                        <p>AI Email Agent</p>
+                    `;
+                }, 2000);
+            });
+            
+            // Email validation helper
+            function validateEmail(email) {
+                const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return re.test(String(email).toLowerCase());
+            }
+            
+            // Toolbar formatting
+            document.querySelectorAll('.toolbar button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const command = this.getAttribute('title').toLowerCase();
+                    document.execCommand(command, false, null);
+                    emailEditor.focus();
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Form with Code Display</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .content {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .preview-section, .code-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            padding: 30px;
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .section-title {
+            color: #1a2980;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+            font-size: 1.8rem;
+        }
+        
+        /* Form styling */
+        .blue-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: #1a2980;
+            font-size: 1.1rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 14px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #1a2980;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+            outline: none;
+            background-color: white;
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .checkbox-group input {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(to right, #1a2980, #26d0ce);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(26, 41, 128, 0.3);
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 41, 128, 0.4);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Code display styling */
+        .code-container {
+            background: #2c3e50;
+            color: #ecf0f1;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            max-height: 500px;
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .language-tabs {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .tab-btn {
+            background: #34495e;
+            color: #ecf0f1;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        
+        .tab-btn.active {
+            background: #3498db;
+            font-weight: bold;
+        }
+        
+        .copy-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background: #2980b9;
+        }
+        
+        .code-content {
+            display: none;
+        }
+        
+        .code-content.active {
+            display: block;
+        }
+        
+        pre {
+            margin: 0;
+        }
+        
+        .token.comment {
+            color: #7f8c8d;
+        }
+        
+        .token.tag {
+            color: #e74c3c;
+        }
+        
+        .token.attr-name {
+            color: #f39c12;
+        }
+        
+        .token.attr-value {
+            color: #2ecc71;
+        }
+        
+        .token.property {
+            color: #9b59b6;
+        }
+        
+        .token.value {
+            color: #1abc9c;
+        }
+        
+        .token.selector {
+            color: #e67e22;
+        }
+        
+        footer {
+            margin-top: 40px;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 1rem;
+            width: 100%;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            header p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Blue-Themed Form with Code Display</h1>
+            <p>This example shows a modern blue-themed form along with the HTML, CSS, and JavaScript code used to create it. Try submitting the form to see validation in action!</p>
+        </header>
+        
+        <div class="content">
+            <!-- Preview Section -->
+            <div class="preview-section">
+                <h2 class="section-title">Form Preview</h2>
+                <form id="blueForm" class="blue-form">
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" placeholder="Enter your phone number">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="service">Service Type</label>
+                        <select id="service" name="service">
+                            <option value="">Select a service</option>
+                            <option value="web">Web Development</option>
+                            <option value="design">UI/UX Design</option>
+                            <option value="consulting">IT Consulting</option>
+                            <option value="maintenance">Maintenance</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Your Message</label>
+                        <textarea id="message" name="message" placeholder="Enter your message here..." required></textarea>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="newsletter" name="newsletter">
+                        <label for="newsletter">Subscribe to our newsletter</label>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Submit Form</button>
+                </form>
+            </div>
+            
+            <!-- Code Section -->
+            <div class="code-section">
+                <h2 class="section-title">Source Code</h2>
+                <div class="code-header">
+                    <div class="language-tabs">
+                        <button class="tab-btn active" data-lang="html">HTML</button>
+                        <button class="tab-btn" data-lang="css">CSS</button>
+                        <button class="tab-btn" data-lang="js">JavaScript</button>
+                    </div>
+                    <button class="copy-btn" id="copyBtn">Copy Code</button>
+                </div>
+                
+                <div class="code-container">
+                    <div class="code-content active" id="html-code">
+                        <pre><code>&lt;!-- Form Structure --&gt;
+&lt;form id="blueForm" class="blue-form"&gt;
+  &lt;div class="form-group"&gt;
+    &lt;label for="fullName"&gt;Full Name&lt;/label&gt;
+    &lt;input type="text" id="fullName" name="fullName" 
+           placeholder="Enter your full name" required&gt;
+  &lt;/div&gt;
+  
+  &lt;div class="form-group"&gt;
+    &lt;label for="email"&gt;Email Address&lt;/label&gt;
+    &lt;input type="email" id="email" name="email" 
+           placeholder="Enter your email" required&gt;
+  &lt;/div&gt;
+  
+  &lt;div class="form-group"&gt;
+    &lt;label for="phone"&gt;Phone Number&lt;/label&gt;
+    &lt;input type="tel" id="phone" name="phone" 
+           placeholder="Enter your phone number"&gt;
+  &lt;/div&gt;
+  
+  &lt;div class="form-group"&gt;
+    &lt;label for="service"&gt;Service Type&lt;/label&gt;
+    &lt;select id="service" name="service"&gt;
+      &lt;option value=""&gt;Select a service&lt;/option&gt;
+      &lt;option value="web"&gt;Web Development&lt;/option&gt;
+      &lt;option value="design"&gt;UI/UX Design&lt;/option&gt;
+      &lt;option value="consulting"&gt;IT Consulting&lt;/option&gt;
+      &lt;option value="maintenance"&gt;Maintenance&lt;/option&gt;
+    &lt;/select&gt;
+  &lt;/div&gt;
+  
+  &lt;div class="form-group"&gt;
+    &lt;label for="message"&gt;Your Message&lt;/label&gt;
+    &lt;textarea id="message" name="message" 
+              placeholder="Enter your message here..." required&gt;&lt;/textarea&gt;
+  &lt;/div&gt;
+  
+  &lt;div class="checkbox-group"&gt;
+    &lt;input type="checkbox" id="newsletter" name="newsletter"&gt;
+    &lt;label for="newsletter"&gt;Subscribe to our newsletter&lt;/label&gt;
+  &lt;/div&gt;
+  
+  &lt;button type="submit" class="submit-btn"&gt;Submit Form&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+                    </div>
+                    
+                    <div class="code-content" id="css-code">
+                        <pre><code>/* Form Styling */
+.blue-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #1a2980;
+  font-size: 1.1rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 14px;
+  border: 2px solid #3498db;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: #f8f9fa;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #1a2980;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+  outline: none;
+  background-color: white;
+}
+
+.form-group textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkbox-group input {
+  width: 20px;
+  height: 20px;
+}
+
+.submit-btn {
+  background: linear-gradient(to right, #1a2980, #26d0ce);
+  color: white;
+  border: none;
+  padding: 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 10px;
+  box-shadow: 0 4px 15px rgba(26, 41, 128, 0.3);
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(26, 41, 128, 0.4);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}</code></pre>
+                    </div>
+                    
+                    <div class="code-content" id="js-code">
+                        <pre><code>// Form Validation and Submission
+document.getElementById('blueForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  // Get form elements
+  const fullName = document.getElementById('fullName').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const message = document.getElementById('message').value.trim();
+  
+  // Simple validation
+  if (!fullName) {
+    alert('Please enter your full name');
+    return;
+  }
+  
+  if (!email) {
+    alert('Please enter your email address');
+    return;
+  } else if (!validateEmail(email)) {
+    alert('Please enter a valid email address');
+    return;
+  }
+  
+  if (!message) {
+    alert('Please enter your message');
+    return;
+  }
+  
+  // If all validations pass
+  alert(`Form submitted successfully!\n\nName: ${fullName}\nEmail: ${email}`);
+  this.reset();
+});
+
+// Email validation function
+function validateEmail(email) {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+}
+
+// Tab switching functionality
+const tabBtns = document.querySelectorAll('.tab-btn');
+tabBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    // Remove active class from all buttons
+    tabBtns.forEach(b => b.classList.remove('active'));
+    // Add active class to clicked button
+    btn.classList.add('active');
+    
+    // Hide all code content
+    document.querySelectorAll('.code-content').forEach(content => {
+      content.classList.remove('active');
+    });
+    
+    // Show the selected code content
+    const lang = btn.getAttribute('data-lang');
+    document.getElementById(`${lang}-code`).classList.add('active');
+  });
+});
+
+// Copy button functionality
+document.getElementById('copyBtn').addEventListener('click', function() {
+  const activeCode = document.querySelector('.code-content.active');
+  const textToCopy = activeCode.textContent;
+  
+  navigator.clipboard.writeText(textToCopy).then(() => {
+    const originalText = this.textContent;
+    this.textContent = 'Copied!';
+    
+    setTimeout(() => {
+      this.textContent = originalText;
+    }, 2000);
+  });
+});</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Created with HTML, CSS, and JavaScript | Blue Gradient Form Example</p>
+        </footer>
+    </div>
+    
+    <script>
+        // Form Validation and Submission
+        document.getElementById('blueForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form elements
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const message = document.getElementById('message').value.trim();
+            
+            // Simple validation
+            if (!fullName) {
+                alert('Please enter your full name');
+                return;
+            }
+            
+            if (!email) {
+                alert('Please enter your email address');
+                return;
+            } else if (!validateEmail(email)) {
+                alert('Please enter a valid email address');
+                return;
+            }
+            
+            if (!message) {
+                alert('Please enter your message');
+                return;
+            }
+            
+            // If all validations pass
+            alert(`Form submitted successfully!\n\nName: ${fullName}\nEmail: ${email}`);
+            this.reset();
+        });
+        
+        // Email validation function
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+        
+        // Tab switching functionality
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons
+                tabBtns.forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                btn.classList.add('active');
+                
+                // Hide all code content
+                document.querySelectorAll('.code-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Show the selected code content
+                const lang = btn.getAttribute('data-lang');
+                document.getElementById(`${lang}-code`).classList.add('active');
+            });
+        });
+        
+        // Copy button functionality
+        document.getElementById('copyBtn').addEventListener('click', function() {
+            const activeCode = document.querySelector('.code-content.active');
+            const textToCopy = activeCode.textContent;
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalText = this.textContent;
+                this.textContent = 'Copied!';
+                
+                setTimeout(() => {
+                    this.textContent = originalText;
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>

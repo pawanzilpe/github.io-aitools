@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charge Per - Search Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+        }
+        
+        header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        .search-box {
+            background: white;
+            border-radius: 50px;
+            display: flex;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            border: 2px solid #4A90E2;
+        }
+        
+        .search-box input {
+            flex: 1;
+            border: none;
+            padding: 20px 25px;
+            font-size: 18px;
+            outline: none;
+        }
+        
+        .search-box button {
+            background: #4A90E2;
+            color: white;
+            border: none;
+            padding: 0 35px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .search-box button:hover {
+            background: #357ABD;
+        }
+        
+        .results-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            margin-bottom: 30px;
+            min-height: 400px;
+        }
+        
+        .result-item {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .result-item h3 {
+            color: #1a0dab;
+            margin-bottom: 8px;
+            font-size: 1.4rem;
+        }
+        
+        .result-item h3 a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .result-item .url {
+            color: #006621;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+        
+        .result-item .snippet {
+            color: #545454;
+            line-height: 1.5;
+        }
+        
+        .loader {
+            text-align: center;
+            padding: 30px;
+            display: none;
+        }
+        
+        .loader .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #4A90E2;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.2rem;
+        }
+        
+        .example-questions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .example-question {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .example-question:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+        
+        footer {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .search-box {
+                flex-direction: column;
+                border-radius: 15px;
+            }
+            
+            .search-box input {
+                padding: 15px;
+            }
+            
+            .search-box button {
+                padding: 15px;
+                border-radius: 0 0 15px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Charge Per</h1>
+            <p>Ask any question and get instant answers from Google search results</p>
+        </header>
+        
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Ask anything...">
+            <button id="search-btn"><i class="fas fa-search"></i> Search</button>
+        </div>
+        
+        <div class="example-questions">
+            <div class="example-question" data-question="What is artificial intelligence?">What is artificial intelligence?</div>
+            <div class="example-question" data-question="How to learn web development?">How to learn web development?</div>
+            <div class="example-question" data-question="Current weather in New York">Current weather in New York</div>
+            <div class="example-question" data-question="Latest space discoveries">Latest space discoveries</div>
+        </div>
+        
+        <div class="results-container">
+            <div class="loader" id="loader">
+                <div class="spinner"></div>
+                <p>Searching the web for answers...</p>
+            </div>
+            
+            <div id="results">
+                <div class="no-results">
+                    <i class="fas fa-search fa-3x" style="margin-bottom: 20px;"></i>
+                    <p>Enter a question above to search the web</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Charge Per Search Assistant &copy; 2023 | Search any question and get answers instantly</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            const searchBtn = document.getElementById('search-btn');
+            const resultsContainer = document.getElementById('results');
+            const loader = document.getElementById('loader');
+            const exampleQuestions = document.querySelectorAll('.example-question');
+            
+            // Function to perform search
+            function search(query) {
+                if (!query.trim()) return;
+                
+                // Show loader
+                loader.style.display = 'block';
+                resultsContainer.innerHTML = '';
+                
+                // Simulate API call delay
+                setTimeout(() => {
+                    // Hide loader
+                    loader.style.display = 'none';
+                    
+                    // Generate fake results for demonstration
+                    const fakeResults = generateFakeResults(query);
+                    
+                    if (fakeResults.length === 0) {
+                        resultsContainer.innerHTML = `
+                            <div class="no-results">
+                                <i class="fas fa-exclamation-triangle fa-3x" style="margin-bottom: 20px;"></i>
+                                <p>No results found for "${query}"</p>
+                                <p>Try different keywords or check your spelling</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    // Display results
+                    resultsContainer.innerHTML = '';
+                    fakeResults.forEach(result => {
+                        const resultElement = document.createElement('div');
+                        resultElement.className = 'result-item';
+                        resultElement.innerHTML = `
+                            <h3><a href="#">${result.title}</a></h3>
+                            <div class="url">${result.url}</div>
+                            <div class="snippet">${result.snippet}</div>
+                        `;
+                        resultsContainer.appendChild(resultElement);
+                    });
+                }, 1500);
+            }
+            
+            // Generate fake search results for demonstration
+            function generateFakeResults(query) {
+                const baseResults = [
+                    {
+                        title: `Understanding ${query} - Comprehensive Guide`,
+                        url: `https://www.wikipedia.org/${query.replace(/\s+/g, '_')}`,
+                        snippet: `Learn all about ${query} in this comprehensive guide. Discover the history, applications, and future trends related to ${query}. This resource provides in-depth information for beginners and experts alike.`
+                    },
+                    {
+                        title: `Latest News on ${query}`,
+                        url: `https://www.newsportal.com/${query.replace(/\s+/g, '-')}`,
+                        snippet: `Stay updated with the latest developments regarding ${query}. Our news portal brings you breaking news, expert analysis, and community insights about ${query}. Check out our daily updates.`
+                    },
+                    {
+                        title: `How to Master ${query} in 30 Days`,
+                        url: `https://www.learninghub.com/courses/${query.replace(/\s+/g, '-')}`,
+                        snippet: `This step-by-step guide will teach you everything you need to know about ${query}. With practical examples and exercises, you'll become proficient in ${query} in just one month. Start your journey today!`
+                    },
+                    {
+                        title: `${query} - Official Documentation`,
+                        url: `https://docs.${query.replace(/\s+/g, '')}.org`,
+                        snippet: `The official documentation for ${query}. Find detailed technical specifications, API references, and usage examples. This is the most authoritative resource for developers working with ${query}.`
+                    },
+                    {
+                        title: `The Science Behind ${query}`,
+                        url: `https://www.sciencejournal.com/${query.replace(/\s+/g, '-')}`,
+                        snippet: `A scientific exploration of ${query}. This peer-reviewed article examines the fundamental principles and recent discoveries related to ${query}. Includes experimental data and analysis.`
+                    }
+                ];
+                
+                return baseResults;
+            }
+            
+            // Event listeners
+            searchBtn.addEventListener('click', () => {
+                search(searchInput.value);
+            });
+            
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    search(searchInput.value);
+                }
+            });
+            
+            exampleQuestions.forEach(question => {
+                question.addEventListener('click', () => {
+                    const questionText = question.getAttribute('data-question');
+                    searchInput.value = questionText;
+                    search(questionText);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

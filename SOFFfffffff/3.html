@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Email Agent</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, #4b6cb7, #182848);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        header h1 i {
+            color: #4dccff;
+        }
+        
+        .main-content {
+            display: flex;
+            min-height: 500px;
+        }
+        
+        .recipients-section {
+            width: 35%;
+            background: #f5f9ff;
+            border-right: 1px solid #e0e8ff;
+            padding: 25px;
+        }
+        
+        .email-section {
+            width: 65%;
+            padding: 25px;
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .recipient-input {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .recipient-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #3498db;
+            border-radius: 8px 0 0 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .recipient-input input:focus {
+            border-color: #2c3e50;
+        }
+        
+        .recipient-input button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .recipient-input button:hover {
+            background: #2980b9;
+        }
+        
+        .recipients-list {
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .recipient {
+            background: white;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .recipient-email {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .remove-recipient {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.3s;
+        }
+        
+        .remove-recipient:hover {
+            background: #c0392b;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #2c3e50;
+            outline: none;
+        }
+        
+        .form-group textarea {
+            min-height: 180px;
+            resize: vertical;
+        }
+        
+        .send-btn {
+            background: linear-gradient(to right, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.4);
+        }
+        
+        .send-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(46, 204, 113, 0.6);
+        }
+        
+        .send-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 0.4s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: linear-gradient(to right, #27ae60, #2ecc71);
+        }
+        
+        .notification.error {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .ai-features {
+            background: #e8f4fc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .ai-features h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .ai-features button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .ai-features button:hover {
+            background: #2980b9;
+        }
+        
+        .counter {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .recipients-section, .email-section {
+                width: 100%;
+            }
+            
+            .recipients-section {
+                border-right: none;
+                border-bottom: 1px solid #e0e8ff;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-robot"></i> AI Email Agent</h1>
+            <p>Send personalized emails to multiple recipients with one click</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="recipients-section">
+                <h2 class="section-title"><i class="fas fa-users"></i> Recipients</h2>
+                
+                <div class="recipient-input">
+                    <input type="email" id="email-input" placeholder="Enter recipient email">
+                    <button id="add-recipient"><i class="fas fa-plus"></i> Add</button>
+                </div>
+                
+                <div class="counter">
+                    <span>Total Recipients:</span>
+                    <span id="recipient-count">0</span>
+                </div>
+                
+                <div class="recipients-list" id="recipients-list">
+                    <!-- Recipients will be added here -->
+                </div>
+            </div>
+            
+            <div class="email-section">
+                <h2 class="section-title"><i class="fas fa-envelope"></i> Compose Email</h2>
+                
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <input type="text" id="subject" placeholder="Email subject">
+                </div>
+                
+                <div class="form-group">
+                    <label for="body">Email Body</label>
+                    <textarea id="body" placeholder="Write your email content here..."></textarea>
+                    <div class="counter">
+                        <span>Character count: <span id="char-count">0</span></span>
+                    </div>
+                </div>
+                
+                <div class="ai-features">
+                    <h3><i class="fas fa-magic"></i> AI Enhancements</h3>
+                    <button id="improve-btn"><i class="fas fa-wand-magic-sparkles"></i> Improve Writing</button>
+                    <button id="translate-btn"><i class="fas fa-language"></i> Translate</button>
+                    <button id="personalize-btn"><i class="fas fa-user-tag"></i> Personalize</button>
+                </div>
+                
+                <button class="send-btn" id="send-btn">
+                    <i class="fas fa-paper-plane"></i> Send Emails to All Recipients
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const emailInput = document.getElementById('email-input');
+            const addRecipientBtn = document.getElementById('add-recipient');
+            const recipientsList = document.getElementById('recipients-list');
+            const recipientCount = document.getElementById('recipient-count');
+            const subjectInput = document.getElementById('subject');
+            const bodyInput = document.getElementById('body');
+            const charCount = document.getElementById('char-count');
+            const sendBtn = document.getElementById('send-btn');
+            const notification = document.getElementById('notification');
+            
+            const improveBtn = document.getElementById('improve-btn');
+            const translateBtn = document.getElementById('translate-btn');
+            const personalizeBtn = document.getElementById('personalize-btn');
+            
+            let recipients = [];
+            
+            // Add recipient function
+            function addRecipient(email) {
+                if (!validateEmail(email)) {
+                    showNotification('Please enter a valid email address', 'error');
+                    return;
+                }
+                
+                if (recipients.includes(email)) {
+                    showNotification('This email is already added', 'error');
+                    return;
+                }
+                
+                recipients.push(email);
+                updateRecipientsList();
+                emailInput.value = '';
+                emailInput.focus();
+            }
+            
+            // Validate email format
+            function validateEmail(email) {
+                const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return re.test(String(email).toLowerCase());
+            }
+            
+            // Update recipients list UI
+            function updateRecipientsList() {
+                recipientsList.innerHTML = '';
+                recipientCount.textContent = recipients.length;
+                
+                recipients.forEach(email => {
+                    const recipientEl = document.createElement('div');
+                    recipientEl.className = 'recipient';
+                    recipientEl.innerHTML = `
+                        <span class="recipient-email">${email}</span>
+                        <button class="remove-recipient" data-email="${email}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    recipientsList.appendChild(recipientEl);
+                });
+                
+                // Add event listeners to remove buttons
+                document.querySelectorAll('.remove-recipient').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const emailToRemove = this.getAttribute('data-email');
+                        recipients = recipients.filter(email => email !== emailToRemove);
+                        updateRecipientsList();
+                    });
+                });
+            }
+            
+            // Show notification
+            function showNotification(message, type) {
+                notification.textContent = message;
+                notification.className = `notification ${type} show`;
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Update character count
+            function updateCharCount() {
+                charCount.textContent = bodyInput.value.length;
+            }
+            
+            // Send emails function
+            function sendEmails() {
+                if (recipients.length === 0) {
+                    showNotification('Please add at least one recipient', 'error');
+                    return;
+                }
+                
+                if (!subjectInput.value.trim()) {
+                    showNotification('Please enter a subject', 'error');
+                    subjectInput.focus();
+                    return;
+                }
+                
+                if (!bodyInput.value.trim()) {
+                    showNotification('Please enter email content', 'error');
+                    bodyInput.focus();
+                    return;
+                }
+                
+                // Simulate sending process
+                showNotification(`Sending emails to ${recipients.length} recipients...`, 'success');
+                
+                // In a real app, this would connect to a backend service
+                setTimeout(() => {
+                    showNotification(`Emails sent successfully to ${recipients.length} recipients!`, 'success');
+                    
+                    // Reset form
+                    recipients = [];
+                    updateRecipientsList();
+                    subjectInput.value = '';
+                    bodyInput.value = '';
+                    updateCharCount();
+                }, 2000);
+            }
+            
+            // AI Enhancements
+            function improveWriting() {
+                if (!bodyInput.value.trim()) {
+                    showNotification('Please write something to improve', 'error');
+                    return;
+                }
+                
+                // Simulate AI processing
+                showNotification('AI is enhancing your email content...', 'success');
+                
+                setTimeout(() => {
+                    // In a real app, this would call an AI API
+                    bodyInput.value = "Dear Recipient,\n\n" + 
+                        "I hope this email finds you well. I wanted to follow up on our recent conversation regarding the upcoming project. " +
+                        "I've prepared a detailed proposal that outlines the key milestones, deliverables, and timeline for your review.\n\n" +
+                        "Please let me know if you have any questions or if there are specific areas you'd like to discuss further. " +
+                        "I'm available for a call anytime next week at your convenience.\n\n" +
+                        "Looking forward to your feedback.\n\nBest regards,\n[Your Name]";
+                    
+                    updateCharCount();
+                    showNotification('Email content enhanced successfully!', 'success');
+                }, 1500);
+            }
+            
+            // Event listeners
+            addRecipientBtn.addEventListener('click', () => addRecipient(emailInput.value.trim()));
+            
+            emailInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addRecipient(emailInput.value.trim());
+                }
+            });
+            
+            bodyInput.addEventListener('input', updateCharCount);
+            
+            sendBtn.addEventListener('click', sendEmails);
+            
+            improveBtn.addEventListener('click', improveWriting);
+            
+            translateBtn.addEventListener('click', () => {
+                showNotification('Translation feature would connect to an AI translation service', 'success');
+            });
+            
+            personalizeBtn.addEventListener('click', () => {
+                showNotification('Personalization feature would customize each email for recipients', 'success');
+            });
+            
+            // Add sample recipients for demo
+            setTimeout(() => {
+                addRecipient('john.doe@example.com');
+                addRecipient('sarah.smith@company.com');
+                addRecipient('mike.johnson@business.org');
+                
+                subjectInput.value = 'Project Update and Next Steps';
+                bodyInput.value = 'Hello,\n\nI wanted to share the latest updates on our project...';
+                updateCharCount();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

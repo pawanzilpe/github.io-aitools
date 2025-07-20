@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Photo Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        @media (max-width: 900px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .upload-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .drop-area {
+            border: 3px dashed rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .drop-area:hover {
+            border-color: white;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .drop-area i {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+        
+        .drop-area p {
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .upload-btn {
+            background: #4a00e0;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            font-weight: bold;
+        }
+        
+        .upload-btn:hover {
+            background: #8e2de2;
+            transform: translateY(-2px);
+        }
+        
+        .image-preview {
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            min-height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .image-preview img {
+            max-width: 100%;
+            max-height: 500px;
+            display: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .image-preview .placeholder {
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
+        
+        .editor-section {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .filters-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: white;
+            transform: translateY(-3px);
+        }
+        
+        .filter-btn.active {
+            background: #8e2de2;
+            border-color: #8e2de2;
+        }
+        
+        .filter-name {
+            font-size: 0.9rem;
+            margin-top: 5px;
+            text-align: center;
+        }
+        
+        .filter-preview {
+            width: 100%;
+            height: 80px;
+            border-radius: 8px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .adjustment-controls {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+        }
+        
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #8e2de2;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .action-btn {
+            padding: 15px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .reset-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .reset-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .download-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+            color: white;
+            border: none;
+        }
+        
+        .download-btn:hover {
+            background: linear-gradient(to right, #00b09b, #00b09b);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .quality-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        
+        /* Filter preview colors */
+        .original { background: linear-gradient(45deg, #ff9a9e, #fad0c4); }
+        .vintage { background: linear-gradient(45deg, #d4a5a5, #a38f8f); }
+        .blackwhite { background: linear-gradient(45deg, #bdc3c7, #2c3e50); }
+        .warm { background: linear-gradient(45deg, #ff7e5f, #feb47b); }
+        .cool { background: linear-gradient(45deg, #2193b0, #6dd5ed); }
+        .clarendon { background: linear-gradient(45deg, #8a2387, #f27121); }
+        .gingham { background: linear-gradient(45deg, #834d9b, #d04ed6); }
+        .moon { background: linear-gradient(45deg, #5d4157, #a8caba); }
+        .lark { background: linear-gradient(45deg, #0f2027, #203a43, #2c5364); }
+        .reyes { background: linear-gradient(45deg, #3a6186, #89253e); }
+        .juno { background: linear-gradient(45deg, #ff4e50, #f9d423); }
+        .slumber { background: linear-gradient(45deg, #1d2b64, #f8cdda); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Advanced Photo Editor</h1>
+            <p class="subtitle">Upload your photo, apply professional filters, and download in high quality</p>
+        </header>
+        
+        <div class="app-container">
+            <div class="upload-section">
+                <div class="drop-area" id="dropArea">
+                    <i>📁</i>
+                    <p>Drag & Drop your photo here</p>
+                    <p>or</p>
+                    <p>Click to browse files</p>
+                </div>
+                
+                <input type="file" id="fileInput" class="file-input" accept="image/*">
+                <button class="upload-btn" id="uploadBtn">
+                    <span>Choose Photo</span>
+                </button>
+                
+                <div class="quality-info">
+                    <p>🛡️ All processing happens in your browser - your photos never leave your device</p>
+                    <p>✨ Downloads in original high quality</p>
+                </div>
+            </div>
+            
+            <div class="editor-section">
+                <div class="image-preview" id="imagePreview">
+                    <div class="placeholder">Your edited photo will appear here</div>
+                    <img id="previewImg" alt="Preview">
+                </div>
+                
+                <div class="filters">
+                    <h2>Filters</h2>
+                    <div class="filters-container" id="filtersContainer">
+                        <!-- Filters will be generated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="adjustment-controls">
+                    <h2>Adjustments</h2>
+                    <div class="control-group">
+                        <div class="control-label">
+                            <span>Brightness</span>
+                            <span id="brightnessValue">100%</span>
+                        </div>
+                        <input type="range" min="0" max="200" value="100" class="slider" id="brightnessSlider">
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="control-label">
+                            <span>Contrast</span>
+                            <span id="contrastValue">100%</span>
+                        </div>
+                        <input type="range" min="0" max="200" value="100" class="slider" id="contrastSlider">
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="control-label">
+                            <span>Saturation</span>
+                            <span id="saturationValue">100%</span>
+                        </div>
+                        <input type="range" min="0" max="200" value="100" class="slider" id="saturationSlider">
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn reset-btn" id="resetBtn">
+                        <span>↺ Reset All</span>
+                    </button>
+                    <button class="action-btn download-btn" id="downloadBtn">
+                        <span>↓ Download Image</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 Advanced Photo Editor | All processing done locally in your browser</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const fileInput = document.getElementById('fileInput');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const dropArea = document.getElementById('dropArea');
+            const previewImg = document.getElementById('previewImg');
+            const imagePreview = document.getElementById('imagePreview');
+            const filtersContainer = document.getElementById('filtersContainer');
+            const resetBtn = document.getElementById('resetBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            
+            // Adjustment sliders
+            const brightnessSlider = document.getElementById('brightnessSlider');
+            const contrastSlider = document.getElementById('contrastSlider');
+            const saturationSlider = document.getElementById('saturationSlider');
+            const brightnessValue = document.getElementById('brightnessValue');
+            const contrastValue = document.getElementById('contrastValue');
+            const saturationValue = document.getElementById('saturationValue');
+            
+            // Current image state
+            let currentImage = null;
+            let originalImageData = null;
+            let currentFilter = 'original';
+            let currentAdjustments = {
+                brightness: 100,
+                contrast: 100,
+                saturation: 100
+            };
+            
+            // Filter definitions
+            const filters = [
+                { id: 'original', name: 'Original', filter: '' },
+                { id: 'vintage', name: 'Vintage', filter: 'sepia(0.5) hue-rotate(-30deg)' },
+                { id: 'blackwhite', name: 'Black & White', filter: 'grayscale(100%)' },
+                { id: 'warm', name: 'Warm', filter: 'brightness(110%) saturate(150%) hue-rotate(-10deg)' },
+                { id: 'cool', name: 'Cool', filter: 'brightness(110%) saturate(120%) hue-rotate(180deg)' },
+                { id: 'clarendon', name: 'Clarendon', filter: 'contrast(120%) saturate(125%)' },
+                { id: 'gingham', name: 'Gingham', filter: 'contrast(90%) brightness(105%)' },
+                { id: 'moon', name: 'Moon', filter: 'grayscale(100%) contrast(110%) brightness(110%)' },
+                { id: 'lark', name: 'Lark', filter: 'contrast(90%) saturate(130%)' },
+                { id: 'reyes', name: 'Reyes', filter: 'sepia(30%) contrast(110%) brightness(110%) saturate(130%)' },
+                { id: 'juno', name: 'Juno', filter: 'sepia(35%) hue-rotate(-15deg) saturate(120%) contrast(115%)' },
+                { id: 'slumber', name: 'Slumber', filter: 'brightness(105%) saturate(110%) hue-rotate(25deg)' }
+            ];
+            
+            // Initialize filters
+            function initFilters() {
+                filtersContainer.innerHTML = '';
+                filters.forEach(filter => {
+                    const filterElement = document.createElement('div');
+                    filterElement.className = `filter-btn ${filter.id === currentFilter ? 'active' : ''}`;
+                    filterElement.dataset.filter = filter.id;
+                    
+                    filterElement.innerHTML = `
+                        <div class="filter-preview ${filter.id}"></div>
+                        <div class="filter-name">${filter.name}</div>
+                    `;
+                    
+                    filterElement.addEventListener('click', () => {
+                        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                        filterElement.classList.add('active');
+                        currentFilter = filter.id;
+                        applyFilters();
+                    });
+                    
+                    filtersContainer.appendChild(filterElement);
+                });
+            }
+            
+            // Apply all filters and adjustments
+            function applyFilters() {
+                if (!currentImage) return;
+                
+                let filterCSS = '';
+                
+                // Get the selected filter
+                const selectedFilter = filters.find(f => f.id === currentFilter);
+                if (selectedFilter) {
+                    filterCSS += selectedFilter.filter;
+                }
+                
+                // Add adjustments
+                filterCSS += ` brightness(${currentAdjustments.brightness}%)`;
+                filterCSS += ` contrast(${currentAdjustments.contrast}%)`;
+                filterCSS += ` saturate(${currentAdjustments.saturation}%)`;
+                
+                previewImg.style.filter = filterCSS;
+            }
+            
+            // Handle file upload
+            function handleFile(file) {
+                if (!file || !file.type.match('image.*')) {
+                    alert('Please select a valid image file (JPEG, PNG, etc.)');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    previewImg.style.display = 'block';
+                    document.querySelector('.image-preview .placeholder').style.display = 'none';
+                    
+                    previewImg.onload = function() {
+                        currentImage = previewImg;
+                        applyFilters();
+                    };
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            // Event listeners
+            uploadBtn.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFile(e.target.files[0]);
+                }
+            });
+            
+            dropArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropArea.style.borderColor = 'white';
+                dropArea.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
+            });
+            
+            dropArea.addEventListener('dragleave', () => {
+                dropArea.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+                dropArea.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+            });
+            
+            dropArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropArea.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+                dropArea.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+                
+                if (e.dataTransfer.files.length > 0) {
+                    handleFile(e.dataTransfer.files[0]);
+                }
+            });
+            
+            dropArea.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            // Adjustment sliders
+            brightnessSlider.addEventListener('input', () => {
+                currentAdjustments.brightness = brightnessSlider.value;
+                brightnessValue.textContent = `${brightnessSlider.value}%`;
+                applyFilters();
+            });
+            
+            contrastSlider.addEventListener('input', () => {
+                currentAdjustments.contrast = contrastSlider.value;
+                contrastValue.textContent = `${contrastSlider.value}%`;
+                applyFilters();
+            });
+            
+            saturationSlider.addEventListener('input', () => {
+                currentAdjustments.saturation = saturationSlider.value;
+                saturationValue.textContent = `${saturationSlider.value}%`;
+                applyFilters();
+            });
+            
+            // Reset button
+            resetBtn.addEventListener('click', () => {
+                currentFilter = 'original';
+                currentAdjustments = {
+                    brightness: 100,
+                    contrast: 100,
+                    saturation: 100
+                };
+                
+                brightnessSlider.value = 100;
+                contrastSlider.value = 100;
+                saturationSlider.value = 100;
+                
+                brightnessValue.textContent = '100%';
+                contrastValue.textContent = '100%';
+                saturationValue.textContent = '100%';
+                
+                initFilters();
+                applyFilters();
+            });
+            
+            // Download button
+            downloadBtn.addEventListener('click', () => {
+                if (!currentImage) {
+                    alert('Please upload an image first');
+                    return;
+                }
+                
+                // Create a temporary canvas to apply filters
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                canvas.width = previewImg.naturalWidth;
+                canvas.height = previewImg.naturalHeight;
+                
+                // Apply the same filters to the canvas
+                ctx.filter = previewImg.style.filter;
+                ctx.drawImage(previewImg, 0, 0, canvas.width, canvas.height);
+                
+                // Create download link
+                const link = document.createElement('a');
+                link.download = 'edited-photo.jpg';
+                link.href = canvas.toDataURL('image/jpeg', 1.0); // Highest quality
+                link.click();
+            });
+            
+            // Initialize the app
+            initFilters();
+        });
+    </script>
+</body>
+</html>

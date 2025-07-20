@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Email Agent - Bulk Email Sender</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+            animation: fadeIn 1s ease;
+        }
+        
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        .app-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            flex: 1;
+            min-width: 300px;
+            animation: slideUp 0.8s ease;
+        }
+        
+        .card-header {
+            background: #2c3e50;
+            color: white;
+            padding: 18px 25px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .card-body {
+            padding: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 22px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e1e5eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        textarea.form-control {
+            min-height: 180px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .recipients-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .recipient-tag {
+            background: #e3f2fd;
+            border-radius: 20px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .recipient-tag .remove-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .toolbar {
+            background: #f8f9fa;
+            padding: 10px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid #e1e5eb;
+        }
+        
+        .toolbar button {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .toolbar button:hover {
+            background: #e9ecef;
+        }
+        
+        .editor {
+            min-height: 200px;
+            padding: 15px;
+            border: 1px solid #e1e5eb;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        .editor:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn-block {
+            width: 100%;
+        }
+        
+        .preview-container {
+            border: 1px solid #e1e5eb;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 300px;
+            background: #f9f9f9;
+            margin-top: 20px;
+        }
+        
+        .email-preview {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid #e1e5eb;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .email-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e1e5eb;
+        }
+        
+        .email-subject {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .email-meta {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .email-body {
+            padding: 25px;
+            line-height: 1.6;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .stat-item h3 {
+            font-size: 2rem;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+        
+        .stat-item p {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 30px 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 30px;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            header h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-robot"></i> AI Email Agent</h1>
+            <p>Send personalized bulk emails to multiple recipients with one click. Perfect for newsletters, announcements, and marketing campaigns.</p>
+        </header>
+        
+        <div class="app-container">
+            <!-- Sender Card -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-user"></i> Sender Information
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="senderName">Your Name</label>
+                        <input type="text" id="senderName" class="form-control" placeholder="John Doe" value="AI Email Agent">
+                    </div>
+                    <div class="form-group">
+                        <label for="senderEmail">Your Email</label>
+                        <input type="email" id="senderEmail" class="form-control" placeholder="you@example.com" value="sender@aiemailagent.com">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recipients Card -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-users"></i> Recipients
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="recipients">Email Addresses (comma separated)</label>
+                        <textarea id="recipients" class="form-control" placeholder="recipient1@example.com, recipient2@example.com, recipient3@example.com">client1@example.com, client2@business.com, user3@website.org, subscriber@newsletter.com, customer@service.in</textarea>
+                        <div class="recipients-container" id="recipientsTags">
+                            <!-- Recipient tags will appear here -->
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Email Subject</label>
+                        <input type="text" id="subject" class="form-control" placeholder="Important Announcement" value="Exciting News from AI Email Agent!">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Email Content -->
+        <div class="card" style="margin-top: 25px;">
+            <div class="card-header">
+                <i class="fas fa-envelope"></i> Email Content
+            </div>
+            <div class="card-body">
+                <div class="toolbar">
+                    <button type="button" data-command="bold"><i class="fas fa-bold"></i></button>
+                    <button type="button" data-command="italic"><i class="fas fa-italic"></i></button>
+                    <button type="button" data-command="underline"><i class="fas fa-underline"></i></button>
+                    <button type="button" data-command="insertUnorderedList"><i class="fas fa-list-ul"></i></button>
+                    <button type="button" data-command="insertOrderedList"><i class="fas fa-list-ol"></i></button>
+                    <button type="button" data-command="createLink"><i class="fas fa-link"></i></button>
+                </div>
+                <div id="editor" class="editor" contenteditable="true">
+                    <h2 style="color: #2c3e50;">Hello [Recipient's Name],</h2>
+                    <p>We're excited to introduce our new AI-powered email agent that makes sending bulk emails a breeze!</p>
+                    <p>With this tool, you can:</p>
+                    <ul>
+                        <li>Send personalized emails to multiple recipients at once</li>
+                        <li>Create beautifully formatted messages with our rich text editor</li>
+                        <li>Track your email campaigns with detailed statistics</li>
+                    </ul>
+                    <p>This is a sample email created with our AI Email Agent. You can customize this template to suit your needs.</p>
+                    <p>Best regards,<br><strong>[Your Name]</strong></p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Preview and Send -->
+        <div class="card" style="margin-top: 25px;">
+            <div class="card-header">
+                <i class="fas fa-paper-plane"></i> Send Emails
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label>Email Preview</label>
+                    <div class="preview-container">
+                        <div class="email-preview">
+                            <div class="email-header">
+                                <div class="email-subject" id="previewSubject">Exciting News from AI Email Agent!</div>
+                                <div class="email-meta">
+                                    From: <span id="previewSender">AI Email Agent &lt;sender@aiemailagent.com&gt;</span><br>
+                                    To: <span id="previewRecipient">recipient@example.com</span>
+                                </div>
+                            </div>
+                            <div class="email-body" id="previewBody">
+                                <!-- Preview content will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <h3 id="recipientCount">0</h3>
+                        <p>Recipients</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3 id="emailLength">0</h3>
+                        <p>Characters</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>Instant</h3>
+                        <p>Delivery</p>
+                    </div>
+                </div>
+                
+                <button id="sendButton" class="btn btn-primary btn-block">
+                    <i class="fas fa-paper-plane"></i> Send to All Recipients
+                </button>
+                
+                <div class="success-message" id="successMessage">
+                    <i class="fas fa-check-circle"></i> Your emails have been sent successfully to all recipients!
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            &copy; 2023 AI Email Agent | Bulk Email Sender | All rights reserved
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the app
+            initApp();
+            
+            function initApp() {
+                // Set up rich text editor functionality
+                setupRichTextEditor();
+                
+                // Set up recipient tags
+                setupRecipientTags();
+                
+                // Set up preview functionality
+                setupPreview();
+                
+                // Set up send button
+                document.getElementById('sendButton').addEventListener('click', sendEmails);
+                
+                // Update stats
+                updateStats();
+            }
+            
+            function setupRichTextEditor() {
+                const editor = document.getElementById('editor');
+                const toolbarButtons = document.querySelectorAll('.toolbar button');
+                
+                toolbarButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const command = this.dataset.command;
+                        
+                        if (command === 'createLink') {
+                            const url = prompt('Enter the URL:');
+                            if (url) {
+                                document.execCommand(command, false, url);
+                            }
+                        } else {
+                            document.execCommand(command, false, null);
+                        }
+                        
+                        // Update preview
+                        updatePreview();
+                    });
+                });
+                
+                // Update preview when editor content changes
+                editor.addEventListener('input', updatePreview);
+            }
+            
+            function setupRecipientTags() {
+                const recipientsTextarea = document.getElementById('recipients');
+                const tagsContainer = document.getElementById('recipientsTags');
+                
+                function updateRecipientTags() {
+                    const emails = recipientsTextarea.value.split(',').map(email => email.trim()).filter(email => email);
+                    
+                    // Clear existing tags
+                    tagsContainer.innerHTML = '';
+                    
+                    // Create new tags
+                    emails.forEach(email => {
+                        if (validateEmail(email)) {
+                            const tag = document.createElement('div');
+                            tag.className = 'recipient-tag';
+                            tag.innerHTML = `
+                                ${email}
+                                <button class="remove-btn" data-email="${email}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            `;
+                            tagsContainer.appendChild(tag);
+                            
+                            // Add event to remove button
+                            tag.querySelector('.remove-btn').addEventListener('click', function() {
+                                removeEmail(email);
+                            });
+                        }
+                    });
+                    
+                    // Update stats
+                    updateStats();
+                }
+                
+                function validateEmail(email) {
+                    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    return re.test(email);
+                }
+                
+                function removeEmail(emailToRemove) {
+                    const emails = recipientsTextarea.value.split(',').map(email => email.trim()).filter(email => email && email !== emailToRemove);
+                    recipientsTextarea.value = emails.join(', ');
+                    updateRecipientTags();
+                }
+                
+                // Update tags when textarea changes
+                recipientsTextarea.addEventListener('input', updateRecipientTags);
+                
+                // Initial update
+                updateRecipientTags();
+            }
+            
+            function setupPreview() {
+                // Update preview when sender info changes
+                document.getElementById('senderName').addEventListener('input', updatePreview);
+                document.getElementById('senderEmail').addEventListener('input', updatePreview);
+                document.getElementById('subject').addEventListener('input', updatePreview);
+                
+                // Initial update
+                updatePreview();
+            }
+            
+            function updatePreview() {
+                const senderName = document.getElementById('senderName').value || 'Your Name';
+                const senderEmail = document.getElementById('senderEmail').value || 'you@example.com';
+                const subject = document.getElementById('subject').value || 'No Subject';
+                const emailContent = document.getElementById('editor').innerHTML;
+                
+                // Update preview elements
+                document.getElementById('previewSubject').textContent = subject;
+                document.getElementById('previewSender').textContent = `${senderName} <${senderEmail}>`;
+                document.getElementById('previewBody').innerHTML = emailContent;
+                
+                // Update stats
+                updateStats();
+            }
+            
+            function updateStats() {
+                // Update recipient count
+                const emails = document.getElementById('recipients').value.split(',').map(email => email.trim()).filter(email => email);
+                document.getElementById('recipientCount').textContent = emails.length;
+                
+                // Update email length
+                const emailContent = document.getElementById('editor').textContent;
+                document.getElementById('emailLength').textContent = emailContent.length;
+            }
+            
+            function sendEmails() {
+                const senderName = document.getElementById('senderName').value;
+                const senderEmail = document.getElementById('senderEmail').value;
+                const subject = document.getElementById('subject').value;
+                const emailContent = document.getElementById('editor').innerHTML;
+                const recipients = document.getElementById('recipients').value.split(',').map(email => email.trim()).filter(email => email);
+                
+                if (recipients.length === 0) {
+                    alert('Please add at least one recipient email address.');
+                    return;
+                }
+                
+                if (!senderName || !senderEmail || !subject || !emailContent) {
+                    alert('Please fill in all required fields.');
+                    return;
+                }
+                
+                // Show loading state on button
+                const sendButton = document.getElementById('sendButton');
+                const originalButtonText = sendButton.innerHTML;
+                sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending Emails...';
+                sendButton.disabled = true;
+                
+                // Simulate sending process (in a real app, this would be an API call)
+                setTimeout(() => {
+                    // Show success message
+                    const successMessage = document.getElementById('successMessage');
+                    successMessage.style.display = 'block';
+                    
+                    // Reset button
+                    sendButton.innerHTML = originalButtonText;
+                    sendButton.disabled = false;
+                    
+                    // Hide success message after 5 seconds
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                    }, 5000);
+                    
+                    // Log the email data (in a real app, this would be sent to a server)
+                    console.log('Email Data:', {
+                        senderName,
+                        senderEmail,
+                        subject,
+                        emailContent,
+                        recipients
+                    });
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>

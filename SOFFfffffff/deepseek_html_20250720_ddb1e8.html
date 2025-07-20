@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Video Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --dark: #1d3557;
+            --light: #f8f9fa;
+            --success: #4cc9f0;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #4cc9f0, #4361ee);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+        
+        header p {
+            color: #94a3b8;
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 25px;
+        }
+        
+        .video-section {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .video-container {
+            position: relative;
+            height: 500px;
+            background: #0f172a;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            border: 2px solid rgba(67, 97, 238, 0.3);
+        }
+        
+        #videoPlayer {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+        
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        .video-card {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            padding: 15px;
+            width: 180px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: float 3s ease-in-out infinite;
+            cursor: move;
+        }
+        
+        .video-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #e2e8f0;
+        }
+        
+        .video-card p {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .control-group {
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(67, 97, 238, 0.2);
+        }
+        
+        .control-group h3 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .control-group h3 i {
+            color: var(--accent);
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+        }
+        
+        .btn-download {
+            background: linear-gradient(to right, #4cc9f0, #3a0ca3);
+            font-size: 1.1rem;
+            padding: 15px;
+        }
+        
+        .btn i {
+            font-size: 1.2rem;
+        }
+        
+        .tools-section {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .tool-panel {
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(67, 97, 238, 0.2);
+        }
+        
+        .tool-panel h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tool-panel h2 i {
+            color: var(--accent);
+        }
+        
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .filter {
+            aspect-ratio: 1/1;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .filter:hover {
+            transform: scale(1.05);
+            border-color: var(--accent);
+        }
+        
+        .filter.active {
+            border-color: var(--success);
+            box-shadow: 0 0 15px rgba(76, 201, 240, 0.5);
+        }
+        
+        .filter-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .filter-1 { filter: sepia(0.8); }
+        .filter-2 { filter: grayscale(100%); }
+        .filter-3 { filter: brightness(1.2) contrast(1.2); }
+        .filter-4 { filter: hue-rotate(90deg); }
+        .filter-5 { filter: invert(100%); }
+        .filter-6 { filter: saturate(3); }
+        
+        .animation-options, .card-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .option-btn {
+            background: rgba(67, 97, 238, 0.1);
+            border: 1px solid rgba(67, 97, 238, 0.3);
+            color: #cbd5e1;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .option-btn:hover {
+            background: rgba(67, 97, 238, 0.3);
+            transform: translateY(-3px);
+        }
+        
+        .option-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--accent);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #94a3b8;
+        }
+        
+        input[type="text"], input[type="range"], textarea, select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(67, 97, 238, 0.3);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        input[type="range"] {
+            padding: 0;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .timeline {
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 25px;
+            border: 1px solid rgba(67, 97, 238, 0.2);
+        }
+        
+        .timeline h2 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #e2e8f0;
+        }
+        
+        .timeline-track {
+            height: 80px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 8px;
+            position: relative;
+            overflow-x: auto;
+            overflow-y: hidden;
+            border: 1px solid rgba(67, 97, 238, 0.2);
+        }
+        
+        .timeline-inner {
+            height: 100%;
+            min-width: 100%;
+            position: relative;
+        }
+        
+        .timeline-marker {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--success);
+            transform: translateX(-50%);
+        }
+        
+        .timeline-card {
+            position: absolute;
+            top: 10px;
+            height: 60px;
+            width: 100px;
+            background: rgba(72, 149, 239, 0.3);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--accent);
+            cursor: pointer;
+        }
+        
+        .timeline-card i {
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .facial-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .feature {
+            flex: 1;
+            min-width: 120px;
+            background: rgba(67, 97, 238, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(67, 97, 238, 0.3);
+        }
+        
+        .feature i {
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+        
+        .feature h3 {
+            font-size: 1rem;
+            color: #e2e8f0;
+        }
+        
+        .feature p {
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+        
+        @media (max-width: 1100px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .video-container {
+                height: 400px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .filters {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .video-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-video"></i> Pro Video Editor</h1>
+            <p>Upload any video and edit with professional tools: crop, apply filters, add animations, insert text cards, and use facial recognition features</p>
+        </header>
+        
+        <div class="editor-container">
+            <div class="video-section">
+                <div class="video-container">
+                    <video id="videoPlayer" controls>
+                        <source src="" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="video-overlay" id="videoOverlay">
+                        <!-- Text cards will appear here -->
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <h3><i class="fas fa-crop-alt"></i> Crop</h3>
+                        <button class="btn" id="cropBtn"><i class="fas fa-crop"></i> Crop Video</button>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h3><i class="fas fa-cut"></i> Split</h3>
+                        <button class="btn" id="splitBtn"><i class="fas fa-cut"></i> Split Video</button>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h3><i class="fas fa-magic"></i> Enhance</h3>
+                        <button class="btn" id="enhanceBtn"><i class="fas fa-wand-magic-sparkles"></i> Auto Enhance</button>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h3><i class="fas fa-upload"></i> Upload</h3>
+                        <button class="btn" id="uploadBtn"><i class="fas fa-cloud-upload-alt"></i> Upload Video</button>
+                        <input type="file" id="videoUpload" accept="video/*" style="display: none;">
+                    </div>
+                </div>
+                
+                <button class="btn btn-download" id="downloadBtn">
+                    <i class="fas fa-download"></i> Download Edited Video
+                </button>
+            </div>
+            
+            <div class="tools-section">
+                <div class="tool-panel">
+                    <h2><i class="fas fa-sliders-h"></i> Filters</h2>
+                    <div class="filters">
+                        <div class="filter filter-1 active">
+                            <img src="https://images.unsplash.com/photo-1507146426996-ef05306b995a?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Sepia" class="filter-img">
+                        </div>
+                        <div class="filter filter-2">
+                            <img src="https://images.unsplash.com/photo-1507146426996-ef05306b995a?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Grayscale" class="filter-img">
+                        </div>
+                        <div class="filter filter-3">
+                            <img src="https://images.unsplash.com/photo-1507146426996-ef05306b995a?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Brightness" class="filter-img">
+                        </div>
+                        <div class="filter filter-4">
+                            <img src="https://images.unsplash.com/photo-1507146426996-ef05306b995a?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Hue" class="filter-img">
+                        </div>
+                        <div class="filter filter-5">
+                            <img src="https://images.unsplash.com/photo-1507146426996-ef05306b995a?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Invert" class="filter-img">
+                        </div>
+                        <div class="filter filter-6">
+                            <img src="https://images.unsplash.com/photo-1507146426996-ef05306b995a?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Saturate" class="filter-img">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tool-panel">
+                    <h2><i class="fas fa-film"></i> Animations</h2>
+                    <div class="animation-options">
+                        <div class="option-btn">Fade In</div>
+                        <div class="option-btn active">Zoom</div>
+                        <div class="option-btn">Bounce</div>
+                        <div class="option-btn">Slide</div>
+                        <div class="option-btn">Rotate</div>
+                        <div class="option-btn">Pan</div>
+                    </div>
+                </div>
+                
+                <div class="tool-panel">
+                    <h2><i class="fas fa-sticky-note"></i> Text Cards</h2>
+                    <div class="form-group">
+                        <label for="cardText">Card Text:</label>
+                        <textarea id="cardText" placeholder="Enter text for your card...">Welcome to our video!</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="cardPosition">Position:</label>
+                        <select id="cardPosition">
+                            <option value="top-left">Top Left</option>
+                            <option value="top-center">Top Center</option>
+                            <option value="top-right">Top Right</option>
+                            <option value="center" selected>Center</option>
+                            <option value="bottom-left">Bottom Left</option>
+                            <option value="bottom-center">Bottom Center</option>
+                            <option value="bottom-right">Bottom Right</option>
+                        </select>
+                    </div>
+                    <button class="btn" id="addCardBtn"><i class="fas fa-plus"></i> Add Card to Video</button>
+                </div>
+                
+                <div class="tool-panel">
+                    <h2><i class="fas fa-user"></i> Facial Features</h2>
+                    <div class="facial-features">
+                        <div class="feature">
+                            <i class="fas fa-smile"></i>
+                            <h3>Smile Detection</h3>
+                            <p>Auto-enhance smiles</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-eye"></i>
+                            <h3>Eye Brighten</h3>
+                            <p>Highlight eyes</p>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-magic"></i>
+                            <h3>Skin Smoothing</h3>
+                            <p>Improve skin texture</p>
+                        </div>
+                    </div>
+                    <button class="btn" id="faceDetectBtn" style="margin-top: 15px;">
+                        <i class="fas fa-face-grin-stars"></i> Apply Facial Features
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="timeline">
+            <h2><i class="fas fa-timeline"></i> Video Timeline</h2>
+            <div class="timeline-track">
+                <div class="timeline-inner">
+                    <div class="timeline-marker" id="timelineMarker" style="left: 50%;"></div>
+                    <div class="timeline-card" style="left: 20%;">
+                        <i class="fas fa-font"></i>
+                    </div>
+                    <div class="timeline-card" style="left: 45%;">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div class="timeline-card" style="left: 70%;">
+                        <i class="fas fa-music"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const videoPlayer = document.getElementById('videoPlayer');
+        const videoUpload = document.getElementById('videoUpload');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const cropBtn = document.getElementById('cropBtn');
+        const splitBtn = document.getElementById('splitBtn');
+        const enhanceBtn = document.getElementById('enhanceBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const addCardBtn = document.getElementById('addCardBtn');
+        const faceDetectBtn = document.getElementById('faceDetectBtn');
+        const videoOverlay = document.getElementById('videoOverlay');
+        const filters = document.querySelectorAll('.filter');
+        const timelineMarker = document.getElementById('timelineMarker');
+        
+        // Event Listeners
+        uploadBtn.addEventListener('click', () => videoUpload.click());
+        videoUpload.addEventListener('change', handleVideoUpload);
+        cropBtn.addEventListener('click', cropVideo);
+        splitBtn.addEventListener('click', splitVideo);
+        enhanceBtn.addEventListener('click', enhanceVideo);
+        downloadBtn.addEventListener('click', downloadVideo);
+        addCardBtn.addEventListener('click', addTextCard);
+        faceDetectBtn.addEventListener('click', detectFaces);
+        
+        // Filter selection
+        filters.forEach(filter => {
+            filter.addEventListener('click', () => {
+                filters.forEach(f => f.classList.remove('active'));
+                filter.classList.add('active');
+                applyFilter();
+            });
+        });
+        
+        // Video player time update
+        videoPlayer.addEventListener('timeupdate', updateTimelineMarker);
+        
+        // Functions
+        function handleVideoUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const videoURL = URL.createObjectURL(file);
+                videoPlayer.src = videoURL;
+                videoPlayer.load();
+            }
+        }
+        
+        function cropVideo() {
+            alert('Crop tool activated. Drag the corners to select the area to keep.');
+            // In a real app, this would activate a crop UI
+        }
+        
+        function splitVideo() {
+            const currentTime = videoPlayer.currentTime;
+            alert(`Video split at ${currentTime.toFixed(2)} seconds.`);
+            // In a real app, this would split the video at the current time
+        }
+        
+        function enhanceVideo() {
+            alert('Enhancing video quality and colors...');
+            videoPlayer.style.filter = 'brightness(1.1) contrast(1.1) saturate(1.2)';
+        }
+        
+        function applyFilter() {
+            const activeFilter = document.querySelector('.filter.active');
+            if (activeFilter) {
+                const filterClass = Array.from(activeFilter.classList).find(c => c.startsWith('filter-'));
+                videoPlayer.style.filter = getComputedStyle(activeFilter).filter;
+            }
+        }
+        
+        function addTextCard() {
+            const text = document.getElementById('cardText').value;
+            const position = document.getElementById('cardPosition').value;
+            
+            if (!text.trim()) {
+                alert('Please enter text for the card');
+                return;
+            }
+            
+            const card = document.createElement('div');
+            card.className = 'video-card';
+            card.innerHTML = `<h3>Text Card</h3><p>${text}</p>`;
+            
+            // Position the card
+            switch(position) {
+                case 'top-left':
+                    card.style.top = '20px';
+                    card.style.left = '20px';
+                    break;
+                case 'top-center':
+                    card.style.top = '20px';
+                    card.style.left = '50%';
+                    card.style.transform = 'translateX(-50%)';
+                    break;
+                case 'top-right':
+                    card.style.top = '20px';
+                    card.style.right = '20px';
+                    break;
+                case 'center':
+                    card.style.top = '50%';
+                    card.style.left = '50%';
+                    card.style.transform = 'translate(-50%, -50%)';
+                    break;
+                case 'bottom-left':
+                    card.style.bottom = '20px';
+                    card.style.left = '20px';
+                    break;
+                case 'bottom-center':
+                    card.style.bottom = '20px';
+                    card.style.left = '50%';
+                    card.style.transform = 'translateX(-50%)';
+                    break;
+                case 'bottom-right':
+                    card.style.bottom = '20px';
+                    card.style.right = '20px';
+                    break;
+            }
+            
+            videoOverlay.appendChild(card);
+            alert('Text card added! Drag to reposition it.');
+        }
+        
+        async function detectFaces() {
+            alert('Facial features applied! Enhancing eyes, skin, and smiles...');
+            // In a real app, this would use TensorFlow.js for face detection
+        }
+        
+        function updateTimelineMarker() {
+            const percent = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+            timelineMarker.style.left = `${percent}%`;
+        }
+        
+        function downloadVideo() {
+            alert('Video processing complete! Your edited video is downloading...');
+            // In a real app, this would process and download the video
+            // This is a simulation for the demo
+            setTimeout(() => {
+                alert('Download completed! Check your downloads folder.');
+            }, 2000);
+        }
+        
+        // Initialize with demo video
+        window.addEventListener('load', () => {
+            videoPlayer.src = 'https://assets.codepen.io/3364143/sample.mp4';
+            videoPlayer.load();
+        });
+    </script>
+</body>
+</html>

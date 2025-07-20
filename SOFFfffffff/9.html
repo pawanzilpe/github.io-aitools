@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-User Photo Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        .app-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .editor-section {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .users-section {
+            width: 300px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .image-container {
+            width: 100%;
+            height: 400px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 25px;
+            position: relative;
+            border: 2px dashed rgba(255,255,255,0.2);
+        }
+        
+        #image-preview {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+        }
+        
+        .upload-area {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .upload-area p {
+            margin: 15px 0;
+            font-size: 1.1rem;
+        }
+        
+        .upload-btn {
+            background: linear-gradient(45deg, #ff8a00, #da1b60);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(218, 27, 96, 0.4);
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(218, 27, 96, 0.6);
+        }
+        
+        .tools-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .tool {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .tool:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        .tool i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .tool.active {
+            background: linear-gradient(45deg, #00c3ff, #ffff1c);
+            color: #1a1a1a;
+        }
+        
+        .slider-container {
+            margin-bottom: 20px;
+        }
+        
+        .slider-container label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff8a00;
+            cursor: pointer;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .save-btn {
+            background: linear-gradient(45deg, #00b09b, #96c93d);
+            color: white;
+        }
+        
+        .reset-btn {
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            color: white;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+        }
+        
+        .user-list {
+            list-style: none;
+        }
+        
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            transition: all 0.2s;
+        }
+        
+        .user-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(5px);
+        }
+        
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff0084, #33001b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+        
+        .user-info h3 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .user-info p {
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        .status {
+            margin-left: auto;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #0f0;
+        }
+        
+        .status.editing {
+            background: #ff8a00;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .users-section {
+                width: 100%;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Multi-User Photo Editor</h1>
+            <p>Edit photos collaboratively with your team in real-time. Upload an image, apply effects, and see changes instantly across all users.</p>
+        </header>
+        
+        <div class="app-container">
+            <div class="editor-section">
+                <h2 class="section-title">Photo Editor</h2>
+                
+                <div class="image-container">
+                    <img id="image-preview" alt="Preview">
+                    <div class="upload-area">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                        <p>Upload an image to start editing</p>
+                        <input type="file" id="file-input" accept="image/*" hidden>
+                        <button class="upload-btn" id="upload-btn"><i class="fas fa-upload"></i> Choose Image</button>
+                    </div>
+                </div>
+                
+                <div class="tools-container">
+                    <div class="tool active" data-tool="brightness">
+                        <i class="fas fa-sun"></i>
+                        <span>Brightness</span>
+                    </div>
+                    <div class="tool" data-tool="contrast">
+                        <i class="fas fa-circle-half-stroke"></i>
+                        <span>Contrast</span>
+                    </div>
+                    <div class="tool" data-tool="saturation">
+                        <i class="fas fa-droplet"></i>
+                        <span>Saturation</span>
+                    </div>
+                    <div class="tool" data-tool="hue">
+                        <i class="fas fa-palette"></i>
+                        <span>Hue</span>
+                    </div>
+                    <div class="tool" data-tool="blur">
+                        <i class="fas fa-wind"></i>
+                        <span>Blur</span>
+                    </div>
+                    <div class="tool" data-tool="rotate">
+                        <i class="fas fa-rotate-right"></i>
+                        <span>Rotate</span>
+                    </div>
+                </div>
+                
+                <div class="slider-container">
+                    <label for="tool-slider">Adjustment: <span id="slider-value">50</span>%</label>
+                    <input type="range" min="0" max="100" value="50" class="slider" id="tool-slider">
+                </div>
+                
+                <div class="actions">
+                    <button class="action-btn save-btn" id="save-btn"><i class="fas fa-save"></i> Save Image</button>
+                    <button class="action-btn reset-btn" id="reset-btn"><i class="fas fa-undo"></i> Reset Changes</button>
+                </div>
+            </div>
+            
+            <div class="users-section">
+                <h2 class="section-title">Active Editors</h2>
+                <ul class="user-list">
+                    <li class="user-item">
+                        <div class="avatar">A</div>
+                        <div class="user-info">
+                            <h3>You</h3>
+                            <p>Editing photo</p>
+                        </div>
+                        <div class="status editing"></div>
+                    </li>
+                    <li class="user-item">
+                        <div class="avatar">S</div>
+                        <div class="user-info">
+                            <h3>Sarah Johnson</h3>
+                            <p>Viewing changes</p>
+                        </div>
+                        <div class="status"></div>
+                    </li>
+                    <li class="user-item">
+                        <div class="avatar">M</div>
+                        <div class="user-info">
+                            <h3>Mike Chen</h3>
+                            <p>Editing photo</p>
+                        </div>
+                        <div class="status editing"></div>
+                    </li>
+                    <li class="user-item">
+                        <div class="avatar">E</div>
+                        <div class="user-info">
+                            <h3>Emma Davis</h3>
+                            <p>Online</p>
+                        </div>
+                        <div class="status"></div>
+                    </li>
+                    <li class="user-item">
+                        <div class="avatar">D</div>
+                        <div class="user-info">
+                            <h3>David Wilson</h3>
+                            <p>Offline</p>
+                        </div>
+                        <div class="status" style="background: #f00;"></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Photo Editor for Multiple Users &copy; 2023 | Created with HTML, CSS & JavaScript</p>
+        </footer>
+    </div>
+
+    <script>
+        // DOM Elements
+        const fileInput = document.getElementById('file-input');
+        const uploadBtn = document.getElementById('upload-btn');
+        const imagePreview = document.getElementById('image-preview');
+        const toolSlider = document.getElementById('tool-slider');
+        const sliderValue = document.getElementById('slider-value');
+        const tools = document.querySelectorAll('.tool');
+        const saveBtn = document.getElementById('save-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        
+        // State variables
+        let currentImage = null;
+        let currentFilter = 'brightness';
+        let filters = {
+            brightness: 100,
+            contrast: 100,
+            saturation: 100,
+            hue: 0,
+            blur: 0,
+            rotate: 0
+        };
+        
+        // Event Listeners
+        uploadBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleImageUpload);
+        toolSlider.addEventListener('input', updateFilterValue);
+        saveBtn.addEventListener('click', saveImage);
+        resetBtn.addEventListener('click', resetFilters);
+        
+        // Tool selection
+        tools.forEach(tool => {
+            tool.addEventListener('click', () => {
+                tools.forEach(t => t.classList.remove('active'));
+                tool.classList.add('active');
+                currentFilter = tool.dataset.tool;
+                toolSlider.value = filters[currentFilter];
+                sliderValue.textContent = toolSlider.value;
+            });
+        });
+        
+        // Functions
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                imagePreview.src = event.target.result;
+                imagePreview.style.display = 'block';
+                document.querySelector('.upload-area').style.display = 'none';
+                currentImage = imagePreview;
+                resetFilters();
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function updateFilterValue() {
+            const value = toolSlider.value;
+            sliderValue.textContent = value;
+            filters[currentFilter] = value;
+            applyFilters();
+        }
+        
+        function applyFilters() {
+            if (!currentImage) return;
+            
+            const filterString = `
+                brightness(${filters.brightness}%) 
+                contrast(${filters.contrast}%) 
+                saturate(${filters.saturation}%) 
+                hue-rotate(${filters.hue}deg) 
+                blur(${filters.blur}px)
+            `;
+            
+            currentImage.style.filter = filterString;
+            currentImage.style.transform = `rotate(${filters.rotate}deg)`;
+        }
+        
+        function resetFilters() {
+            filters = {
+                brightness: 100,
+                contrast: 100,
+                saturation: 100,
+                hue: 0,
+                blur: 0,
+                rotate: 0
+            };
+            
+            tools[0].classList.add('active');
+            currentFilter = 'brightness';
+            toolSlider.value = filters[currentFilter];
+            sliderValue.textContent = toolSlider.value;
+            
+            applyFilters();
+        }
+        
+        function saveImage() {
+            if (!currentImage) {
+                alert('Please upload an image first');
+                return;
+            }
+            
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = currentImage.naturalWidth;
+            canvas.height = currentImage.naturalHeight;
+            
+            // Apply current filters to canvas
+            ctx.filter = `
+                brightness(${filters.brightness}%) 
+                contrast(${filters.contrast}%) 
+                saturate(${filters.saturation}%) 
+                hue-rotate(${filters.hue}deg) 
+                blur(${filters.blur}px)
+            `;
+            
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate(filters.rotate * Math.PI / 180);
+            ctx.translate(-canvas.width / 2, -canvas.height / 2);
+            
+            ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+            
+            // Create download link
+            const link = document.createElement('a');
+            link.download = 'edited-photo.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        // Demo: Simulate user activity
+        setInterval(() => {
+            const userItems = document.querySelectorAll('.user-item:not(:first-child) .status');
+            userItems.forEach(item => {
+                if (Math.random() > 0.7) {
+                    item.style.background = item.style.background === 'rgb(255, 138, 0)' ? '#0f0' : '#ff8a00';
+                    item.previousElementSibling.querySelector('p').textContent = 
+                        item.style.background === 'rgb(255, 138, 0)' ? 'Editing photo' : 'Viewing changes';
+                }
+            });
+        }, 3000);
+    </script>
+</body>
+</html>

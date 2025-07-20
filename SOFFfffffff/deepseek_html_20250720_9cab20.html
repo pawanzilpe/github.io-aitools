@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Form with Code Preview</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1e5799, #207cca);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            display: flex;
+            max-width: 1200px;
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .form-container {
+            flex: 1;
+            padding: 40px;
+            background: linear-gradient(120deg, #3498db, #1a5276);
+            color: white;
+            position: relative;
+        }
+        
+        .code-container {
+            flex: 1;
+            padding: 20px;
+            background: #2c3e50;
+            color: #ecf0f1;
+            overflow: auto;
+            max-height: 700px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 15px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.5);
+            background: white;
+        }
+        
+        .form-group i {
+            position: absolute;
+            right: 15px;
+            top: 42px;
+            color: #3498db;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:hover {
+            background: #1a252f;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .code-header h2 {
+            font-size: 1.8rem;
+            color: #3498db;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .tab {
+            padding: 8px 15px;
+            background: #34495e;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            background: #3498db;
+        }
+        
+        pre {
+            background: #1a252f;
+            padding: 20px;
+            border-radius: 8px;
+            overflow: auto;
+            line-height: 1.5;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+        
+        .html-code, .css-code, .js-code {
+            display: none;
+        }
+        
+        .html-code.active, .css-code.active, .js-code.active {
+            display: block;
+        }
+        
+        .form-decoration {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            opacity: 0.1;
+            font-size: 6rem;
+            transform: rotate(15deg);
+        }
+        
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .form-container, .code-container {
+                padding: 30px;
+            }
+            
+            .code-container {
+                max-height: 500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <div class="form-decoration">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <div class="header">
+                <h1><i class="fas fa-user-circle"></i> Registration Form</h1>
+                <p>Please fill in the form below to create an account</p>
+            </div>
+            
+            <form id="registrationForm">
+                <div class="form-group">
+                    <label for="fullName"><i class="fas fa-user"></i> Full Name</label>
+                    <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email"><i class="fas fa-envelope"></i> Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone"><i class="fas fa-phone"></i> Phone Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password"><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="password" name="password" placeholder="Create a password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword"><i class="fas fa-lock"></i> Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="country"><i class="fas fa-globe"></i> Country</label>
+                    <select id="country" name="country" required>
+                        <option value="">Select your country</option>
+                        <option value="usa">United States</option>
+                        <option value="uk">United Kingdom</option>
+                        <option value="canada">Canada</option>
+                        <option value="australia">Australia</option>
+                        <option value="india">India</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="message"><i class="fas fa-comment"></i> Additional Information</label>
+                    <textarea id="message" name="message" placeholder="Any additional information..." rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn">Register Now <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="code-container">
+            <div class="code-header">
+                <h2><i class="fas fa-code"></i> Source Code</h2>
+                <div class="tabs">
+                    <div class="tab active" data-tab="html">HTML</div>
+                    <div class="tab" data-tab="css">CSS</div>
+                    <div class="tab" data-tab="js">JS</div>
+                </div>
+            </div>
+            
+            <div class="html-code active">
+                <pre><code>&lt;!-- HTML Form Structure --&gt;
+&lt;div class="form-container"&gt;
+  &lt;div class="header"&gt;
+    &lt;h1&gt;&lt;i class="fas fa-user-circle"&gt;&lt;/i&gt; Registration Form&lt;/h1&gt;
+    &lt;p&gt;Please fill in the form below to create an account&lt;/p&gt;
+  &lt;/div&gt;
+  
+  &lt;form id="registrationForm"&gt;
+    &lt;div class="form-group"&gt;
+      &lt;label for="fullName"&gt;&lt;i class="fas fa-user"&gt;&lt;/i&gt; Full Name&lt;/label&gt;
+      &lt;input type="text" id="fullName" placeholder="Enter your full name" required&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="form-group"&gt;
+      &lt;label for="email"&gt;&lt;i class="fas fa-envelope"&gt;&lt;/i&gt; Email Address&lt;/label&gt;
+      &lt;input type="email" id="email" placeholder="Enter your email" required&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="form-group"&gt;
+      &lt;label for="phone"&gt;&lt;i class="fas fa-phone"&gt;&lt;/i&gt; Phone Number&lt;/label&gt;
+      &lt;input type="tel" id="phone" placeholder="Enter your phone number" required&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="form-group"&gt;
+      &lt;label for="password"&gt;&lt;i class="fas fa-lock"&gt;&lt;/i&gt; Password&lt;/label&gt;
+      &lt;input type="password" id="password" placeholder="Create a password" required&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="form-group"&gt;
+      &lt;label for="confirmPassword"&gt;&lt;i class="fas fa-lock"&gt;&lt;/i&gt; Confirm Password&lt;/label&gt;
+      &lt;input type="password" id="confirmPassword" placeholder="Confirm your password" required&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="form-group"&gt;
+      &lt;label for="country"&gt;&lt;i class="fas fa-globe"&gt;&lt;/i&gt; Country&lt;/label&gt;
+      &lt;select id="country" required&gt;
+        &lt;option value=""&gt;Select your country&lt;/option&gt;
+        &lt;option value="usa"&gt;United States&lt;/option&gt;
+        &lt;option value="uk"&gt;United Kingdom&lt;/option&gt;
+        &lt;option value="canada"&gt;Canada&lt;/option&gt;
+        &lt;option value="australia"&gt;Australia&lt;/option&gt;
+        &lt;option value="india"&gt;India&lt;/option&gt;
+      &lt;/select&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="form-group"&gt;
+      &lt;label for="message"&gt;&lt;i class="fas fa-comment"&gt;&lt;/i&gt; Additional Information&lt;/label&gt;
+      &lt;textarea id="message" placeholder="Any additional information..." rows="3"&gt;&lt;/textarea&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="form-group"&gt;
+      &lt;button type="submit" class="btn"&gt;Register Now &lt;i class="fas fa-arrow-right"&gt;&lt;/i&gt;&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+            
+            <div class="css-code">
+                <pre><code>/* CSS Styling for Blue Form */
+.form-container {
+  padding: 40px;
+  background: linear-gradient(120deg, #3498db, #1a5276);
+  color: white;
+  position: relative;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.header p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.form-group {
+  margin-bottom: 25px;
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 14px 15px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.5);
+  background: white;
+}
+
+.form-group i {
+  position: absolute;
+  right: 15px;
+  top: 42px;
+  color: #3498db;
+}
+
+.btn {
+  width: 100%;
+  padding: 15px;
+  background: #2c3e50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn:hover {
+  background: #1a252f;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.form-decoration {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  opacity: 0.1;
+  font-size: 6rem;
+  transform: rotate(15deg);
+}</code></pre>
+            </div>
+            
+            <div class="js-code">
+                <pre><code>// JavaScript for Form Validation
+document.getElementById('registrationForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  // Get form values
+  const fullName = document.getElementById('fullName').value;
+  const email = document.getElementById('email').value;
+  const phone = document.getElementById('phone').value;
+  const password = document.getElementById('password').value;
+  const confirmPassword = document.getElementById('confirmPassword').value;
+  const country = document.getElementById('country').value;
+  
+  // Simple validation
+  if (password !== confirmPassword) {
+    alert('Passwords do not match!');
+    return;
+  }
+  
+  if (!validateEmail(email)) {
+    alert('Please enter a valid email address!');
+    return;
+  }
+  
+  if (country === '') {
+    alert('Please select your country!');
+    return;
+  }
+  
+  // If validation passes
+  alert(`Registration successful!\nWelcome ${fullName}`);
+  this.reset();
+});
+
+// Email validation function
+function validateEmail(email) {
+  const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(String(email).toLowerCase());
+}
+
+// Tab switching functionality
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    // Remove active class from all tabs
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    
+    // Add active class to clicked tab
+    tab.classList.add('active');
+    
+    // Hide all code sections
+    document.querySelectorAll('.html-code, .css-code, .js-code').forEach(code => {
+      code.classList.remove('active');
+    });
+    
+    // Show the selected code section
+    const tabType = tab.getAttribute('data-tab');
+    document.querySelector(`.${tabType}-code`).classList.add('active');
+  });
+});</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const country = document.getElementById('country').value;
+            
+            // Simple validation
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            if (!validateEmail(email)) {
+                alert('Please enter a valid email address!');
+                return;
+            }
+            
+            if (country === '') {
+                alert('Please select your country!');
+                return;
+            }
+            
+            // If validation passes
+            alert(`Registration successful!\nWelcome ${fullName}`);
+            this.reset();
+        });
+        
+        // Email validation function
+        function validateEmail(email) {
+            const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(String(email).toLowerCase());
+        }
+        
+        // Tab switching functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Hide all code sections
+                document.querySelectorAll('.html-code, .css-code, .js-code').forEach(code => {
+                    code.classList.remove('active');
+                });
+                
+                // Show the selected code section
+                const tabType = tab.getAttribute('data-tab');
+                document.querySelector(`.${tabType}-code`).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

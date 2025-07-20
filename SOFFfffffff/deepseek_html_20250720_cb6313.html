@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Engine - Google की तरह</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #f8f9fa;
+            color: #202124;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header Styles */
+        .header {
+            padding: 20px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: rgba(0,0,0,.87);
+            text-decoration: none;
+            font-size: 14px;
+            margin-left: 15px;
+            padding: 5px 10px;
+        }
+        
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Main Content */
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 100px;
+            flex: 1;
+        }
+        
+        .logo {
+            font-size: 90px;
+            font-weight: 400;
+            margin-bottom: 30px;
+            letter-spacing: -3px;
+        }
+        
+        .blue {
+            color: #4285F4;
+        }
+        
+        .red {
+            color: #EA4335;
+        }
+        
+        .yellow {
+            color: #FBBC05;
+        }
+        
+        .green {
+            color: #34A853;
+        }
+        
+        /* Search Box */
+        .search-container {
+            width: 100%;
+            max-width: 584px;
+            margin-bottom: 30px;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            border: 1px solid #dfe1e5;
+            border-radius: 24px;
+            padding: 10px 15px;
+            background: #fff;
+            box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+            transition: all 0.3s ease;
+        }
+        
+        .search-box:hover, .search-box:focus-within {
+            box-shadow: 0 1px 10px rgba(32, 33, 36, 0.28);
+        }
+        
+        .search-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            color: #9aa0a6;
+        }
+        
+        .search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            background: transparent;
+            height: 34px;
+        }
+        
+        .voice-icon, .camera-icon {
+            width: 24px;
+            height: 24px;
+            margin-left: 10px;
+            color: #4285F4;
+            cursor: pointer;
+        }
+        
+        /* Search Buttons */
+        .search-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .search-btn {
+            background-color: #f8f9fa;
+            border: 1px solid #f8f9fa;
+            border-radius: 4px;
+            color: #3c4043;
+            font-size: 14px;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .search-btn:hover {
+            box-shadow: 0 1px 1px rgba(0,0,0,.1);
+            border: 1px solid #dadce0;
+        }
+        
+        /* Results Section */
+        .results-container {
+            width: 100%;
+            max-width: 700px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .result-stats {
+            color: #70757a;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        
+        .result-item {
+            margin-bottom: 30px;
+        }
+        
+        .result-url {
+            color: #202124;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .result-title {
+            color: #1a0dab;
+            font-size: 20px;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .result-title:hover {
+            text-decoration: underline;
+        }
+        
+        .result-snippet {
+            color: #4d5156;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #f2f2f2;
+            padding: 15px 30px;
+            border-top: 1px solid #dadce0;
+            color: #70757a;
+            font-size: 14px;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: #70757a;
+            text-decoration: none;
+            margin-right: 20px;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 60px;
+            }
+            
+            .search-container {
+                max-width: 90%;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <a href="#" class="nav-link">Gmail</a>
+        <a href="#" class="nav-link">Images</a>
+        <a href="#" class="nav-link">Apps</a>
+        <a href="#" class="nav-link">Sign in</a>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="container">
+        <div class="logo">
+            <span class="blue">S</span>
+            <span class="red">e</span>
+            <span class="yellow">a</span>
+            <span class="blue">r</span>
+            <span class="green">c</span>
+            <span class="red">h</span>
+        </div>
+        
+        <div class="search-container">
+            <div class="search-box">
+                <svg class="search-icon" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+                </svg>
+                <input type="text" class="search-input" id="search-input" placeholder="Search the web..." autofocus>
+                <svg class="voice-icon" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#4285F4" d="m12 15c1.66 0 3-1.31 3-2.97v-7.02c0-1.66-1.34-3.01-3-3.01s-3 1.34-3 3.01v7.02c0 1.66 1.34 2.97 3 2.97z"></path>
+                    <path fill="#34A853" d="m11 18.08h2v3.92h-2z"></path>
+                    <path fill="#EA4335" d="m7.05 16.87c-1.27-1.33-2.05-2.83-2.05-4.87h2c0 1.45 0.56 2.42 1.47 3.38v0.32l-1.15 1.18z"></path>
+                    <path fill="#FBBC05" d="m16.95 16.87-1.14-1.18c0.91-0.94 1.47-1.89 1.47-3.38h2c0 2.04-0.78 3.54-2.05 4.87z"></path>
+                </svg>
+                <svg class="camera-icon" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <circle fill="#4285F4" cx="12" cy="12" r="3.2"></circle>
+                    <path fill="#EA4335" d="M9 2 7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"></path>
+                </svg>
+            </div>
+            
+            <div class="search-buttons">
+                <button class="search-btn" id="search-btn">Search</button>
+                <button class="search-btn">I'm Feeling Lucky</button>
+            </div>
+        </div>
+        
+        <!-- Search Results Container -->
+        <div class="results-container" id="results-container">
+            <div class="result-stats" id="result-stats">About 0 results (0.00 seconds)</div>
+            
+            <div id="results-list">
+                <!-- Results will be dynamically added here -->
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer Section -->
+    <footer class="footer">
+        <div class="footer-links">
+            <div>
+                <a href="#">About</a>
+                <a href="#">Advertising</a>
+                <a href="#">Business</a>
+                <a href="#">How Search works</a>
+            </div>
+            <div>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Settings</a>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            const searchBtn = document.getElementById('search-btn');
+            const resultsContainer = document.getElementById('results-container');
+            const resultsList = document.getElementById('results-list');
+            const resultStats = document.getElementById('result-stats');
+            
+            // Function to perform search
+            function performSearch(query) {
+                if (!query.trim()) return;
+                
+                // Show results container
+                resultsContainer.style.display = 'block';
+                
+                // Clear previous results
+                resultsList.innerHTML = '';
+                
+                // Simulate search delay
+                setTimeout(() => {
+                    // Generate mock search results
+                    const results = generateSearchResults(query);
+                    
+                    // Update result stats
+                    const resultCount = results.length;
+                    const time = (Math.random() * 0.5 + 0.1).toFixed(2);
+                    resultStats.textContent = `About ${resultCount} results (${time} seconds)`;
+                    
+                    // Add results to page
+                    results.forEach(result => {
+                        const resultItem = document.createElement('div');
+                        resultItem.className = 'result-item';
+                        resultItem.innerHTML = `
+                            <div class="result-url">${result.url}</div>
+                            <a href="${result.url}" class="result-title">${result.title}</a>
+                            <div class="result-snippet">${result.snippet}</div>
+                        `;
+                        resultsList.appendChild(resultItem);
+                    });
+                    
+                    // Scroll to results
+                    resultsContainer.scrollIntoView({ behavior: 'smooth' });
+                }, 800);
+            }
+            
+            // Generate mock search results
+            function generateSearchResults(query) {
+                const topics = [
+                    "technology", "science", "history", "education", 
+                    "health", "travel", "food", "sports", "entertainment"
+                ];
+                
+                const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+                
+                return [
+                    {
+                        url: `https://www.wikipedia.org/wiki/${encodeURIComponent(query)}`,
+                        title: `${query} - Wikipedia`,
+                        snippet: `Learn about ${query} on Wikipedia. Explore the history, significance, and modern applications of ${query} in this comprehensive article.`
+                    },
+                    {
+                        url: `https://www.${randomTopic}.com/${encodeURIComponent(query.replace(/\s+/g, '-'))}`,
+                        title: `Everything You Need to Know About ${query}`,
+                        snippet: `Discover the latest information about ${query}. Our comprehensive guide covers everything from basics to advanced concepts.`
+                    },
+                    {
+                        url: `https://learn.com/${encodeURIComponent(query)}-guide`,
+                        title: `The Ultimate Guide to ${query}`,
+                        snippet: `Master ${query} with our step-by-step guide. Perfect for beginners and experts alike. Includes practical examples and real-world applications.`
+                    },
+                    {
+                        url: `https://news.com/${encodeURIComponent(query)}-latest`,
+                        title: `Breaking News: ${query} Developments`,
+                        snippet: `Stay updated with the latest news about ${query}. Our team of experts brings you real-time updates and analysis.`
+                    },
+                    {
+                        url: `https://forum.com/discuss/${encodeURIComponent(query)}`,
+                        title: `Community Discussion: ${query}`,
+                        snippet: `Join thousands of enthusiasts discussing ${query}. Ask questions, share experiences, and connect with experts in the field.`
+                    },
+                    {
+                        url: `https://research.org/study/${encodeURIComponent(query)}`,
+                        title: `Scientific Research on ${query}`,
+                        snippet: `Explore peer-reviewed studies and scientific papers about ${query}. Discover the latest research findings and their implications.`
+                    },
+                    {
+                        url: `https://tutorials.com/${encodeURIComponent(query)}-tutorial`,
+                        title: `Step-by-Step Tutorial: Mastering ${query}`,
+                        snippet: `Learn how to work with ${query} through our detailed tutorial. Includes videos, code samples, and practical exercises.`
+                    }
+                ];
+            }
+            
+            // Event listeners
+            searchBtn.addEventListener('click', () => {
+                performSearch(searchInput.value);
+            });
+            
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    performSearch(searchInput.value);
+                }
+            });
+            
+            // Voice search simulation
+            document.querySelector('.voice-icon').addEventListener('click', () => {
+                searchInput.value = "How does voice search work?";
+                setTimeout(() => {
+                    performSearch(searchInput.value);
+                }, 1000);
+            });
+            
+            // Camera search simulation
+            document.querySelector('.camera-icon').addEventListener('click', () => {
+                searchInput.value = "Image search technology";
+                setTimeout(() => {
+                    performSearch(searchInput.value);
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html>

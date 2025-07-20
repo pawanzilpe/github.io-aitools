@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent - Bulk Email Sender</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+            animation: fadeIn 1s;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .app-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: slideUp 0.8s ease-out;
+        }
+        
+        .app-tabs {
+            display: flex;
+            background: #2c3e50;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            color: #ecf0f1;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .tab.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .tab:hover:not(.active) {
+            background: #34495e;
+        }
+        
+        .tab-content {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .recipients-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .recipient-tag {
+            background: #3498db;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .recipient-tag .remove {
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-block {
+            width: 100%;
+        }
+        
+        .btn-send {
+            background: #27ae60;
+            padding: 16px;
+            font-size: 1.2rem;
+        }
+        
+        .btn-send:hover {
+            background: #219653;
+        }
+        
+        .preview-box {
+            border: 2px dashed #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            background: #f8f9fa;
+        }
+        
+        .preview-header {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .preview-subject {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .preview-content {
+            line-height: 1.6;
+        }
+        
+        .preview-content p {
+            margin-bottom: 15px;
+        }
+        
+        .response-box {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background: #e8f4fc;
+            display: none;
+        }
+        
+        .response-box.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            display: block;
+        }
+        
+        .response-box.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            display: block;
+        }
+        
+        .instructions {
+            background: #fff9db;
+            border-left: 4px solid #ffd43b;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin: 25px 0;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @media (max-width: 768px) {
+            .app-tabs {
+                flex-direction: column;
+            }
+            
+            .tab-content {
+                padding: 20px;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-robot"></i> AI Agent - Bulk Email Sender</h1>
+            <p>Send emails to multiple recipients simultaneously with this AI-powered tool</p>
+        </header>
+        
+        <div class="app-card">
+            <div class="app-tabs">
+                <div class="tab active" data-tab="compose">Compose Email</div>
+                <div class="tab" data-tab="recipients">Manage Recipients</div>
+                <div class="tab" data-tab="preview">Preview</div>
+            </div>
+            
+            <div class="tab-content">
+                <!-- Compose Email Tab -->
+                <div class="tab-pane active" id="compose">
+                    <form id="emailForm">
+                        <div class="form-group">
+                            <label for="senderEmail"><i class="fas fa-envelope"></i> Your Email</label>
+                            <input type="email" id="senderEmail" placeholder="your.email@example.com" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="recipients"><i class="fas fa-users"></i> Recipients (comma separated)</label>
+                            <textarea id="recipients" placeholder="Enter email addresses separated by commas: email1@example.com, email2@example.com" required></textarea>
+                            <div class="recipients-container" id="recipientTags"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="emailSubject"><i class="fas fa-tag"></i> Subject</label>
+                            <input type="text" id="emailSubject" placeholder="Email subject" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="emailBody"><i class="fas fa-align-left"></i> Email Body</label>
+                            <textarea id="emailBody" placeholder="Compose your email here..." required>Hello,
+
+This is a bulk email sent using the AI Agent Bulk Email Sender.
+
+Best regards,
+[Your Name]</textarea>
+                        </div>
+                        
+                        <div class="instructions">
+                            <h3><i class="fas fa-lightbulb"></i> Pro Tips for Effective Bulk Emailing</h3>
+                            <ul>
+                                <li>Always personalize your emails with recipient names when possible</li>
+                                <li>Keep your subject line clear and under 50 characters</li>
+                                <li>Use a professional email address as the sender</li>
+                                <li>Test your email with 1-2 recipients before sending to your entire list</li>
+                                <li>Avoid using ALL CAPS or excessive exclamation marks!!!</li>
+                            </ul>
+                        </div>
+                        
+                        <button type="button" id="previewBtn" class="btn"><i class="fas fa-eye"></i> Preview Email</button>
+                        <button type="submit" id="sendBtn" class="btn btn-block btn-send pulse"><i class="fas fa-paper-plane"></i> Send to All Recipients</button>
+                    </form>
+                </div>
+                
+                <!-- Manage Recipients Tab -->
+                <div class="tab-pane" id="recipients" style="display: none;">
+                    <h2><i class="fas fa-address-book"></i> Recipient Management</h2>
+                    <p>Save email addresses for quick access in future campaigns</p>
+                    
+                    <div class="form-group">
+                        <label for="newRecipient"><i class="fas fa-plus-circle"></i> Add New Recipient</label>
+                        <input type="email" id="newRecipient" placeholder="new.recipient@example.com">
+                        <button type="button" id="addRecipientBtn" class="btn"><i class="fas fa-plus"></i> Add to Address Book</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-book"></i> Saved Recipients</label>
+                        <div id="savedRecipients" class="recipients-container">
+                            <!-- Saved recipients will appear here -->
+                        </div>
+                    </div>
+                    
+                    <div class="instructions">
+                        <h3><i class="fas fa-shield-alt"></i> Privacy Notice</h3>
+                        <p>All email addresses are stored locally in your browser and are never sent to any server. Your data remains private and secure on your own device.</p>
+                    </div>
+                </div>
+                
+                <!-- Preview Tab -->
+                <div class="tab-pane" id="previewPane" style="display: none;">
+                    <h2><i class="fas fa-search"></i> Email Preview</h2>
+                    <p>Review your email before sending</p>
+                    
+                    <div class="preview-box">
+                        <div class="preview-header">
+                            <div><strong>From:</strong> <span id="previewSender">your.email@example.com</span></div>
+                            <div><strong>To:</strong> <span id="previewRecipients">recipient1@example.com, recipient2@example.com</span></div>
+                            <div class="preview-subject" id="previewSubject">Email Subject</div>
+                        </div>
+                        <div class="preview-content" id="previewBody">
+                            Email content will appear here...
+                        </div>
+                    </div>
+                    
+                    <button type="button" id="backToComposeBtn" class="btn"><i class="fas fa-edit"></i> Back to Editing</button>
+                    <button type="button" id="sendFromPreviewBtn" class="btn btn-block btn-send"><i class="fas fa-paper-plane"></i> Send Email Now</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="responseBox" class="response-box"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching functionality
+            const tabs = document.querySelectorAll('.tab');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    // Hide all tab panes
+                    tabPanes.forEach(pane => pane.style.display = 'none');
+                    
+                    // Add active class to clicked tab
+                    tab.classList.add('active');
+                    
+                    // Show corresponding tab pane
+                    const tabName = tab.getAttribute('data-tab');
+                    if (tabName === 'compose') {
+                        document.getElementById('compose').style.display = 'block';
+                    } else if (tabName === 'recipients') {
+                        document.getElementById('recipients').style.display = 'block';
+                        loadSavedRecipients();
+                    } else if (tabName === 'preview') {
+                        document.getElementById('previewPane').style.display = 'block';
+                        updatePreview();
+                    }
+                });
+            });
+            
+            // Recipient tags functionality
+            const recipientsTextarea = document.getElementById('recipients');
+            const recipientTagsContainer = document.getElementById('recipientTags');
+            
+            recipientsTextarea.addEventListener('input', updateRecipientTags);
+            
+            function updateRecipientTags() {
+                recipientTagsContainer.innerHTML = '';
+                const emails = recipientsTextarea.value.split(',').map(email => email.trim()).filter(email => email);
+                
+                emails.forEach(email => {
+                    if (validateEmail(email)) {
+                        const tag = document.createElement('div');
+                        tag.className = 'recipient-tag';
+                        tag.innerHTML = `
+                            ${email}
+                            <span class="remove" data-email="${email}"><i class="fas fa-times"></i></span>
+                        `;
+                        recipientTagsContainer.appendChild(tag);
+                    }
+                });
+                
+                // Add remove functionality
+                document.querySelectorAll('.recipient-tag .remove').forEach(removeBtn => {
+                    removeBtn.addEventListener('click', function() {
+                        const emailToRemove = this.getAttribute('data-email');
+                        let emails = recipientsTextarea.value.split(',').map(email => email.trim()).filter(email => email && email !== emailToRemove);
+                        recipientsTextarea.value = emails.join(', ');
+                        updateRecipientTags();
+                    });
+                });
+            }
+            
+            // Email validation function
+            function validateEmail(email) {
+                const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return re.test(String(email).toLowerCase());
+            }
+            
+            // Form submission
+            const emailForm = document.getElementById('emailForm');
+            const sendBtn = document.getElementById('sendBtn');
+            const previewBtn = document.getElementById('previewBtn');
+            const responseBox = document.getElementById('responseBox');
+            
+            previewBtn.addEventListener('click', function() {
+                if (validateForm()) {
+                    document.querySelector('[data-tab="preview"]').click();
+                }
+            });
+            
+            emailForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                sendEmails();
+            });
+            
+            document.getElementById('sendFromPreviewBtn').addEventListener('click', sendEmails);
+            document.getElementById('backToComposeBtn').addEventListener('click', function() {
+                document.querySelector('[data-tab="compose"]').click();
+            });
+            
+            function validateForm() {
+                const senderEmail = document.getElementById('senderEmail').value;
+                const recipients = document.getElementById('recipients').value;
+                const subject = document.getElementById('emailSubject').value;
+                const body = document.getElementById('emailBody').value;
+                
+                if (!senderEmail || !validateEmail(senderEmail)) {
+                    showResponse('Please enter a valid sender email address', 'error');
+                    return false;
+                }
+                
+                const recipientEmails = recipients.split(',').map(email => email.trim()).filter(email => email);
+                if (recipientEmails.length === 0) {
+                    showResponse('Please enter at least one recipient email', 'error');
+                    return false;
+                }
+                
+                for (const email of recipientEmails) {
+                    if (!validateEmail(email)) {
+                        showResponse(`"${email}" is not a valid email address`, 'error');
+                        return false;
+                    }
+                }
+                
+                if (!subject) {
+                    showResponse('Please enter an email subject', 'error');
+                    return false;
+                }
+                
+                if (!body) {
+                    showResponse('Please enter an email body', 'error');
+                    return false;
+                }
+                
+                return true;
+            }
+            
+            function updatePreview() {
+                document.getElementById('previewSender').textContent = document.getElementById('senderEmail').value;
+                document.getElementById('previewRecipients').textContent = document.getElementById('recipients').value;
+                document.getElementById('previewSubject').textContent = document.getElementById('emailSubject').value;
+                
+                // Simple formatting for the preview
+                const body = document.getElementById('emailBody').value;
+                const formattedBody = body.replace(/\n/g, '<br>');
+                document.getElementById('previewBody').innerHTML = formattedBody;
+            }
+            
+            function sendEmails() {
+                if (!validateForm()) return;
+                
+                const senderEmail = document.getElementById('senderEmail').value;
+                const recipients = document.getElementById('recipients').value;
+                const subject = document.getElementById('emailSubject').value;
+                const body = document.getElementById('emailBody').value;
+                
+                const recipientList = recipients.split(',').map(email => email.trim()).filter(email => email);
+                
+                // Simulate sending process
+                showResponse(`Sending emails to ${recipientList.length} recipients...`, 'info');
+                
+                setTimeout(() => {
+                    showResponse(`Success! Emails have been sent to ${recipientList.length} recipients.`, 'success');
+                    
+                    // In a real application, you would send the data to a server here
+                    // For demo purposes, we'll just log the data
+                    console.log("Sender:", senderEmail);
+                    console.log("Recipients:", recipientList);
+                    console.log("Subject:", subject);
+                    console.log("Body:", body);
+                }, 2000);
+            }
+            
+            function showResponse(message, type) {
+                responseBox.textContent = message;
+                responseBox.className = 'response-box';
+                
+                if (type === 'success') {
+                    responseBox.classList.add('success');
+                } else if (type === 'error') {
+                    responseBox.classList.add('error');
+                }
+                
+                // Auto-hide success messages after 5 seconds
+                if (type === 'success') {
+                    setTimeout(() => {
+                        responseBox.style.display = 'none';
+                    }, 5000);
+                }
+            }
+            
+            // Saved recipients functionality
+            const addRecipientBtn = document.getElementById('addRecipientBtn');
+            const newRecipientInput = document.getElementById('newRecipient');
+            const savedRecipientsContainer = document.getElementById('savedRecipients');
+            
+            addRecipientBtn.addEventListener('click', function() {
+                const email = newRecipientInput.value.trim();
+                
+                if (!email) {
+                    showResponse('Please enter an email address', 'error');
+                    return;
+                }
+                
+                if (!validateEmail(email)) {
+                    showResponse('Please enter a valid email address', 'error');
+                    return;
+                }
+                
+                saveRecipient(email);
+                newRecipientInput.value = '';
+                loadSavedRecipients();
+                showResponse(`"${email}" added to saved recipients`, 'success');
+            });
+            
+            function saveRecipient(email) {
+                let savedRecipients = JSON.parse(localStorage.getItem('savedRecipients') || []);
+                
+                // Check if email already exists
+                if (!savedRecipients.includes(email)) {
+                    savedRecipients.push(email);
+                    localStorage.setItem('savedRecipients', JSON.stringify(savedRecipients));
+                }
+            }
+            
+            function loadSavedRecipients() {
+                savedRecipientsContainer.innerHTML = '';
+                const savedRecipients = JSON.parse(localStorage.getItem('savedRecipients')) || [];
+                
+                savedRecipients.forEach(email => {
+                    const tag = document.createElement('div');
+                    tag.className = 'recipient-tag';
+                    tag.innerHTML = `
+                        ${email}
+                        <span class="remove" data-saved-email="${email}"><i class="fas fa-times"></i></span>
+                        <span class="add-to-list" data-email="${email}" title="Add to recipient list"><i class="fas fa-plus"></i></span>
+                    `;
+                    savedRecipientsContainer.appendChild(tag);
+                });
+                
+                // Add remove functionality
+                document.querySelectorAll('.recipient-tag .remove').forEach(removeBtn => {
+                    removeBtn.addEventListener('click', function() {
+                        const emailToRemove = this.getAttribute('data-saved-email');
+                        removeSavedRecipient(emailToRemove);
+                        loadSavedRecipients();
+                        showResponse(`"${emailToRemove}" removed from saved recipients`, 'success');
+                    });
+                });
+                
+                // Add to recipient list functionality
+                document.querySelectorAll('.recipient-tag .add-to-list').forEach(addBtn => {
+                    addBtn.addEventListener('click', function() {
+                        const emailToAdd = this.getAttribute('data-email');
+                        addToRecipientList(emailToAdd);
+                    });
+                });
+            }
+            
+            function removeSavedRecipient(email) {
+                let savedRecipients = JSON.parse(localStorage.getItem('savedRecipients')) || [];
+                savedRecipients = savedRecipients.filter(e => e !== email);
+                localStorage.setItem('savedRecipients', JSON.stringify(savedRecipients));
+            }
+            
+            function addToRecipientList(email) {
+                let currentRecipients = recipientsTextarea.value.split(',').map(e => e.trim()).filter(e => e);
+                
+                // Check if email already exists
+                if (!currentRecipients.includes(email)) {
+                    if (currentRecipients.length > 0) {
+                        recipientsTextarea.value += ', ' + email;
+                    } else {
+                        recipientsTextarea.value = email;
+                    }
+                    updateRecipientTags();
+                    showResponse(`"${email}" added to recipient list`, 'success');
+                } else {
+                    showResponse(`"${email}" is already in the recipient list`, 'error');
+                }
+            }
+            
+            // Initialize the app
+            updateRecipientTags();
+        });
+    </script>
+</body>
+</html>

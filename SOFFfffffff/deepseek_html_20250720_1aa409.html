@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charge Per Search - ज्ञान का खजाना</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            font-size: 2.5rem;
+            color: #fff;
+            background: linear-gradient(45deg, #FF5722, #FFC107);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .logo h1 {
+            font-size: 2.2rem;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .search-box {
+            width: 100%;
+            max-width: 700px;
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 18px 25px;
+            padding-left: 60px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        .search-input:focus {
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            transform: translateY(-3px);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #1a73e8;
+            font-size: 1.5rem;
+        }
+        
+        .search-btn {
+            padding: 15px 35px;
+            background: linear-gradient(45deg, #FF5722, #FFC107);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 87, 34, 0.4);
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 87, 34, 0.6);
+        }
+        
+        .search-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            width: 250px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-card i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #1a73e8, #0d47a1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #1a2980;
+        }
+        
+        .feature-card p {
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .results-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            margin-bottom: 40px;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .results-header h2 {
+            color: #1a2980;
+            font-size: 1.8rem;
+        }
+        
+        .results-count {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .results-list {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .result-card {
+            padding: 20px;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+        
+        .result-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .result-title {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            color: #1a0dab;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .result-title:hover {
+            text-decoration: underline;
+        }
+        
+        .result-url {
+            color: #006621;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .result-snippet {
+            color: #444;
+            line-height: 1.6;
+            font-size: 1.05rem;
+        }
+        
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .loader i {
+            font-size: 3rem;
+            color: #1a73e8;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        
+        .empty-state i {
+            font-size: 5rem;
+            color: #1a73e8;
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.8rem;
+            color: #444;
+            margin-bottom: 15px;
+        }
+        
+        .empty-state p {
+            color: #666;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            margin-top: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .logo h1 {
+                font-size: 1.8rem;
+            }
+            
+            .features {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .search-input {
+                padding: 15px 20px;
+                padding-left: 50px;
+                font-size: 1rem;
+            }
+            
+            .search-icon {
+                left: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-bolt"></i>
+                <h1>Charge Per Search</h1>
+            </div>
+        </header>
+        
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" id="searchInput" placeholder="दुनिया का ज्ञान यहाँ खोजें...">
+            </div>
+            <button class="search-btn" id="searchBtn"><i class="fas fa-bolt"></i> खोजें</button>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <i class="fas fa-globe"></i>
+                <h3>विश्वव्यापी खोज</h3>
+                <p>पूरे इंटरनेट से सटीक और प्रासंगिक परिणाम प्राप्त करें</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-bolt"></i>
+                <h3>त्वरित परिणाम</h3>
+                <p>किसी भी प्रश्न का उत्तर कुछ ही सेकंड में पाएँ</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-rupee-sign"></i>
+                <h3>निशुल्क सेवा</h3>
+                <p>बिना किसी शुल्क के असीमित खोजें करें</p>
+            </div>
+        </div>
+        
+        <div class="results-container">
+            <div class="results-header">
+                <h2>खोज परिणाम</h2>
+                <div class="results-count" id="resultsCount">0 परिणाम मिले</div>
+            </div>
+            
+            <div class="loader" id="loader">
+                <i class="fas fa-spinner"></i>
+            </div>
+            
+            <div class="empty-state" id="emptyState">
+                <i class="fas fa-search"></i>
+                <h3>खोज शुरू करें</h3>
+                <p>ऊपर दिए गए खोज बॉक्स में कोई भी प्रश्न टाइप करें और खोज बटन दबाएँ। आपको विश्वसनीय स्रोतों से त्वरित और सटीक परिणाम मिलेंगे।</p>
+            </div>
+            
+            <div class="results-list" id="resultsList">
+                <!-- Results will be populated here -->
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2023 Charge Per Search - सभी अधिकार सुरक्षित | ज्ञान सभी के लिए</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const searchBtn = document.getElementById('searchBtn');
+            const resultsList = document.getElementById('resultsList');
+            const loader = document.getElementById('loader');
+            const emptyState = document.getElementById('emptyState');
+            const resultsCount = document.getElementById('resultsCount');
+            
+            // Function to perform search
+            async function performSearch(query) {
+                if (!query.trim()) return;
+                
+                // Show loader, hide empty state
+                loader.style.display = 'block';
+                emptyState.style.display = 'none';
+                resultsList.innerHTML = '';
+                
+                try {
+                    // Use DuckDuckGo API as a proxy
+                    const response = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json`);
+                    const data = await response.json();
+                    
+                    // Process results
+                    displayResults(data);
+                } catch (error) {
+                    console.error('Error fetching results:', error);
+                    displayError();
+                }
+            }
+            
+            // Function to display results
+            function displayResults(data) {
+                loader.style.display = 'none';
+                
+                if (!data || !data.RelatedTopics || data.RelatedTopics.length === 0) {
+                    resultsList.innerHTML = `
+                        <div class="result-card">
+                            <h3 class="result-title">कोई परिणाम नहीं मिला</h3>
+                            <p class="result-snippet">कृपया कोई अन्य प्रश्न खोजें या अपनी क्वेरी बदलें।</p>
+                        </div>
+                    `;
+                    resultsCount.textContent = "0 परिणाम मिले";
+                    return;
+                }
+                
+                // Filter out topics without FirstURL
+                const validResults = data.RelatedTopics.filter(topic => topic.FirstURL);
+                
+                resultsCount.textContent = `${validResults.length} परिणाम मिले`;
+                
+                // Display results
+                resultsList.innerHTML = validResults.slice(0, 10).map((result, index) => {
+                    // Extract domain from URL
+                    const domain = result.FirstURL ? new URL(result.FirstURL).hostname.replace('www.', '') : '';
+                    
+                    return `
+                        <div class="result-card">
+                            <a href="${result.FirstURL}" target="_blank" class="result-title">${result.Text || 'Untitled'}</a>
+                            <a href="${result.FirstURL}" target="_blank" class="result-url">${domain}</a>
+                            <p class="result-snippet">${result.Result || 'No description available.'}</p>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            // Function to display error
+            function displayError() {
+                loader.style.display = 'none';
+                resultsList.innerHTML = `
+                    <div class="result-card">
+                        <h3 class="result-title">त्रुटि</h3>
+                        <p class="result-snippet">खोज परिणाम प्राप्त करने में समस्या हुई। कृपया बाद में पुनः प्रयास करें।</p>
+                    </div>
+                `;
+                resultsCount.textContent = "त्रुटि";
+            }
+            
+            // Event listeners
+            searchBtn.addEventListener('click', () => {
+                performSearch(searchInput.value);
+            });
+            
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    performSearch(searchInput.value);
+                }
+            });
+            
+            // Sample questions display for empty state
+            const sampleQuestions = [
+                "भारत की राजधानी क्या है?",
+                "चंद्रयान 3 के बारे में जानकारी",
+                "विश्व का सबसे ऊँचा पर्वत कौन सा है?",
+                "आज का मौसम कैसा रहेगा?",
+                "कोरोना वायरस के लक्षण क्या हैं?"
+            ];
+            
+            // Display sample questions in empty state
+            const sampleList = document.createElement('div');
+            sampleList.style.marginTop = '20px';
+            sampleList.innerHTML = '<h4 style="margin-bottom: 15px; color: #444;">आप ये प्रश्न पूछ सकते हैं:</h4>' + 
+                sampleQuestions.map(q => `<p style="margin-bottom: 10px; cursor: pointer; color: #1a73e8;" onclick="document.getElementById('searchInput').value = '${q}'; document.getElementById('searchBtn').click();">${q}</p>`).join('');
+            
+            document.querySelector('.empty-state').appendChild(sampleList);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Vacancy Page Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #f0f9ff;
+            --text: #1e293b;
+            --light: #f8fafc;
+            --border: #cbd5e1;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: #64748b;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 900px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-header {
+            padding: 18px 25px;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-container {
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #334155;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: auto;
+            padding-top: 15px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: var(--text);
+            flex: 1;
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+        
+        .preview-container {
+            padding: 25px;
+            background: #f1f5f9;
+            flex: 1;
+            overflow: auto;
+            min-height: 400px;
+        }
+        
+        .vacancy-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .vacancy-header {
+            background: var(--primary);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .vacancy-title {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+        
+        .vacancy-company {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .vacancy-meta {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            font-size: 0.95rem;
+        }
+        
+        .vacancy-meta div {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .vacancy-body {
+            padding: 25px;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .job-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        @media (max-width: 480px) {
+            .job-details {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .detail-card {
+            background: var(--secondary);
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .detail-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #334155;
+        }
+        
+        .detail-value {
+            font-size: 1.1rem;
+        }
+        
+        .requirements {
+            margin-bottom: 25px;
+        }
+        
+        .requirements ul {
+            padding-left: 25px;
+        }
+        
+        .requirements li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .vacancy-footer {
+            padding: 20px 25px;
+            background: #f8fafc;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        
+        .apply-btn {
+            background: var(--primary);
+            color: white;
+            padding: 12px 35px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .apply-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .code-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        @media (max-width: 1100px) {
+            .code-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .code-panel {
+            background: #1e293b;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .code-header {
+            padding: 15px 20px;
+            background: #0f172a;
+            color: #cbd5e1;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .code-content {
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            color: #e2e8f0;
+            overflow: auto;
+            max-height: 400px;
+            font-size: 0.95rem;
+        }
+        
+        .code-content pre {
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+        
+        .code-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .btn-download {
+            background: var(--success);
+            color: white;
+            padding: 12px 25px;
+        }
+        
+        .btn-download:hover {
+            background: #059669;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+        
+        .feature-desc {
+            color: #64748b;
+            line-height: 1.6;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #64748b;
+            border-top: 1px solid var(--border);
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-code"></i> Job Vacancy Page Generator</h1>
+            <p class="subtitle">Create professional job vacancy pages with real-time preview and export the complete HTML, CSS, and JavaScript code with one click.</p>
+        </header>
+        
+        <div class="app-container">
+            <div class="panel">
+                <div class="panel-header">
+                    <i class="fas fa-edit"></i> Job Details
+                </div>
+                <div class="form-container">
+                    <div class="form-group">
+                        <label for="jobTitle">Job Title</label>
+                        <input type="text" id="jobTitle" placeholder="e.g., Senior Frontend Developer" value="Senior Frontend Developer">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="companyName">Company Name</label>
+                        <input type="text" id="companyName" placeholder="e.g., Tech Innovations Inc." value="Tech Innovations Inc.">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="jobLocation">Location</label>
+                        <input type="text" id="jobLocation" placeholder="e.g., San Francisco, CA or Remote" value="Remote / Hybrid">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="salaryRange">Salary Range</label>
+                        <input type="text" id="salaryRange" placeholder="e.g., $90,000 - $120,000 per year" value="$90,000 - $120,000 per year">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="jobType">Job Type</label>
+                        <select id="jobType">
+                            <option>Full-time</option>
+                            <option selected>Part-time</option>
+                            <option>Contract</option>
+                            <option>Freelance</option>
+                            <option>Internship</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="experienceLevel">Experience Level</label>
+                        <select id="experienceLevel">
+                            <option>Entry Level</option>
+                            <option selected>Mid Level</option>
+                            <option>Senior Level</option>
+                            <option>Executive</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="jobDescription">Job Description</label>
+                        <textarea id="jobDescription">We are looking for a skilled Frontend Developer with expertise in modern JavaScript frameworks. You will be responsible for building user interfaces and implementing web design principles to create seamless user experiences.
+
+Responsibilities:
+- Develop responsive web applications
+- Collaborate with design and backend teams
+- Optimize applications for maximum speed and scalability
+- Implement testing and debugging processes</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="jobRequirements">Requirements</label>
+                        <textarea id="jobRequirements">- 3+ years of experience with JavaScript, HTML, and CSS
+- Proficient with React.js or similar framework
+- Experience with state management (Redux, Context API)
+- Familiarity with RESTful APIs and modern authorization mechanisms
+- Strong understanding of responsive design principles
+- Experience with version control (Git)</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="benefits">Benefits</label>
+                        <textarea id="benefits">- Competitive salary and performance bonuses
+- Comprehensive health insurance
+- Flexible working hours and remote work options
+- Professional development budget
+- Generous vacation policy
+- Team building events and activities</textarea>
+                    </div>
+                    
+                    <div class="btn-container">
+                        <button class="btn btn-primary" id="generateBtn">
+                            <i class="fas fa-magic"></i> Generate Vacancy Page
+                        </button>
+                        <button class="btn btn-secondary" id="resetBtn">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header">
+                    <i class="fas fa-eye"></i> Live Preview
+                </div>
+                <div class="preview-container" id="previewContainer">
+                    <!-- Preview will be generated here -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-laptop-code"></i>
+                </div>
+                <h3 class="feature-title">Real-time Preview</h3>
+                <p class="feature-desc">See your job vacancy page come to life instantly as you make changes. No need to refresh or compile.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-file-code"></i>
+                </div>
+                <h3 class="feature-title">Export Complete Code</h3>
+                <p class="feature-desc">Get clean, well-structured HTML, CSS, and JavaScript code ready to use on your website.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3 class="feature-title">Fully Responsive</h3>
+                <p class="feature-desc">Your vacancy pages will look great on all devices - desktops, tablets, and smartphones.</p>
+            </div>
+        </div>
+        
+        <h1 style="margin-bottom: 20px;"><i class="fas fa-file-export"></i> Export Code</h1>
+        <p class="subtitle" style="margin-bottom: 30px;">Copy or download the complete code for your job vacancy page</p>
+        
+        <div class="code-container">
+            <div class="code-panel">
+                <div class="code-header">
+                    <i class="fab fa-html5"></i> HTML Code
+                </div>
+                <div class="code-content">
+                    <pre id="htmlCode"><!-- HTML code will appear here --></pre>
+                </div>
+            </div>
+            
+            <div class="code-panel">
+                <div class="code-header">
+                    <i class="fab fa-css3-alt"></i> CSS Code
+                </div>
+                <div class="code-content">
+                    <pre id="cssCode"><!-- CSS code will appear here --></pre>
+                </div>
+            </div>
+            
+            <div class="code-panel">
+                <div class="code-header">
+                    <i class="fab fa-js"></i> JavaScript Code
+                </div>
+                <div class="code-content">
+                    <pre id="jsCode"><!-- JavaScript code will appear here --></pre>
+                </div>
+            </div>
+        </div>
+        
+        <div class="code-actions">
+            <button class="btn btn-primary btn-download" id="downloadHtml">
+                <i class="fas fa-download"></i> Download HTML
+            </button>
+            <button class="btn btn-primary btn-download" id="downloadCss">
+                <i class="fas fa-download"></i> Download CSS
+            </button>
+            <button class="btn btn-primary btn-download" id="downloadJs">
+                <i class="fas fa-download"></i> Download JS
+            </button>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText">Code downloaded successfully!</span>
+    </div>
+    
+    <footer>
+        <p>© 2023 Job Vacancy Page Generator | All-in-one solution for creating professional job postings</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const generateBtn = document.getElementById('generateBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const previewContainer = document.getElementById('previewContainer');
+            const htmlCode = document.getElementById('htmlCode');
+            const cssCode = document.getElementById('cssCode');
+            const jsCode = document.getElementById('jsCode');
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            // Form elements
+            const jobTitle = document.getElementById('jobTitle');
+            const companyName = document.getElementById('companyName');
+            const jobLocation = document.getElementById('jobLocation');
+            const salaryRange = document.getElementById('salaryRange');
+            const jobType = document.getElementById('jobType');
+            const experienceLevel = document.getElementById('experienceLevel');
+            const jobDescription = document.getElementById('jobDescription');
+            const jobRequirements = document.getElementById('jobRequirements');
+            const benefits = document.getElementById('benefits');
+            
+            // Download buttons
+            const downloadHtml = document.getElementById('downloadHtml');
+            const downloadCss = document.getElementById('downloadCss');
+            const downloadJs = document.getElementById('downloadJs');
+            
+            // Generate vacancy page
+            function generateVacancyPage() {
+                // Format requirements as list items
+                const requirementsList = jobRequirements.value
+                    .split('\n')
+                    .filter(req => req.trim() !== '')
+                    .map(req => `<li>${req}</li>`)
+                    .join('');
+                
+                // Format benefits as list items
+                const benefitsList = benefits.value
+                    .split('\n')
+                    .filter(benefit => benefit.trim() !== '')
+                    .map(benefit => `<li>${benefit}</li>`)
+                    .join('');
+                
+                // Generate HTML for preview
+                const vacancyHTML = `
+                    <div class="vacancy-card">
+                        <div class="vacancy-header">
+                            <h2 class="vacancy-title">${jobTitle.value}</h2>
+                            <div class="vacancy-company">${companyName.value}</div>
+                            <div class="vacancy-location">${jobLocation.value}</div>
+                            
+                            <div class="vacancy-meta">
+                                <div><i class="fas fa-dollar-sign"></i> ${salaryRange.value}</div>
+                                <div><i class="fas fa-briefcase"></i> ${jobType.value}</div>
+                                <div><i class="fas fa-chart-line"></i> ${experienceLevel.value}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="vacancy-body">
+                            <div class="job-details">
+                                <div class="detail-card">
+                                    <div class="detail-title">Job Type</div>
+                                    <div class="detail-value">${jobType.value}</div>
+                                </div>
+                                
+                                <div class="detail-card">
+                                    <div class="detail-title">Experience Level</div>
+                                    <div class="detail-value">${experienceLevel.value}</div>
+                                </div>
+                                
+                                <div class="detail-card">
+                                    <div class="detail-title">Salary Range</div>
+                                    <div class="detail-value">${salaryRange.value}</div>
+                                </div>
+                                
+                                <div class="detail-card">
+                                    <div class="detail-title">Location</div>
+                                    <div class="detail-value">${jobLocation.value}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="description">
+                                <h3 class="section-title">Job Description</h3>
+                                <p>${jobDescription.value.replace(/\n/g, '<br>')}</p>
+                            </div>
+                            
+                            <div class="requirements">
+                                <h3 class="section-title">Requirements</h3>
+                                <ul>${requirementsList}</ul>
+                            </div>
+                            
+                            <div class="benefits">
+                                <h3 class="section-title">Benefits</h3>
+                                <ul>${benefitsList}</ul>
+                            </div>
+                        </div>
+                        
+                        <div class="vacancy-footer">
+                            <button class="apply-btn">Apply Now</button>
+                        </div>
+                    </div>
+                `;
+                
+                // Update preview
+                previewContainer.innerHTML = vacancyHTML;
+                
+                // Generate code for export
+                generateCode();
+            }
+            
+            // Generate HTML, CSS, and JS code
+            function generateCode() {
+                // HTML Code
+                const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${jobTitle.value} - ${companyName.value}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* CSS will be included here */
+    </style>
+</head>
+<body>
+    <div class="vacancy-card">
+        <div class="vacancy-header">
+            <h2 class="vacancy-title">${jobTitle.value}</h2>
+            <div class="vacancy-company">${companyName.value}</div>
+            <div class="vacancy-location">${jobLocation.value}</div>
+            
+            <div class="vacancy-meta">
+                <div><i class="fas fa-dollar-sign"></i> ${salaryRange.value}</div>
+                <div><i class="fas fa-briefcase"></i> ${jobType.value}</div>
+                <div><i class="fas fa-chart-line"></i> ${experienceLevel.value}</div>
+            </div>
+        </div>
+        
+        <div class="vacancy-body">
+            <div class="job-details">
+                <div class="detail-card">
+                    <div class="detail-title">Job Type</div>
+                    <div class="detail-value">${jobType.value}</div>
+                </div>
+                
+                <div class="detail-card">
+                    <div class="detail-title">Experience Level</div>
+                    <div class="detail-value">${experienceLevel.value}</div>
+                </div>
+                
+                <div class="detail-card">
+                    <div class="detail-title">Salary Range</div>
+                    <div class="detail-value">${salaryRange.value}</div>
+                </div>
+                
+                <div class="detail-card">
+                    <div class="detail-title">Location</div>
+                    <div class="detail-value">${jobLocation.value}</div>
+                </div>
+            </div>
+            
+            <div class="description">
+                <h3 class="section-title">Job Description</h3>
+                <p>${jobDescription.value.replace(/\n/g, '<br>')}</p>
+            </div>
+            
+            <div class="requirements">
+                <h3 class="section-title">Requirements</h3>
+                <ul>${jobRequirements.value.split('\n').filter(req => req.trim() !== '').map(req => `<li>${req}</li>`).join('')}</ul>
+            </div>
+            
+            <div class="benefits">
+                <h3 class="section-title">Benefits</h3>
+                <ul>${benefits.value.split('\n').filter(benefit => benefit.trim() !== '').map(benefit => `<li>${benefit}</li>`).join('')}</ul>
+            </div>
+        </div>
+        
+        <div class="vacancy-footer">
+            <button class="apply-btn">Apply Now</button>
+        </div>
+    </div>
+    
+    <script>
+        // Apply button functionality
+        document.querySelector('.apply-btn').addEventListener('click', function() {
+            alert('Application process would start here. This is a demo.');
+        });
+    <\/script>
+</body>
+</html>
+                `;
+                
+                // CSS Code
+                const css = `
+/* Job Vacancy Page Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    color: #1e293b;
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.vacancy-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.vacancy-header {
+    background: #2563eb;
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+.vacancy-title {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.vacancy-company {
+    font-size: 1.4rem;
+    opacity: 0.9;
+    margin-bottom: 5px;
+}
+
+.vacancy-location {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+}
+
+.vacancy-meta {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    margin-top: 20px;
+    font-size: 1rem;
+}
+
+.vacancy-meta div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.vacancy-body {
+    padding: 30px;
+}
+
+.job-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.detail-card {
+    background: #f0f9ff;
+    padding: 18px;
+    border-radius: 8px;
+}
+
+.detail-title {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #334155;
+    font-size: 0.95rem;
+}
+
+.detail-value {
+    font-size: 1.15rem;
+}
+
+.section-title {
+    font-size: 1.4rem;
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #2563eb;
+    color: #2563eb;
+}
+
+.description p {
+    line-height: 1.7;
+    margin-bottom: 25px;
+}
+
+.requirements ul, .benefits ul {
+    padding-left: 25px;
+}
+
+.requirements li, .benefits li {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.vacancy-footer {
+    padding: 25px 30px;
+    background: #f8fafc;
+    border-top: 1px solid #cbd5e1;
+    text-align: center;
+}
+
+.apply-btn {
+    background: #2563eb;
+    color: white;
+    padding: 14px 45px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.apply-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .job-details {
+        grid-template-columns: 1fr;
+    }
+    
+    .vacancy-header {
+        padding: 25px 20px;
+    }
+    
+    .vacancy-body {
+        padding: 25px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .vacancy-meta {
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+    }
+    
+    .vacancy-title {
+        font-size: 1.7rem;
+    }
+    
+    .vacancy-company {
+        font-size: 1.2rem;
+    }
+}
+                `;
+                
+                // JavaScript Code
+                const js = `
+// Apply button functionality
+document.querySelector('.apply-btn').addEventListener('click', function() {
+    alert('Thank you for your interest! The application process would start here. This is a demo.');
+});
+
+// Additional functionality can be added as needed
+                `;
+                
+                // Update code displays
+                htmlCode.textContent = html;
+                cssCode.textContent = css;
+                jsCode.textContent = js;
+                
+                // Apply syntax highlighting
+                applySyntaxHighlighting();
+            }
+            
+            // Apply basic syntax highlighting
+            function applySyntaxHighlighting() {
+                // Simple highlighting for demonstration
+                const htmlText = htmlCode.textContent;
+                const cssText = cssCode.textContent;
+                const jsText = jsCode.textContent;
+                
+                // HTML highlighting
+                htmlCode.innerHTML = htmlText
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/(".*?")/g, '<span style="color:#f78c6c;">$1</span>')
+                    .replace(/(&lt;\/?[a-z][a-z0-9]*\b[^&]*&gt;)/gi, '<span style="color:#c792ea;">$1</span>')
+                    .replace(/(&lt;!--.*?--&gt;)/g, '<span style="color:#546e7a;">$1</span>');
+                
+                // CSS highlighting
+                cssCode.innerHTML = cssText
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/([{}:;])/g, '<span style="color:#c792ea;">$1</span>')
+                    .replace(/(\/\*[\s\S]*?\*\/)/g, '<span style="color:#546e7a;">$1</span>')
+                    .replace(/(@media|@keyframes|@import|@font-face)/g, '<span style="color:#ffcb6b;">$1</span>')
+                    .replace(/([a-zA-Z-]+)(?=\s*:)/g, '<span style="color:#89ddff;">$1</span>');
+                
+                // JS highlighting
+                jsCode.innerHTML = jsText
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/(\/\/.*)/g, '<span style="color:#546e7a;">$1</span>')
+                    .replace(/(\b(function|var|let|const|return|if|else|for|while|switch|case|break|continue|document|addEventListener|alert)\b)/g, '<span style="color:#c792ea;">$1</span>')
+                    .replace(/(".*?")/g, '<span style="color:#f78c6c;">$1</span>');
+            }
+            
+            // Show notification
+            function showNotification(message) {
+                notificationText.textContent = message;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Download code
+            function downloadCode(content, fileName) {
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+            
+            // Event listeners
+            generateBtn.addEventListener('click', generateVacancyPage);
+            
+            resetBtn.addEventListener('click', function() {
+                jobTitle.value = '';
+                companyName.value = '';
+                jobLocation.value = '';
+                salaryRange.value = '';
+                jobType.selectedIndex = 0;
+                experienceLevel.selectedIndex = 0;
+                jobDescription.value = '';
+                jobRequirements.value = '';
+                benefits.value = '';
+                
+                previewContainer.innerHTML = '<p class="subtitle" style="text-align: center; padding: 50px 0;">Enter job details and click "Generate Vacancy Page" to see a preview here</p>';
+                
+                htmlCode.textContent = '<!-- HTML code will appear here -->';
+                cssCode.textContent = '/* CSS code will appear here */';
+                jsCode.textContent = '// JavaScript code will appear here';
+            });
+            
+            downloadHtml.addEventListener('click', function() {
+                downloadCode(htmlCode.textContent, 'job-vacancy.html');
+                showNotification('HTML file downloaded successfully!');
+            });
+            
+            downloadCss.addEventListener('click', function() {
+                downloadCode(cssCode.textContent, 'styles.css');
+                showNotification('CSS file downloaded successfully!');
+            });
+            
+            downloadJs.addEventListener('click', function() {
+                downloadCode(jsCode.textContent, 'script.js');
+                showNotification('JavaScript file downloaded successfully!');
+            });
+            
+            // Generate initial preview
+            generateVacancyPage();
+        });
+    </script>
+</body>
+</html>

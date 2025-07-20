@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Stylish Form</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1e5799, #207cca, #2989d8, #1e5799);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+        }
+        
+        .code-container {
+            flex: 1;
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 25px;
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+        
+        .preview-container {
+            flex: 1;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #2980b9;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .form-container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #3498db;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 14px 14px 14px 45px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        button {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+        }
+        
+        button:hover {
+            background: linear-gradient(to right, #2980b9, #3498db);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        .checkbox-group input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #34495e;
+        }
+        
+        .code-header h2 {
+            font-size: 1.5rem;
+            color: #3498db;
+        }
+        
+        .code-block {
+            background: #1a2530;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+        
+        pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .html-code { color: #e74c3c; }
+        .css-code { color: #3498db; }
+        .js-code { color: #f1c40f; }
+        
+        .tag { color: #e74c3c; }
+        .attr { color: #9b59b6; }
+        .val { color: #2ecc71; }
+        .comment { color: #7f8c8d; }
+        
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .code-container, .preview-container {
+                max-height: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="code-container">
+            <div class="code-header">
+                <h2>Form Implementation Code</h2>
+                <div class="buttons">
+                    <button onclick="copyCode('html')">Copy HTML</button>
+                    <button onclick="copyCode('all')">Copy All</button>
+                </div>
+            </div>
+            
+            <div class="code-block">
+                <h3>HTML Structure</h3>
+                <pre><code class="html-code"><span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"preview-container"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"header"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h1&gt;</span>Registration Form<span class="tag">&lt;/h1&gt;</span>
+    <span class="tag">&lt;p&gt;</span>Please fill in all the required fields<span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+  
+  <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"form-container"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;form</span> <span class="attr">id</span>=<span class="val">"registrationForm"</span><span class="tag">&gt;</span>
+      <span class="comment">&lt;!-- Form fields go here --&gt;</span>
+    <span class="tag">&lt;/form&gt;</span>
+  <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/div&gt;</span></code></pre>
+            </div>
+            
+            <div class="code-block">
+                <h3>CSS Styling</h3>
+                <pre><code class="css-code"><span class="tag">body</span> {
+  <span class="attr">background</span>: <span class="val">linear-gradient(135deg, #1e5799, #207cca, #2989d8, #1e5799)</span>;
+  <span class="attr">min-height</span>: <span class="val">100vh</span>;
+  <span class="attr">display</span>: <span class="val">flex</span>;
+  <span class="attr">justify-content</span>: <span class="val">center</span>;
+  <span class="attr">align-items</span>: <span class="val">center</span>;
+}
+
+<span class="tag">.form-container</span> {
+  <span class="attr">background</span>: <span class="val">white</span>;
+  <span class="attr">border-radius</span>: <span class="val">10px</span>;
+  <span class="attr">padding</span>: <span class="val">30px</span>;
+  <span class="attr">box-shadow</span>: <span class="val">0 5px 15px rgba(0,0,0,0.1)</span>;
+}
+
+<span class="tag">input</span>, <span class="tag">select</span>, <span class="tag">textarea</span> {
+  <span class="attr">width</span>: <span class="val">100%</span>;
+  <span class="attr">padding</span>: <span class="val">14px 14px 14px 45px</span>;
+  <span class="attr">border</span>: <span class="val">2px solid #e0e0e0</span>;
+  <span class="attr">border-radius</span>: <span class="val">8px</span>;
+  <span class="attr">font-size</span>: <span class="val">16px</span>;
+  <span class="attr">transition</span>: <span class="val">all 0.3s</span>;
+}
+
+<span class="tag">button</span> {
+  <span class="attr">background</span>: <span class="val">linear-gradient(to right, #3498db, #2980b9)</span>;
+  <span class="attr">color</span>: <span class="val">white</span>;
+  <span class="attr">border</span>: <span class="val">none</span>;
+  <span class="attr">padding</span>: <span class="val">14px 25px</span>;
+  <span class="attr">border-radius</span>: <span class="val">8px</span>;
+  <span class="attr">font-size</span>: <span class="val">18px</span>;
+}</code></pre>
+            </div>
+            
+            <div class="code-block">
+                <h3>JavaScript Validation</h3>
+                <pre><code class="js-code"><span class="comment">// Form validation function</span>
+<span class="keyword">function</span> <span class="function">validateForm</span>() {
+  <span class="keyword">const</span> <span class="var">name</span> = <span class="dom">document</span>.<span class="function">getElementById</span>(<span class="val">'name'</span>).<span class="attr">value</span>;
+  <span class="keyword">const</span> <span class="var">email</span> = <span class="dom">document</span>.<span class="function">getElementById</span>(<span class="val">'email'</span>).<span class="attr">value</span>;
+  
+  <span class="keyword">if</span>(<span class="var">name</span> === <span class="val">''</span>) {
+    <span class="function">alert</span>(<span class="val">'Please enter your name'</span>);
+    <span class="keyword">return</span> <span class="val">false</span>;
+  }
+  
+  <span class="keyword">const</span> <span class="var">emailRegex</span> = <span class="regex">/^[^\s@]+@[^\s@]+\.[^\s@]+$/</span>;
+  <span class="keyword">if</span>(!<span class="var">emailRegex</span>.<span class="function">test</span>(<span class="var">email</span>)) {
+    <span class="function">alert</span>(<span class="val">'Please enter a valid email address'</span>);
+    <span class="keyword">return</span> <span class="val">false</span>;
+  }
+  
+  <span class="function">alert</span>(<span class="val">'Form submitted successfully!'</span>);
+  <span class="keyword">return</span> <span class="val">true</span>;
+}
+
+<span class="comment">// Add event listener to form</span>
+<span class="dom">document</span>.<span class="function">getElementById</span>(<span class="val">'registrationForm'</span>)
+  .<span class="function">addEventListener</span>(<span class="val">'submit'</span>, <span class="function">function</span>(<span class="var">e</span>) {
+    <span class="var">e</span>.<span class="function">preventDefault</span>();
+    <span class="function">validateForm</span>();
+  });</code></pre>
+            </div>
+        </div>
+        
+        <div class="preview-container">
+            <div class="header">
+                <h1>Registration Form</h1>
+                <p>Please fill in all the required fields</p>
+            </div>
+            
+            <div class="form-container">
+                <form id="registrationForm">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="name" placeholder="Enter your full name" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="email" placeholder="Enter your email" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-phone"></i>
+                            <input type="tel" id="phone" placeholder="Enter your phone number">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dob">Date of Birth</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-calendar"></i>
+                            <input type="date" id="dob">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-venus-mars"></i>
+                            <select id="gender">
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="country">Country</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-globe"></i>
+                            <select id="country">
+                                <option value="">Select Country</option>
+                                <option value="usa">United States</option>
+                                <option value="uk">United Kingdom</option>
+                                <option value="canada">Canada</option>
+                                <option value="australia">Australia</option>
+                                <option value="india">India</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="interests">Interests</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-heart"></i>
+                            <input type="text" id="interests" placeholder="Your interests (comma separated)">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bio">Short Bio</label>
+                        <textarea id="bio" placeholder="Tell us about yourself..." rows="4"></textarea>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="terms" required>
+                        <label for="terms">I agree to the Terms & Conditions</label>
+                    </div>
+                    
+                    <button type="submit">Register Now</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Form validation
+        function validateForm() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            
+            if(name === '') {
+                alert('Please enter your name');
+                return false;
+            }
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if(!emailRegex.test(email)) {
+                alert('Please enter a valid email address');
+                return false;
+            }
+            
+            alert('Form submitted successfully!');
+            return true;
+        }
+        
+        // Add event listener to form
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            validateForm();
+        });
+        
+        // Copy code functions
+        function copyCode(type) {
+            let code = '';
+            
+            if(type === 'html') {
+                code = document.querySelector('.html-code').textContent;
+            } else if(type === 'all') {
+                const htmlCode = document.querySelector('.html-code').textContent;
+                const cssCode = document.querySelector('.css-code').textContent;
+                const jsCode = document.querySelector('.js-code').textContent;
+                code = `<!-- HTML -->\n${htmlCode}\n\n<!-- CSS -->\n<style>\n${cssCode}\n</style>\n\n<!-- JavaScript -->\n<script>\n${jsCode}\n<\/script>`;
+            }
+            
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Code copied to clipboard!');
+            });
+        }
+    </script>
+</body>
+</html>

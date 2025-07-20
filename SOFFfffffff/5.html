@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Form Design</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #2a5298);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+        }
+        
+        /* Code Panel Styles */
+        .code-panel {
+            flex: 1;
+            background: #1e1e1e;
+            padding: 25px;
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #3a3a3a;
+        }
+        
+        .code-header h2 {
+            color: #3498db;
+            font-size: 1.8rem;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .tab {
+            padding: 8px 15px;
+            background: #2d2d2d;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #ddd;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .code-content {
+            display: none;
+        }
+        
+        .code-content.active {
+            display: block;
+        }
+        
+        pre {
+            background: #252526;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-x: auto;
+            line-height: 1.5;
+            font-size: 15px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        code {
+            font-family: 'Fira Code', monospace;
+        }
+        
+        .html-code { color: #e06c75; }
+        .css-code { color: #61afef; }
+        .js-code { color: #e5c07b; }
+        
+        /* Form Panel Styles */
+        .form-panel {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .form-container {
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        
+        .form-header h1 {
+            color: #2c3e50;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .form-header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .blue-form {
+            background: white;
+            padding: 35px 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.15);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-group i {
+            position: absolute;
+            left: 15px;
+            top: 40px;
+            color: #3498db;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px 14px 14px 45px;
+            border: 2px solid #e0e7ff;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: #3498db;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+        
+        .form-footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #7f8c8d;
+        }
+        
+        .form-footer a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .code-panel, .form-panel {
+                max-height: none;
+            }
+            
+            .form-panel {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Panel: Code Display -->
+        <div class="code-panel">
+            <div class="code-header">
+                <h2><i class="fas fa-code"></i> Form Code</h2>
+                <div class="tabs">
+                    <div class="tab active" data-tab="html">HTML</div>
+                    <div class="tab" data-tab="css">CSS</div>
+                    <div class="tab" data-tab="js">JavaScript</div>
+                </div>
+            </div>
+            
+            <div class="code-content html-code active" id="html-code">
+                <pre><code>&lt;div class="form-container"&gt;
+  &lt;div class="form-header"&gt;
+    &lt;h1&gt;Create Your Account&lt;/h1&gt;
+    &lt;p&gt;Join our community today!&lt;/p&gt;
+  &lt;/div&gt;
+  
+  &lt;form class="blue-form" id="registrationForm"&gt;
+    &lt;div class="form-group"&gt;
+      &lt;label for="name"&gt;Full Name&lt;/label&gt;
+      &lt;i class="fas fa-user"&gt;&lt;/i&gt;
+      &lt;input type="text" id="name" class="form-control" placeholder="Enter your full name" required&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="form-group"&gt;
+      &lt;label for="email"&gt;Email Address&lt;/label&gt;
+      &lt;i class="fas fa-envelope"&gt;&lt;/i&gt;
+      &lt;input type="email" id="email" class="form-control" placeholder="Enter your email" required&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="form-group"&gt;
+      &lt;label for="password"&gt;Password&lt;/label&gt;
+      &lt;i class="fas fa-lock"&gt;&lt;/i&gt;
+      &lt;input type="password" id="password" class="form-control" placeholder="Create a password" required&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="form-group"&gt;
+      &lt;label for="confirmPassword"&gt;Confirm Password&lt;/label&gt;
+      &lt;i class="fas fa-lock"&gt;&lt;/i&gt;
+      &lt;input type="password" id="confirmPassword" class="form-control" placeholder="Confirm your password" required&gt;
+    &lt;/div&gt;
+    
+    &lt;button type="submit" class="btn"&gt;Sign Up Now&lt;/button&gt;
+  &lt;/form&gt;
+  
+  &lt;div class="success-message" id="successMessage"&gt;
+    &lt;i class="fas fa-check-circle"&gt;&lt;/i&gt; 
+    Account created successfully!
+  &lt;/div&gt;
+  
+  &lt;div class="form-footer"&gt;
+    &lt;p&gt;Already have an account? &lt;a href="#"&gt;Sign In&lt;/a&gt;&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+            
+            <div class="code-content css-code" id="css-code">
+                <pre><code>.blue-form {
+  background: white;
+  padding: 35px 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(52, 152, 219, 0.15);
+}
+
+.form-group {
+  margin-bottom: 25px;
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.form-group i {
+  position: absolute;
+  left: 15px;
+  top: 40px;
+  color: #3498db;
+}
+
+.form-control {
+  width: 100%;
+  padding: 14px 14px 14px 45px;
+  border: 2px solid #e0e7ff;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+.btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: #3498db;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.btn:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+}
+
+.success-message {
+  background: #d4edda;
+  color: #155724;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+  text-align: center;
+  display: none;
+}</code></pre>
+            </div>
+            
+            <div class="code-content js-code" id="js-code">
+                <pre><code>// Form validation and submission
+document.getElementById('registrationForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  // Get form values
+  const name = document.getElementById('name').value;
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const confirmPassword = document.getElementById('confirmPassword').value;
+  
+  // Validate password match
+  if (password !== confirmPassword) {
+    alert('Passwords do not match!');
+    return;
+  }
+  
+  // Validate password strength
+  if (password.length < 6) {
+    alert('Password must be at least 6 characters long!');
+    return;
+  }
+  
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    alert('Please enter a valid email address!');
+    return;
+  }
+  
+  // If all validations pass, show success message
+  document.getElementById('successMessage').style.display = 'block';
+  
+  // Reset form
+  this.reset();
+  
+  // Hide success message after 5 seconds
+  setTimeout(() => {
+    document.getElementById('successMessage').style.display = 'none';
+  }, 5000);
+});
+
+// Tab switching functionality
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    // Remove active class from all tabs
+    document.querySelectorAll('.tab').forEach(t => {
+      t.classList.remove('active');
+    });
+    
+    // Add active class to clicked tab
+    tab.classList.add('active');
+    
+    // Hide all code content
+    document.querySelectorAll('.code-content').forEach(content => {
+      content.classList.remove('active');
+    });
+    
+    // Show the corresponding code content
+    const tabId = tab.getAttribute('data-tab');
+    document.getElementById(`${tabId}-code`).classList.add('active');
+  });
+});</code></pre>
+            </div>
+        </div>
+        
+        <!-- Right Panel: Form Output -->
+        <div class="form-panel">
+            <div class="form-container">
+                <div class="form-header">
+                    <h1>Create Your Account</h1>
+                    <p>Join our community today!</p>
+                </div>
+                
+                <form class="blue-form" id="registrationForm">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="name" class="form-control" placeholder="Enter your full name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" class="form-control" placeholder="Create a password" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm your password" required>
+                    </div>
+                    
+                    <button type="submit" class="btn">Sign Up Now</button>
+                </form>
+                
+                <div class="success-message" id="successMessage">
+                    <i class="fas fa-check-circle"></i> 
+                    Account created successfully!
+                </div>
+                
+                <div class="form-footer">
+                    <p>Already have an account? <a href="#">Sign In</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Form validation and submission
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validate password match
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            // Validate password strength
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters long!');
+                return;
+            }
+            
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address!');
+                return;
+            }
+            
+            // If all validations pass, show success message
+            document.getElementById('successMessage').style.display = 'block';
+            
+            // Reset form
+            this.reset();
+            
+            // Hide success message after 5 seconds
+            setTimeout(() => {
+                document.getElementById('successMessage').style.display = 'none';
+            }, 5000);
+        });
+        
+        // Tab switching functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Hide all code content
+                document.querySelectorAll('.code-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Show the corresponding code content
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(`${tabId}-code`).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

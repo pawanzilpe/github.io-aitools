@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Form Generator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #1a2980;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            color: #26d0ce;
+            font-size: 1.2rem;
+        }
+        
+        .content-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .code-container, .output-container {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section-title {
+            background: #1a2980;
+            color: white;
+            padding: 12px 15px;
+            border-radius: 5px;
+            margin: -20px -20px 20px -20px;
+            font-size: 1.4rem;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #e0e7ff;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            background: #1a2980;
+            color: white;
+            border-radius: 5px;
+        }
+        
+        .tab-content {
+            display: none;
+            background: #f8f9ff;
+            border-radius: 5px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #d0d9ff;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        pre {
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            line-height: 1.4;
+            font-size: 0.95rem;
+        }
+        
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .blue-form {
+            background: linear-gradient(to bottom, #4a7bff, #2a4cb4);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 123, 255, 0.5);
+            background: white;
+        }
+        
+        button {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            font-size: 1.1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 82, 82, 0.4);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .confirmation {
+            display: none;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            color: #1a2980;
+        }
+        
+        .confirmation h3 {
+            margin-bottom: 10px;
+            color: #26d0ce;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        @media (max-width: 768px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Blue Form Generator</h1>
+            <p class="subtitle">HTML, CSS & JavaScript Implementation</p>
+        </header>
+        
+        <div class="content-wrapper">
+            <div class="code-container">
+                <h2 class="section-title">Source Code</h2>
+                <div class="tabs">
+                    <div class="tab active" data-tab="html">HTML</div>
+                    <div class="tab" data-tab="css">CSS</div>
+                    <div class="tab" data-tab="js">JavaScript</div>
+                </div>
+                
+                <div class="tab-content active" id="html-code">
+                    <pre><code>&lt;form class="blue-form" id="registrationForm"&gt;
+  &lt;h2 style="text-align: center; margin-bottom: 25px;"&gt;Registration Form&lt;/h2&gt;
+  
+  &lt;div class="form-row"&gt;
+    &lt;div class="form-group"&gt;
+      &lt;label for="firstName"&gt;First Name&lt;/label&gt;
+      &lt;input type="text" id="firstName" required&gt;
+    &lt;/div&gt;
+    &lt;div class="form-group"&gt;
+      &lt;label for="lastName"&gt;Last Name&lt;/label&gt;
+      &lt;input type="text" id="lastName" required&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  
+  &lt;div class="form-group"&gt;
+    &lt;label for="email"&gt;Email Address&lt;/label&gt;
+    &lt;input type="email" id="email" required&gt;
+  &lt;/div&gt;
+  
+  &lt;div class="form-group"&gt;
+    &lt;label for="phone"&gt;Phone Number&lt;/label&gt;
+    &lt;input type="tel" id="phone" placeholder="(123) 456-7890"&gt;
+  &lt;/div&gt;
+  
+  &lt;div class="form-group"&gt;
+    &lt;label for="password"&gt;Password&lt;/label&gt;
+    &lt;input type="password" id="password" required&gt;
+  &lt;/div&gt;
+  
+  &lt;div class="form-group"&gt;
+    &lt;label for="country"&gt;Country&lt;/label&gt;
+    &lt;select id="country"&gt;
+      &lt;option value=""&gt;Select Country&lt;/option&gt;
+      &lt;option value="usa"&gt;United States&lt;/option&gt;
+      &lt;option value="canada"&gt;Canada&lt;/option&gt;
+      &lt;option value="uk"&gt;United Kingdom&lt;/option&gt;
+      &lt;option value="australia"&gt;Australia&lt;/option&gt;
+      &lt;option value="india"&gt;India&lt;/option&gt;
+    &lt;/select&gt;
+  &lt;/div&gt;
+  
+  &lt;div class="form-group"&gt;
+    &lt;label&gt;Subscribe to Newsletter&lt;/label&gt;
+    &lt;div style="display: flex; gap: 20px; margin-top: 8px;"&gt;
+      &lt;label style="display: flex; align-items: center;"&gt;
+        &lt;input type="radio" name="newsletter" value="yes" checked&gt;
+        &lt;span style="margin-left: 8px;"&gt;Yes&lt;/span&gt;
+      &lt;/label&gt;
+      &lt;label style="display: flex; align-items: center;"&gt;
+        &lt;input type="radio" name="newsletter" value="no"&gt;
+        &lt;span style="margin-left: 8px;"&gt;No&lt;/span&gt;
+      &lt;/label&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  
+  &lt;div class="form-group"&gt;
+    &lt;label for="comments"&gt;Additional Comments&lt;/label&gt;
+    &lt;textarea id="comments" rows="4"&gt;&lt;/textarea&gt;
+  &lt;/div&gt;
+  
+  &lt;div class="form-group"&gt;
+    &lt;label style="display: flex; align-items: flex-start;"&gt;
+      &lt;input type="checkbox" id="terms" style="margin-top: 3px; margin-right: 8px;" required&gt;
+      &lt;span&gt;I agree to the Terms and Conditions and Privacy Policy&lt;/span&gt;
+    &lt;/label&gt;
+  &lt;/div&gt;
+  
+  &lt;button type="submit"&gt;Register Now&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;div class="confirmation" id="confirmation"&gt;
+  &lt;h3&gt;Registration Successful!&lt;/h3&gt;
+  &lt;p&gt;Thank you for registering. We've sent a confirmation email to your address.&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+                </div>
+                
+                <div class="tab-content" id="css-code">
+                    <pre><code>/* Blue Form Styles */
+.blue-form {
+  background: linear-gradient(to bottom, #4a7bff, #2a4cb4);
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  color: white;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: none;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(74, 123, 255, 0.5);
+  background: white;
+}
+
+button {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 14px 25px;
+  font-size: 1.1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  width: 100%;
+  margin-top: 10px;
+}
+
+button:hover {
+  background: #ff5252;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 82, 82, 0.4);
+}
+
+.form-row {
+  display: flex;
+  gap: 15px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.confirmation {
+  display: none;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+  text-align: center;
+  color: #1a2980;
+}
+
+.confirmation h3 {
+  margin-bottom: 10px;
+  color: #26d0ce;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}</code></pre>
+                </div>
+                
+                <div class="tab-content" id="js-code">
+                    <pre><code>document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('registrationForm');
+  const confirmation = document.getElementById('confirmation');
+  
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Simple validation
+    const firstName = document.getElementById('firstName').value;
+    const lastName = document.getElementById('lastName').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    
+    if (!firstName || !lastName || !email || !password) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+    
+    // Email validation
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+    
+    // Password validation
+    if (password.length < 6) {
+      alert('Password must be at least 6 characters long.');
+      return;
+    }
+    
+    // If all validations pass, show confirmation
+    form.style.display = 'none';
+    confirmation.style.display = 'block';
+    
+    // Reset form after 5 seconds (simulation)
+    setTimeout(() => {
+      form.reset();
+      form.style.display = 'block';
+      confirmation.style.display = 'none';
+    }, 5000);
+  });
+  
+  // Tab switching functionality
+  const tabs = document.querySelectorAll('.tab');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      // Remove active class from all tabs and content
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      
+      // Add active class to clicked tab
+      tab.classList.add('active');
+      
+      // Show corresponding content
+      const tabId = tab.getAttribute('data-tab');
+      document.getElementById(`${tabId}-code`).classList.add('active');
+    });
+  });
+});</code></pre>
+                </div>
+            </div>
+            
+            <div class="output-container">
+                <h2 class="section-title">Form Output</h2>
+                <div class="form-container">
+                    <form class="blue-form" id="registrationForm">
+                        <h2 style="text-align: center; margin-bottom: 25px;">Registration Form</h2>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">First Name</label>
+                                <input type="text" id="firstName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name</label>
+                                <input type="text" id="lastName" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" placeholder="(123) 456-7890">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="country">Country</label>
+                            <select id="country">
+                                <option value="">Select Country</option>
+                                <option value="usa">United States</option>
+                                <option value="canada">Canada</option>
+                                <option value="uk">United Kingdom</option>
+                                <option value="australia">Australia</option>
+                                <option value="india">India</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Subscribe to Newsletter</label>
+                            <div style="display: flex; gap: 20px; margin-top: 8px;">
+                                <label style="display: flex; align-items: center;">
+                                    <input type="radio" name="newsletter" value="yes" checked>
+                                    <span style="margin-left: 8px;">Yes</span>
+                                </label>
+                                <label style="display: flex; align-items: center;">
+                                    <input type="radio" name="newsletter" value="no">
+                                    <span style="margin-left: 8px;">No</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="comments">Additional Comments</label>
+                            <textarea id="comments" rows="4"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="display: flex; align-items: flex-start;">
+                                <input type="checkbox" id="terms" style="margin-top: 3px; margin-right: 8px;" required>
+                                <span>I agree to the Terms and Conditions and Privacy Policy</span>
+                            </label>
+                        </div>
+                        
+                        <button type="submit">Register Now</button>
+                    </form>
+                    
+                    <div class="confirmation" id="confirmation">
+                        <h3>Registration Successful!</h3>
+                        <p>Thank you for registering. We've sent a confirmation email to your address.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Blue Form Generator | HTML, CSS & JavaScript Implementation</p>
+            <p>Try submitting the form to see the confirmation message!</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registrationForm');
+            const confirmation = document.getElementById('confirmation');
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Simple validation
+                const firstName = document.getElementById('firstName').value;
+                const lastName = document.getElementById('lastName').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                if (!firstName || !lastName || !email || !password) {
+                    alert('Please fill in all required fields.');
+                    return;
+                }
+                
+                // Email validation
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(email)) {
+                    alert('Please enter a valid email address.');
+                    return;
+                }
+                
+                // Password validation
+                if (password.length < 6) {
+                    alert('Password must be at least 6 characters long.');
+                    return;
+                }
+                
+                // If all validations pass, show confirmation
+                form.style.display = 'none';
+                confirmation.style.display = 'block';
+                
+                // Reset form after 5 seconds (simulation)
+                setTimeout(() => {
+                    form.reset();
+                    form.style.display = 'block';
+                    confirmation.style.display = 'none';
+                }, 5000);
+            });
+            
+            // Tab switching functionality
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs and content
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    tab.classList.add('active');
+                    
+                    // Show corresponding content
+                    const tabId = tab.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-code`).classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Photo Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50% }
+            50% { background-position: 100% 50% }
+            100% { background-position: 0% 50% }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .app-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .user-panel {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            flex: 1;
+            min-width: 300px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .user-panel h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .user-item.active {
+            background: rgba(41, 128, 185, 0.7);
+            border-left: 4px solid #3498db;
+        }
+
+        .user-item .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #3498db, #1abc9c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        .editor-container {
+            flex: 2;
+            min-width: 500px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .editor-header h2 {
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .current-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 50px;
+        }
+
+        .editor-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .image-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            height: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+        }
+
+        .image-placeholder {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .image-placeholder i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .tools-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .tool-btn {
+            flex: 1;
+            min-width: 120px;
+            background: rgba(41, 128, 185, 0.7);
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .tool-btn:hover {
+            background: rgba(52, 152, 219, 0.9);
+            transform: translateY(-3px);
+        }
+
+        .tool-btn i {
+            font-size: 1.5rem;
+        }
+
+        .ai-features {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .ai-features h3 {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+        }
+
+        .ai-tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .ai-tool {
+            flex: 1;
+            min-width: 150px;
+            background: rgba(155, 89, 182, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .ai-tool:hover {
+            background: rgba(142, 68, 173, 0.9);
+            transform: translateY(-3px);
+        }
+
+        .ai-tool i {
+            font-size: 2rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .upload-btn {
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+        }
+
+        .download-btn {
+            background: linear-gradient(45deg, #e74c3c, #e67e22);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .action-btn:active {
+            transform: translateY(1px);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 900px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .editor-container {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-robot"></i> AI Photo Editor</h1>
+            <p>Edit photos with AI-powered tools and collaborate with multiple users</p>
+        </header>
+
+        <div class="app-container">
+            <div class="user-panel">
+                <h2><i class="fas fa-users"></i> Active Users</h2>
+                <div class="user-list" id="userList">
+                    <!-- Users will be populated by JavaScript -->
+                </div>
+                <div class="action-buttons">
+                    <button class="action-btn" id="addUserBtn">
+                        <i class="fas fa-user-plus"></i> Add User
+                    </button>
+                </div>
+            </div>
+
+            <div class="editor-container">
+                <div class="editor-header">
+                    <h2><i class="fas fa-edit"></i> Photo Editor</h2>
+                    <div class="current-user">
+                        <div class="avatar">U</div>
+                        <span>Select a user to start editing</span>
+                    </div>
+                </div>
+
+                <div class="editor-content">
+                    <div class="image-container">
+                        <div class="image-placeholder">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h3>Upload an Image to Edit</h3>
+                            <p>Supported formats: JPG, PNG, GIF</p>
+                        </div>
+                        <img id="editedImage" src="" alt="Edited Image">
+                    </div>
+
+                    <div class="tools-panel">
+                        <button class="tool-btn">
+                            <i class="fas fa-crop-alt"></i>
+                            Crop
+                        </button>
+                        <button class="tool-btn">
+                            <i class="fas fa-sync"></i>
+                            Rotate
+                        </button>
+                        <button class="tool-btn">
+                            <i class="fas fa-sun"></i>
+                            Brightness
+                        </button>
+                        <button class="tool-btn">
+                            <i class="fas fa-adjust"></i>
+                            Contrast
+                        </button>
+                        <button class="tool-btn">
+                            <i class="fas fa-paint-brush"></i>
+                            Filters
+                        </button>
+                    </div>
+
+                    <div class="ai-features">
+                        <h3><i class="fas fa-magic"></i> AI-Powered Tools</h3>
+                        <div class="ai-tools">
+                            <div class="ai-tool">
+                                <i class="fas fa-portrait"></i>
+                                <h4>AI Enhance</h4>
+                                <p>Improve quality automatically</p>
+                            </div>
+                            <div class="ai-tool">
+                                <i class="fas fa-object-ungroup"></i>
+                                <h4>Remove Background</h4>
+                                <p>AI background removal</p>
+                            </div>
+                            <div class="ai-tool">
+                                <i class="fas fa-palette"></i>
+                                <h4>Colorize</h4>
+                                <p>Add color to B&W photos</p>
+                            </div>
+                            <div class="ai-tool">
+                                <i class="fas fa-search-plus"></i>
+                                <h4>Super Resolution</h4>
+                                <p>Enlarge without quality loss</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="action-btn upload-btn" id="uploadBtn">
+                            <i class="fas fa-upload"></i> Upload Image
+                        </button>
+                        <button class="action-btn download-btn" id="downloadBtn">
+                            <i class="fas fa-download"></i> Download Image
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>AI Photo Editor &copy; 2023 | Built with HTML, CSS & JavaScript | Supports multiple users</p>
+        </footer>
+    </div>
+
+    <script>
+        // Sample user data
+        const users = [
+            { id: 1, name: "Alex Johnson", active: true },
+            { id: 2, name: "Maria Garcia", active: true },
+            { id: 3, name: "David Smith", active: true },
+            { id: 4, name: "Sarah Williams", active: false }
+        ];
+
+        // DOM Elements
+        const userList = document.getElementById('userList');
+        const addUserBtn = document.getElementById('addUserBtn');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const editedImage = document.getElementById('editedImage');
+        const imagePlaceholder = document.querySelector('.image-placeholder');
+        const currentUser = document.querySelector('.current-user span');
+
+        // Initialize the app
+        function initApp() {
+            renderUserList();
+            setActiveUser(users[0]);
+        }
+
+        // Render user list
+        function renderUserList() {
+            userList.innerHTML = '';
+            users.forEach(user => {
+                if (user.active) {
+                    const userItem = document.createElement('div');
+                    userItem.className = 'user-item';
+                    userItem.innerHTML = `
+                        <div class="avatar">${user.name.charAt(0)}</div>
+                        <div class="user-info">
+                            <h4>${user.name}</h4>
+                            <p>Online</p>
+                        </div>
+                    `;
+                    userItem.addEventListener('click', () => setActiveUser(user));
+                    userList.appendChild(userItem);
+                }
+            });
+        }
+
+        // Set active user
+        function setActiveUser(user) {
+            currentUser.textContent = user.name;
+            
+            // Update UI to show active user
+            const userItems = document.querySelectorAll('.user-item');
+            userItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.querySelector('h4').textContent === user.name) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // For demonstration, load a sample image for the user
+            editedImage.src = `https://picsum.photos/600/400?random=${user.id}`;
+            editedImage.style.display = 'block';
+            imagePlaceholder.style.display = 'none';
+        }
+
+        // Add new user
+        addUserBtn.addEventListener('click', () => {
+            const newUser = {
+                id: users.length + 1,
+                name: `User ${users.length + 1}`,
+                active: true
+            };
+            users.push(newUser);
+            renderUserList();
+            setActiveUser(newUser);
+            
+            // Show notification
+            alert(`New user "${newUser.name}" added!`);
+        });
+
+        // Upload image
+        uploadBtn.addEventListener('click', () => {
+            // In a real app, this would open a file dialog
+            // For demo, we'll use a random image
+            editedImage.src = `https://picsum.photos/600/400?random=${Math.floor(Math.random() * 100)}`;
+            editedImage.style.display = 'block';
+            imagePlaceholder.style.display = 'none';
+            
+            // Show notification
+            alert("Image uploaded successfully!");
+        });
+
+        // Download image
+        downloadBtn.addEventListener('click', () => {
+            alert("In a real application, this would download the edited image");
+            // For demo purposes, we'll just show a notification
+        });
+
+        // Initialize the app when the page loads
+        window.addEventListener('load', initApp);
+    </script>
+</body>
+</html>

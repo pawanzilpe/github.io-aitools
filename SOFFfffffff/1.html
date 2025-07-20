@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Photo Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(90deg, #4b6cb7, #182848);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        header h1 i {
+            color: #fdbb2d;
+        }
+
+        .main-content {
+            display: flex;
+            padding: 30px;
+            gap: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                flex-direction: column;
+            }
+        }
+
+        .upload-section {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-area {
+            border: 3px dashed #4b6cb7;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: rgba(75, 108, 183, 0.05);
+            margin-bottom: 25px;
+        }
+
+        .upload-area:hover {
+            background-color: rgba(75, 108, 183, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .upload-area i {
+            font-size: 4rem;
+            color: #4b6cb7;
+            margin-bottom: 20px;
+        }
+
+        .upload-area h3 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .upload-area p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .image-preview {
+            width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #e9ecef;
+            min-height: 200px;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+        }
+
+        .editor-section {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .image-display {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .image-display h2 {
+            color: #333;
+            font-size: 1.8rem;
+            align-self: flex-start;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .image-display h2 i {
+            color: #4b6cb7;
+        }
+
+        .canvas-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #e9ecef;
+            min-height: 300px;
+            position: relative;
+        }
+
+        canvas {
+            max-width: 100%;
+            display: none;
+        }
+
+        .placeholder-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #6c757d;
+            font-size: 1.2rem;
+            text-align: center;
+            width: 80%;
+        }
+
+        .controls {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls h2 {
+            color: #333;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .controls h2 i {
+            color: #4b6cb7;
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .filter-btn {
+            background: #4b6cb7;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-btn:hover {
+            background: #3a5795;
+            transform: translateY(-3px);
+        }
+
+        .filter-btn i {
+            font-size: 1.5rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            flex: 1;
+            min-width: 180px;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .download-btn {
+            background: linear-gradient(90deg, #4CAF50, #2E7D32);
+            color: white;
+        }
+
+        .download-btn:hover {
+            background: linear-gradient(90deg, #43A047, #1B5E20);
+            transform: translateY(-3px);
+        }
+
+        .reset-btn {
+            background: linear-gradient(90deg, #f44336, #c62828);
+            color: white;
+        }
+
+        .reset-btn:hover {
+            background: linear-gradient(90deg, #e53935, #b71c1c);
+            transform: translateY(-3px);
+        }
+
+        .quality-control {
+            margin: 25px 0;
+        }
+
+        .quality-control label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .quality-slider {
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: #dee2e6;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .quality-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #4b6cb7;
+            cursor: pointer;
+        }
+
+        .quality-value {
+            text-align: center;
+            font-weight: 600;
+            color: #4b6cb7;
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+
+        footer {
+            background: #182848;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1rem;
+        }
+
+        .filter-active {
+            background: #182848;
+            box-shadow: 0 0 0 3px #fdbb2d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-camera-retro"></i> Advanced Photo Editor</h1>
+            <p>Upload your photo, apply professional filters, and download high-quality results</p>
+        </header>
+
+        <div class="main-content">
+            <div class="upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>Upload Your Photo</h3>
+                    <p>Click or drag & drop your image here</p>
+                    <p>Supports JPG, PNG, WEBP formats</p>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                </div>
+
+                <div class="image-preview">
+                    <img id="previewImage" alt="Preview">
+                    <p class="placeholder-text" id="previewPlaceholder">Your image will appear here</p>
+                </div>
+            </div>
+
+            <div class="editor-section">
+                <div class="image-display">
+                    <h2><i class="fas fa-image"></i> Edited Photo</h2>
+                    <div class="canvas-container">
+                        <canvas id="canvas"></canvas>
+                        <p class="placeholder-text" id="canvasPlaceholder">Apply filters to see the edited version</p>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <h2><i class="fas fa-sliders-h"></i> Editing Tools</h2>
+                    
+                    <div class="quality-control">
+                        <label for="qualitySlider">Quality: <span id="qualityValue">100%</span></label>
+                        <input type="range" id="qualitySlider" class="quality-slider" min="50" max="100" value="100">
+                        <div class="quality-value">High Quality Processing</div>
+                    </div>
+                    
+                    <h3>Filters</h3>
+                    <div class="filters">
+                        <button class="filter-btn" data-filter="original">
+                            <i class="fas fa-sync"></i> Original
+                        </button>
+                        <button class="filter-btn" data-filter="vintage">
+                            <i class="fas fa-history"></i> Vintage
+                        </button>
+                        <button class="filter-btn" data-filter="blackWhite">
+                            <i class="fas fa-moon"></i> B&W
+                        </button>
+                        <button class="filter-btn" data-filter="sepia">
+                            <i class="fas fa-sun"></i> Sepia
+                        </button>
+                        <button class="filter-btn" data-filter="invert">
+                            <i class="fas fa-adjust"></i> Invert
+                        </button>
+                        <button class="filter-btn" data-filter="blur">
+                            <i class="fas fa-wind"></i> Blur
+                        </button>
+                        <button class="filter-btn" data-filter="sharpen">
+                            <i class="fas fa-cut"></i> Sharpen
+                        </button>
+                        <button class="filter-btn" data-filter="warm">
+                            <i class="fas fa-fire"></i> Warm
+                        </button>
+                        <button class="filter-btn" data-filter="cool">
+                            <i class="fas fa-snowflake"></i> Cool
+                        </button>
+                        <button class="filter-btn" data-filter="pixelate">
+                            <i class="fas fa-th-large"></i> Pixelate
+                        </button>
+                        <button class="filter-btn" data-filter="posterize">
+                            <i class="fas fa-paint-brush"></i> Posterize
+                        </button>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="action-btn download-btn" id="downloadBtn">
+                            <i class="fas fa-download"></i> Download Image
+                        </button>
+                        <button class="action-btn reset-btn" id="resetBtn">
+                            <i class="fas fa-trash-alt"></i> Reset All
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2023 Advanced Photo Editor | All edits are processed locally in your browser</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const previewImage = document.getElementById('previewImage');
+            const previewPlaceholder = document.getElementById('previewPlaceholder');
+            const canvas = document.getElementById('canvas');
+            const canvasPlaceholder = document.getElementById('canvasPlaceholder');
+            const qualitySlider = document.getElementById('qualitySlider');
+            const qualityValue = document.getElementById('qualityValue');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            
+            let ctx = canvas.getContext('2d');
+            let currentImage = null;
+            let currentFilter = 'original';
+            
+            // Event Listeners
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('drop', handleDrop);
+            fileInput.addEventListener('change', handleFileSelect);
+            qualitySlider.addEventListener('input', updateQuality);
+            downloadBtn.addEventListener('click', downloadImage);
+            resetBtn.addEventListener('click', resetEditor);
+            
+            // Add event listeners to filter buttons
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    applyFilter(this.dataset.filter);
+                    
+                    // Update active button
+                    filterButtons.forEach(btn => btn.classList.remove('filter-active'));
+                    this.classList.add('filter-active');
+                });
+            });
+            
+            // Functions
+            function handleDragOver(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadArea.style.backgroundColor = 'rgba(75, 108, 183, 0.2)';
+            }
+            
+            function handleDrop(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadArea.style.backgroundColor = '';
+                
+                const files = e.dataTransfer.files;
+                if (files.length) {
+                    fileInput.files = files;
+                    handleFileSelect(e);
+                }
+            }
+            
+            function handleFileSelect(e) {
+                const file = e.target.files[0];
+                if (!file || !file.type.match('image.*')) return;
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                    previewPlaceholder.style.display = 'none';
+                    
+                    previewImage.onload = function() {
+                        currentImage = new Image();
+                        currentImage.src = e.target.result;
+                        
+                        currentImage.onload = function() {
+                            canvas.width = currentImage.width;
+                            canvas.height = currentImage.height;
+                            canvas.style.display = 'block';
+                            canvasPlaceholder.style.display = 'none';
+                            
+                            applyFilter(currentFilter);
+                        };
+                    };
+                };
+                
+                reader.readAsDataURL(file);
+            }
+            
+            function updateQuality() {
+                const value = qualitySlider.value;
+                qualityValue.textContent = `${value}%`;
+                applyFilter(currentFilter);
+            }
+            
+            function applyFilter(filter) {
+                if (!currentImage) return;
+                
+                currentFilter = filter;
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw original image
+                ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+                
+                // Apply selected filter
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imageData.data;
+                
+                switch(filter) {
+                    case 'original':
+                        // No filter
+                        break;
+                    case 'vintage':
+                        applyVintageEffect(data);
+                        break;
+                    case 'blackWhite':
+                        applyBlackWhiteEffect(data);
+                        break;
+                    case 'sepia':
+                        applySepiaEffect(data);
+                        break;
+                    case 'invert':
+                        applyInvertEffect(data);
+                        break;
+                    case 'blur':
+                        // For performance, we'll use canvas filter for blur
+                        ctx.filter = 'blur(4px)';
+                        ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+                        ctx.filter = 'none';
+                        return;
+                    case 'sharpen':
+                        applySharpenEffect(imageData);
+                        break;
+                    case 'warm':
+                        applyWarmEffect(data);
+                        break;
+                    case 'cool':
+                        applyCoolEffect(data);
+                        break;
+                    case 'pixelate':
+                        applyPixelateEffect(8);
+                        return;
+                    case 'posterize':
+                        applyPosterizeEffect(data);
+                        break;
+                }
+                
+                ctx.putImageData(imageData, 0, 0);
+            }
+            
+            function applyVintageEffect(data) {
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i];
+                    const g = data[i + 1];
+                    const b = data[i + 2];
+                    
+                    // Vintage effect: increase red, decrease blue
+                    data[i] = Math.min(255, r * 1.1);
+                    data[i + 1] = g * 0.9;
+                    data[i + 2] = b * 0.8;
+                    
+                    // Add sepia-like tint
+                    data[i] = Math.min(255, r * 0.9 + g * 0.4 + b * 0.2);
+                    data[i + 1] = r * 0.6 + g * 0.7 + b * 0.2;
+                    data[i + 2] = r * 0.4 + g * 0.5 + b * 0.3;
+                }
+            }
+            
+            function applyBlackWhiteEffect(data) {
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i];
+                    const g = data[i + 1];
+                    const b = data[i + 2];
+                    const avg = 0.299 * r + 0.587 * g + 0.114 * b;
+                    
+                    data[i] = avg;
+                    data[i + 1] = avg;
+                    data[i + 2] = avg;
+                }
+            }
+            
+            function applySepiaEffect(data) {
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i];
+                    const g = data[i + 1];
+                    const b = data[i + 2];
+                    
+                    data[i] = Math.min(255, (r * 0.393) + (g * 0.769) + (b * 0.189));
+                    data[i + 1] = Math.min(255, (r * 0.349) + (g * 0.686) + (b * 0.168));
+                    data[i + 2] = Math.min(255, (r * 0.272) + (g * 0.534) + (b * 0.131));
+                }
+            }
+            
+            function applyInvertEffect(data) {
+                for (let i = 0; i < data.length; i += 4) {
+                    data[i] = 255 - data[i];
+                    data[i + 1] = 255 - data[i + 1];
+                    data[i + 2] = 255 - data[i + 2];
+                }
+            }
+            
+            function applySharpenEffect(imageData) {
+                // Create a temporary canvas for convolution
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCanvas.width = canvas.width;
+                tempCanvas.height = canvas.height;
+                
+                // Draw the current image to temp canvas
+                tempCtx.putImageData(imageData, 0, 0);
+                
+                // Apply sharpen using convolution
+                const weights = [0, -1, 0, -1, 5, -1, 0, -1, 0];
+                applyConvolutionFilter(tempCtx, weights, 1);
+                
+                // Copy back to main canvas
+                ctx.putImageData(tempCtx.getImageData(0, 0, canvas.width, canvas.height), 0, 0);
+            }
+            
+            function applyConvolutionFilter(context, weights, divisor = 1) {
+                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imageData.data;
+                const tempData = new Uint8ClampedArray(data);
+                
+                const side = Math.round(Math.sqrt(weights.length));
+                const halfSide = Math.floor(side / 2);
+                
+                for (let y = halfSide; y < canvas.height - halfSide; y++) {
+                    for (let x = halfSide; x < canvas.width - halfSide; x++) {
+                        let r = 0, g = 0, b = 0, a = 0;
+                        let weightIndex = 0;
+                        
+                        for (let cy = y - halfSide; cy <= y + halfSide; cy++) {
+                            for (let cx = x - halfSide; cx <= x + halfSide; cx++) {
+                                const pixelIndex = (cy * canvas.width + cx) * 4;
+                                
+                                r += tempData[pixelIndex] * weights[weightIndex];
+                                g += tempData[pixelIndex + 1] * weights[weightIndex];
+                                b += tempData[pixelIndex + 2] * weights[weightIndex];
+                                a += tempData[pixelIndex + 3] * weights[weightIndex];
+                                
+                                weightIndex++;
+                            }
+                        }
+                        
+                        const pixelIndex = (y * canvas.width + x) * 4;
+                        data[pixelIndex] = r / divisor;
+                        data[pixelIndex + 1] = g / divisor;
+                        data[pixelIndex + 2] = b / divisor;
+                        data[pixelIndex + 3] = a / divisor;
+                    }
+                }
+                
+                context.putImageData(imageData, 0, 0);
+            }
+            
+            function applyWarmEffect(data) {
+                for (let i = 0; i < data.length; i += 4) {
+                    data[i] = Math.min(255, data[i] * 1.2);     // Increase red
+                    data[i + 1] = data[i + 1] * 1.1;           // Increase green
+                    data[i + 2] = data[i + 2] * 0.9;           // Decrease blue
+                }
+            }
+            
+            function applyCoolEffect(data) {
+                for (let i = 0; i < data.length; i += 4) {
+                    data[i] = data[i] * 0.9;                   // Decrease red
+                    data[i + 1] = data[i + 1] * 0.95;          // Slightly decrease green
+                    data[i + 2] = Math.min(255, data[i + 2] * 1.2); // Increase blue
+                }
+            }
+            
+            function applyPixelateEffect(pixelSize) {
+                ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+                
+                const pixelCanvas = document.createElement('canvas');
+                const pixelCtx = pixelCanvas.getContext('2d');
+                const size = pixelSize * 0.01 * (canvas.width + canvas.height) / 2;
+                
+                pixelCanvas.width = Math.ceil(canvas.width / size);
+                pixelCanvas.height = Math.ceil(canvas.height / size);
+                
+                pixelCtx.drawImage(canvas, 0, 0, pixelCanvas.width, pixelCanvas.height);
+                ctx.imageSmoothingEnabled = false;
+                ctx.drawImage(pixelCanvas, 0, 0, pixelCanvas.width, pixelCanvas.height, 
+                            0, 0, canvas.width, canvas.height);
+                ctx.imageSmoothingEnabled = true;
+            }
+            
+            function applyPosterizeEffect(data) {
+                const levels = 4;
+                
+                for (let i = 0; i < data.length; i += 4) {
+                    // Posterize each channel
+                    data[i] = Math.floor(data[i] / 255 * levels) / levels * 255;
+                    data[i + 1] = Math.floor(data[i + 1] / 255 * levels) / levels * 255;
+                    data[i + 2] = Math.floor(data[i + 2] / 255 * levels) / levels * 255;
+                }
+            }
+            
+            function downloadImage() {
+                if (!currentImage) {
+                    alert('Please upload an image first!');
+                    return;
+                }
+                
+                // Create a temporary canvas for high-quality export
+                const exportCanvas = document.createElement('canvas');
+                const exportCtx = exportCanvas.getContext('2d');
+                
+                // Set export dimensions based on quality setting
+                const quality = parseInt(qualitySlider.value) / 100;
+                exportCanvas.width = canvas.width * quality;
+                exportCanvas.height = canvas.height * quality;
+                
+                // Draw the edited image to export canvas
+                exportCtx.drawImage(canvas, 0, 0, exportCanvas.width, exportCanvas.height);
+                
+                // Create download link
+                const link = document.createElement('a');
+                link.download = 'edited-photo.png';
+                link.href = exportCanvas.toDataURL('image/png');
+                link.click();
+            }
+            
+            function resetEditor() {
+                fileInput.value = '';
+                previewImage.style.display = 'none';
+                previewPlaceholder.style.display = 'block';
+                canvas.style.display = 'none';
+                canvasPlaceholder.style.display = 'block';
+                currentImage = null;
+                
+                // Reset active filter button
+                filterButtons.forEach(btn => btn.classList.remove('filter-active'));
+                document.querySelector('[data-filter="original"]').classList.add('filter-active');
+                
+                // Reset quality slider
+                qualitySlider.value = 100;
+                qualityValue.textContent = '100%';
+            }
+        });
+    </script>
+</body>
+</html>

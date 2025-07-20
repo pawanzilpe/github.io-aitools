@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Builder with Live Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .main-content {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .code-editors {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .editor-container {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .editor-header {
+            background: rgba(30, 30, 40, 0.9);
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+        }
+        
+        .editor-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+        
+        .html-header .editor-icon { background: #e34c26; }
+        .css-header .editor-icon { background: #2965f1; }
+        .js-header .editor-icon { background: #f0db4f; color: #000; }
+        
+        .editor {
+            width: 100%;
+            height: 200px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border: none;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .preview-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .preview-header {
+            background: rgba(30, 30, 40, 0.9);
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+        }
+        
+        .preview-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            background: #4CAF50;
+        }
+        
+        .preview-content {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            overflow: auto;
+            min-height: 500px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .run-btn {
+            background: linear-gradient(to right, #4CAF50, #2E7D32);
+            color: white;
+        }
+        
+        .reset-btn {
+            background: linear-gradient(to right, #f44336, #c62828);
+            color: white;
+        }
+        
+        .example-btn {
+            background: linear-gradient(to right, #2196F3, #0D47A1);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            .main-content {
+                flex-direction: column;
+            }
+        }
+        
+        /* Sample elements in preview */
+        .website-title {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #3498db;
+        }
+        
+        .card h3 {
+            color: #2980b9;
+            margin-bottom: 10px;
+        }
+        
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .feature {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            width: 200px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .feature:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature i {
+            font-size: 2.5rem;
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+        
+        .feature h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Website Builder with Live Preview</h1>
+            <p class="subtitle">Create your website using the HTML, CSS, and JavaScript editors on the left. See the live output in the preview area on the right in real-time.</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="code-editors">
+                <div class="editor-container">
+                    <div class="editor-header html-header">
+                        <div class="editor-icon">HTML</div>
+                        <div>HTML Editor</div>
+                    </div>
+                    <textarea id="html-editor" class="editor" placeholder="Enter your HTML code here...">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;My Website&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="container"&gt;
+        &lt;h1 class="website-title"&gt;Welcome to My Website&lt;/h1&gt;
+        
+        &lt;div class="card"&gt;
+            &lt;h3&gt;About This Website Builder&lt;/h3&gt;
+            &lt;p&gt;This is a powerful tool that allows you to create websites using HTML, CSS, and JavaScript. As you type in the editors, you'll see the live preview update instantly.&lt;/p&gt;
+        &lt;/div&gt;
+        
+        &lt;div class="card"&gt;
+            &lt;h3&gt;Features&lt;/h3&gt;
+            &lt;div class="features"&gt;
+                &lt;div class="feature"&gt;
+                    &lt;i&gt;🚀&lt;/i&gt;
+                    &lt;h4&gt;Fast&lt;/h4&gt;
+                    &lt;p&gt;Real-time preview&lt;/p&gt;
+                &lt;/div&gt;
+                &lt;div class="feature"&gt;
+                    &lt;i&gt;💡&lt;/i&gt;
+                    &lt;h4&gt;Smart&lt;/h4&gt;
+                    &lt;p&gt;Intuitive interface&lt;/p&gt;
+                &lt;/div&gt;
+                &lt;div class="feature"&gt;
+                    &lt;i&gt;⚡&lt;/i&gt;
+                    &lt;h4&gt;Powerful&lt;/h4&gt;
+                    &lt;p&gt;Full code control&lt;/p&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</textarea>
+                </div>
+                
+                <div class="editor-container">
+                    <div class="editor-header css-header">
+                        <div class="editor-icon">CSS</div>
+                        <div>CSS Editor</div>
+                    </div>
+                    <textarea id="css-editor" class="editor" placeholder="Enter your CSS code here...">body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.container {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.website-title {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3498db;
+}
+
+.card {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 15px 0;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-left: 4px solid #3498db;
+}
+
+.card h3 {
+    color: #2980b9;
+    margin-bottom: 10px;
+}
+
+.features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.feature {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    width: 200px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+.feature:hover {
+    transform: translateY(-5px);
+}
+
+.feature i {
+    font-size: 2.5rem;
+    color: #3498db;
+    margin-bottom: 15px;
+}
+
+.feature h4 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}</textarea>
+                </div>
+                
+                <div class="editor-container">
+                    <div class="editor-header js-header">
+                        <div class="editor-icon">JS</div>
+                        <div>JavaScript Editor</div>
+                    </div>
+                    <textarea id="js-editor" class="editor" placeholder="Enter your JavaScript code here...">// Simple interactive features
+document.addEventListener('DOMContentLoaded', function() {
+    // Change title color on click
+    const title = document.querySelector('.website-title');
+    title.addEventListener('click', function() {
+        const colors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6'];
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        title.style.color = randomColor;
+    });
+    
+    // Add animation to cards on hover
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.02)';
+            this.style.boxShadow = '0 8px 16px rgba(0,0,0,0.2)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+            this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+        });
+    });
+    
+    // Alert when clicking features
+    const features = document.querySelectorAll('.feature');
+    features.forEach(feature => {
+        feature.addEventListener('click', function() {
+            const featureName = this.querySelector('h4').textContent;
+            alert(`You clicked on the ${featureName} feature!`);
+        });
+    });
+});</textarea>
+                </div>
+            </div>
+            
+            <div class="preview-section">
+                <div class="preview-header">
+                    <div class="preview-icon">📱</div>
+                    <div>Live Preview</div>
+                </div>
+                <div id="preview-content" class="preview-content">
+                    <!-- Preview will be rendered here -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="run-btn" class="btn run-btn">Run Code ▶️</button>
+            <button id="reset-btn" class="btn reset-btn">Reset Editors 🔄</button>
+            <button id="example-btn" class="btn example-btn">Load Example 💡</button>
+        </div>
+        
+        <footer>
+            <p>Website Builder Tool | Edit the code in the editors and click "Run Code" to see the changes in the preview area.</p>
+            <p>You can create complete websites with this tool by writing HTML, CSS, and JavaScript code.</p>
+        </footer>
+    </div>
+    
+    <script>
+        // Get DOM elements
+        const htmlEditor = document.getElementById('html-editor');
+        const cssEditor = document.getElementById('css-editor');
+        const jsEditor = document.getElementById('js-editor');
+        const previewContent = document.getElementById('preview-content');
+        const runBtn = document.getElementById('run-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const exampleBtn = document.getElementById('example-btn');
+        
+        // Default code for example
+        const defaultHTML = htmlEditor.value;
+        const defaultCSS = cssEditor.value;
+        const defaultJS = jsEditor.value;
+        
+        // Run the code to update preview
+        function runCode() {
+            const htmlCode = htmlEditor.value;
+            const cssCode = cssEditor.value;
+            const jsCode = jsEditor.value;
+            
+            // Create a complete HTML document
+            const previewDocument = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>${cssCode}</style>
+                </head>
+                <body>
+                    ${htmlCode}
+                    <script>${jsCode}<\/script>
+                </body>
+                </html>
+            `;
+            
+            // Update the preview iframe
+            previewContent.innerHTML = '';
+            const iframe = document.createElement('iframe');
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.border = 'none';
+            previewContent.appendChild(iframe);
+            
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            iframeDoc.open();
+            iframeDoc.write(previewDocument);
+            iframeDoc.close();
+        }
+        
+        // Reset editors to default state
+        function resetEditors() {
+            if (confirm('Are you sure you want to reset all editors?')) {
+                htmlEditor.value = '';
+                cssEditor.value = '';
+                jsEditor.value = '';
+                previewContent.innerHTML = '<p class="website-title">Preview will appear here after running code</p>';
+            }
+        }
+        
+        // Load example code
+        function loadExample() {
+            htmlEditor.value = defaultHTML;
+            cssEditor.value = defaultCSS;
+            jsEditor.value = defaultJS;
+            runCode();
+        }
+        
+        // Event listeners
+        runBtn.addEventListener('click', runCode);
+        resetBtn.addEventListener('click', resetEditors);
+        exampleBtn.addEventListener('click', loadExample);
+        
+        // Initialize with example code
+        window.addEventListener('load', function() {
+            runCode();
+        });
+    </script>
+</body>
+</html>

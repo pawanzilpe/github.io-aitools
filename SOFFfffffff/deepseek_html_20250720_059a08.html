@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Photo Editor - Collaborative</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .editor-section {
+            flex: 3;
+            min-width: 300px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .tools-section {
+            flex: 1;
+            min-width: 250px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .canvas-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #canvas {
+            background: rgba(255, 255, 255, 0.1);
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 5px;
+        }
+
+        .upload-area {
+            text-align: center;
+            padding: 20px;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #4CAF50;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            color: #4CAF50;
+        }
+
+        .tool-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tool-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+
+        .tool-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .tool-btn.active {
+            background: #4CAF50;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+        }
+
+        .slider-control {
+            margin-bottom: 15px;
+        }
+
+        .slider-control label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .slider-control input {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider-control input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+
+        .ai-tools {
+            margin-top: 20px;
+        }
+
+        .ai-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, #FF416C, #FF4B2B);
+            border: none;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .ai-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 65, 108, 0.4);
+        }
+
+        .users-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .users-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .user {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-icon {
+            width: 10px;
+            height: 10px;
+            background: #4CAF50;
+            border-radius: 50%;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            padding: 15px;
+            border-radius: 8px;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .save-btn {
+            background: linear-gradient(to right, #2193b0, #6dd5ed);
+        }
+
+        .reset-btn {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateX(120%);
+            transition: transform 0.4s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .ai-processing {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #4CAF50;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .tool-buttons {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI Photo Editor</h1>
+            <p class="subtitle">Collaborative photo editing platform powered by AI. Edit images with multiple users in real-time.</p>
+        </header>
+
+        <div class="main-content">
+            <section class="editor-section">
+                <h2 class="section-title">Editing Canvas</h2>
+                <div class="canvas-container">
+                    <canvas id="canvas" width="600" height="400">Your browser does not support the canvas element.</canvas>
+                </div>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <h3>Upload an Image</h3>
+                    <p>Drag & drop or click to select an image</p>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                </div>
+                
+                <div class="ai-processing" id="aiProcessing">
+                    <div class="spinner"></div>
+                    <p>AI is processing your image...</p>
+                </div>
+            </section>
+            
+            <section class="tools-section">
+                <h2 class="section-title">Editing Tools</h2>
+                
+                <div class="tool-buttons">
+                    <button class="tool-btn active" data-tool="select">✏️ Select</button>
+                    <button class="tool-btn" data-tool="crop">✂️ Crop</button>
+                    <button class="tool-btn" data-tool="rotate">🔄 Rotate</button>
+                    <button class="tool-btn" data-tool="filter">🌈 Filter</button>
+                    <button class="tool-btn" data-tool="text">🔤 Text</button>
+                    <button class="tool-btn" data-tool="draw">🎨 Draw</button>
+                </div>
+                
+                <div class="slider-control">
+                    <label for="brightness">Brightness: <span id="brightnessValue">100%</span></label>
+                    <input type="range" id="brightness" min="0" max="200" value="100">
+                </div>
+                
+                <div class="slider-control">
+                    <label for="contrast">Contrast: <span id="contrastValue">100%</span></label>
+                    <input type="range" id="contrast" min="0" max="200" value="100">
+                </div>
+                
+                <div class="slider-control">
+                    <label for="saturation">Saturation: <span id="saturationValue">100%</span></label>
+                    <input type="range" id="saturation" min="0" max="200" value="100">
+                </div>
+                
+                <div class="ai-tools">
+                    <h2 class="section-title">AI Tools</h2>
+                    <button class="ai-btn" id="aiEnhance">✨ Enhance Image</button>
+                    <button class="ai-btn" id="aiBackground">🌅 Remove Background</button>
+                    <button class="ai-btn" id="aiColorize">🎨 Colorize B&W</button>
+                    <button class="ai-btn" id="aiArt">🖼️ Art Style Transfer</button>
+                </div>
+                
+                <div class="users-section">
+                    <h2 class="section-title">Active Users</h2>
+                    <div class="users-list" id="usersList">
+                        <div class="user"><div class="user-icon"></div> You</div>
+                        <div class="user"><div class="user-icon"></div> Alex</div>
+                        <div class="user"><div class="user-icon"></div> Sam</div>
+                        <div class="user"><div class="user-icon"></div> Priya</div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn save-btn" id="saveBtn">💾 Save Image</button>
+                    <button class="action-btn reset-btn" id="resetBtn">🔄 Reset</button>
+                </div>
+            </section>
+        </div>
+        
+        <footer>
+            <p>AI Photo Editor v1.0 | Collaborative Editing | Real-time Updates</p>
+        </footer>
+    </div>
+    
+    <div class="notification" id="notification">
+        Image saved successfully!
+    </div>
+
+    <script>
+        // DOM Elements
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const toolButtons = document.querySelectorAll('.tool-btn');
+        const brightnessSlider = document.getElementById('brightness');
+        const contrastSlider = document.getElementById('contrast');
+        const saturationSlider = document.getElementById('saturation');
+        const brightnessValue = document.getElementById('brightnessValue');
+        const contrastValue = document.getElementById('contrastValue');
+        const saturationValue = document.getElementById('saturationValue');
+        const aiEnhanceBtn = document.getElementById('aiEnhance');
+        const aiBackgroundBtn = document.getElementById('aiBackground');
+        const aiColorizeBtn = document.getElementById('aiColorize');
+        const aiArtBtn = document.getElementById('aiArt');
+        const saveBtn = document.getElementById('saveBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const notification = document.getElementById('notification');
+        const aiProcessing = document.getElementById('aiProcessing');
+        const usersList = document.getElementById('usersList');
+        
+        // State variables
+        let currentImage = null;
+        let activeTool = 'select';
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        
+        // Initialize canvas
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.font = '20px Arial';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.textAlign = 'center';
+        ctx.fillText('Upload an image to start editing', canvas.width/2, canvas.height/2);
+        
+        // Event Listeners
+        uploadArea.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleImageUpload);
+        
+        // Tool selection
+        toolButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                toolButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                activeTool = button.dataset.tool;
+                
+                // Special handling for drawing tool
+                if (activeTool === 'draw') {
+                    canvas.style.cursor = 'crosshair';
+                } else {
+                    canvas.style.cursor = 'default';
+                }
+            });
+        });
+        
+        // Slider events
+        brightnessSlider.addEventListener('input', updateImageFilters);
+        contrastSlider.addEventListener('input', updateImageFilters);
+        saturationSlider.addEventListener('input', updateImageFilters);
+        
+        // AI Tools
+        aiEnhanceBtn.addEventListener('click', () => simulateAI('enhancing image...'));
+        aiBackgroundBtn.addEventListener('click', () => simulateAI('removing background...'));
+        aiColorizeBtn.addEventListener('click', () => simulateAI('colorizing image...'));
+        aiArtBtn.addEventListener('click', () => simulateAI('applying art style...'));
+        
+        // Action buttons
+        saveBtn.addEventListener('click', saveImage);
+        resetBtn.addEventListener('click', resetFilters);
+        
+        // Drawing functionality
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+        
+        // Functions
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (!file || !file.type.match('image.*')) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    // Scale image to fit canvas
+                    const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+                    const width = img.width * scale;
+                    const height = img.height * scale;
+                    
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, (canvas.width - width) / 2, (canvas.height - height) / 2, width, height);
+                    currentImage = img;
+                    
+                    // Update user list to show collaboration
+                    updateUserList();
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function updateImageFilters() {
+            if (!currentImage) return;
+            
+            brightnessValue.textContent = `${brightnessSlider.value}%`;
+            contrastValue.textContent = `${contrastSlider.value}%`;
+            saturationValue.textContent = `${saturationSlider.value}%`;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Apply filters
+            ctx.filter = `
+                brightness(${brightnessSlider.value}%)
+                contrast(${contrastSlider.value}%)
+                saturate(${saturationSlider.value}%)
+            `;
+            
+            // Redraw image
+            const scale = Math.min(canvas.width / currentImage.width, canvas.height / currentImage.height);
+            const width = currentImage.width * scale;
+            const height = currentImage.height * scale;
+            
+            ctx.drawImage(
+                currentImage, 
+                (canvas.width - width) / 2, 
+                (canvas.height - height) / 2, 
+                width, 
+                height
+            );
+            
+            // Reset filter for next operations
+            ctx.filter = 'none';
+        }
+        
+        function simulateAI(action) {
+            if (!currentImage) {
+                showNotification('Please upload an image first');
+                return;
+            }
+            
+            aiProcessing.style.display = 'block';
+            
+            // Simulate AI processing time
+            setTimeout(() => {
+                aiProcessing.style.display = 'none';
+                
+                // Apply a random filter to simulate AI effect
+                const randomFilter = Math.floor(Math.random() * 4);
+                switch(randomFilter) {
+                    case 0:
+                        brightnessSlider.value = 130;
+                        contrastSlider.value = 120;
+                        saturationSlider.value = 110;
+                        break;
+                    case 1:
+                        brightnessSlider.value = 110;
+                        contrastSlider.value = 130;
+                        saturationSlider.value = 90;
+                        break;
+                    case 2:
+                        brightnessSlider.value = 90;
+                        contrastSlider.value = 110;
+                        saturationSlider.value = 150;
+                        break;
+                    case 3:
+                        brightnessSlider.value = 120;
+                        contrastSlider.value = 90;
+                        saturationSlider.value = 130;
+                        break;
+                }
+                
+                updateImageFilters();
+                showNotification(`AI completed: ${action}`);
+            }, 2000);
+        }
+        
+        function saveImage() {
+            if (!currentImage) {
+                showNotification('Please upload an image first');
+                return;
+            }
+            
+            const link = document.createElement('a');
+            link.download = 'edited-image.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            showNotification('Image saved successfully!');
+        }
+        
+        function resetFilters() {
+            if (!currentImage) return;
+            
+            brightnessSlider.value = 100;
+            contrastSlider.value = 100;
+            saturationSlider.value = 100;
+            updateImageFilters();
+            showNotification('Filters reset to default');
+        }
+        
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        function updateUserList() {
+            // Simulate collaborative editing by showing random users
+            const userCount = 3 + Math.floor(Math.random() * 3);
+            let usersHTML = '<div class="user"><div class="user-icon"></div> You</div>';
+            
+            const names = ['Alex', 'Sam', 'Priya', 'Jordan', 'Taylor', 'Morgan', 'Riley', 'Casey'];
+            
+            for (let i = 0; i < userCount; i++) {
+                const randomName = names[Math.floor(Math.random() * names.length)];
+                usersHTML += `<div class="user"><div class="user-icon"></div> ${randomName}</div>`;
+            }
+            
+            usersList.innerHTML = usersHTML;
+        }
+        
+        // Drawing functions
+        function startDrawing(e) {
+            if (activeTool !== 'draw') return;
+            
+            isDrawing = true;
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+        }
+        
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            ctx.strokeStyle = '#4CAF50';
+            ctx.lineWidth = 5;
+            ctx.lineCap = 'round';
+            
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+            
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+        }
+        
+        function stopDrawing() {
+            isDrawing = false;
+        }
+        
+        // Simulate initial users
+        setTimeout(updateUserList, 1000);
+    </script>
+</body>
+</html>

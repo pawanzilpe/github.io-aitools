@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Video Editor</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --dark: #22223b;
+            --light: #f8f9fa;
+            --success: #4cc9f0;
+            --warning: #f72585;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        header p {
+            color: #c0c0c0;
+            font-size: 1.1rem;
+        }
+        
+        .editor-container {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .preview-section {
+            background: rgba(30, 30, 50, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        
+        .preview-section h2 {
+            margin-bottom: 15px;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .video-container {
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .video-container video {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        .upload-area {
+            border: 2px dashed var(--primary);
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(67, 97, 238, 0.1);
+        }
+        
+        .upload-area:hover {
+            background: rgba(67, 97, 238, 0.2);
+        }
+        
+        .upload-area i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .upload-area p {
+            color: #aaa;
+        }
+        
+        .controls-section {
+            background: rgba(30, 30, 50, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            overflow-y: auto;
+            max-height: 600px;
+        }
+        
+        .controls-section h2 {
+            margin-bottom: 20px;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .control-group {
+            margin-bottom: 25px;
+        }
+        
+        .control-group h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.2rem;
+        }
+        
+        .btn-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .btn i {
+            font-size: 1.2rem;
+        }
+        
+        .btn.active {
+            background: var(--success);
+            box-shadow: 0 0 0 2px var(--light);
+        }
+        
+        .slider-container {
+            margin: 15px 0;
+        }
+        
+        .slider-container label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ccc;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: #3a3a5a;
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .timeline-container {
+            background: rgba(30, 30, 50, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+        
+        .timeline-container h2 {
+            margin-bottom: 15px;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .timeline {
+            height: 100px;
+            background: #2a2a4a;
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #3a3a5a;
+        }
+        
+        .timeline-content {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        
+        .timeline-item {
+            height: 80%;
+            min-width: 80px;
+            background: var(--primary);
+            margin: 0 5px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+            position: relative;
+        }
+        
+        .timeline-item.card {
+            background: var(--warning);
+        }
+        
+        .timeline-playhead {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            height: 100%;
+            width: 3px;
+            background: var(--success);
+            transform: translateX(-50%);
+        }
+        
+        .timeline-playhead::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -8px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid var(--success);
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px 0;
+        }
+        
+        .action-btn {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        
+        .action-btn.download {
+            background: linear-gradient(90deg, var(--success), #2a9d8f);
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .feature-card {
+            background: rgba(30, 30, 50, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-card h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .feature-card p {
+            color: #bbb;
+            line-height: 1.6;
+        }
+        
+        .feature-card ul {
+            margin-top: 10px;
+            padding-left: 20px;
+            color: #aaa;
+        }
+        
+        .feature-card li {
+            margin-bottom: 8px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: #888;
+            margin-top: 40px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        @media (max-width: 900px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-video"></i> Web Video Editor</h1>
+            <p>Professional video editing directly in your browser - Crop, Filter, Animate, Split and more!</p>
+        </header>
+        
+        <div class="editor-container">
+            <div class="preview-section">
+                <h2><i class="fas fa-play-circle"></i> Video Preview</h2>
+                <div class="video-container">
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3>Upload Your Video</h3>
+                        <p>Click or drag & drop to upload a video file</p>
+                        <p class="small">Supported formats: MP4, MOV, AVI, MKV</p>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn">
+                        <i class="fas fa-play"></i> Preview
+                    </button>
+                    <button class="action-btn download">
+                        <i class="fas fa-download"></i> Download Video
+                    </button>
+                </div>
+            </div>
+            
+            <div class="controls-section">
+                <h2><i class="fas fa-sliders-h"></i> Editing Tools</h2>
+                
+                <div class="control-group">
+                    <h3><i class="fas fa-crop-alt"></i> Crop & Transform</h3>
+                    <div class="btn-group">
+                        <button class="btn active">16:9</button>
+                        <button class="btn">1:1</button>
+                        <button class="btn">9:16</button>
+                        <button class="btn">4:3</button>
+                        <button class="btn">Custom</button>
+                    </div>
+                    <div class="slider-container">
+                        <label>Rotation: <span id="rotationValue">0°</span></label>
+                        <input type="range" min="0" max="360" value="0" id="rotationSlider">
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <h3><i class="fas fa-filter"></i> Filters</h3>
+                    <div class="btn-group">
+                        <button class="btn active">None</button>
+                        <button class="btn">Vintage</button>
+                        <button class="btn">B&W</button>
+                        <button class="btn">Cinematic</button>
+                        <button class="btn">Warm</button>
+                        <button class="btn">Cool</button>
+                        <button class="btn">Bright</button>
+                        <button class="btn">Dramatic</button>
+                    </div>
+                    <div class="slider-container">
+                        <label>Intensity: <span id="intensityValue">0%</span></label>
+                        <input type="range" min="0" max="100" value="0" id="intensitySlider">
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <h3><i class="fas fa-bolt"></i> Animation</h3>
+                    <div class="btn-group">
+                        <button class="btn">Fade In</button>
+                        <button class="btn">Zoom</button>
+                        <button class="btn">Slide</button>
+                        <button class="btn">Bounce</button>
+                        <button class="btn">Rotate</button>
+                        <button class="btn">Pan</button>
+                    </div>
+                    <div class="slider-container">
+                        <label>Duration: <span id="durationValue">1s</span></label>
+                        <input type="range" min="0.1" max="5" step="0.1" value="1" id="durationSlider">
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <h3><i class="fas fa-cut"></i> Split & Trim</h3>
+                    <div class="btn-group">
+                        <button class="btn">Split</button>
+                        <button class="btn">Trim Start</button>
+                        <button class="btn">Trim End</button>
+                        <button class="btn">Delete Section</button>
+                    </div>
+                    <div class="slider-container">
+                        <label>Position: <span id="positionValue">00:00</span></label>
+                        <input type="range" min="0" max="100" value="0" id="positionSlider">
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <h3><i class="fas fa-images"></i> Cards & Overlays</h3>
+                    <div class="btn-group">
+                        <button class="btn">Text</button>
+                        <button class="btn">Image</button>
+                        <button class="btn">Shape</button>
+                        <button class="btn">Logo</button>
+                        <button class="btn">Sticker</button>
+                    </div>
+                    <div class="slider-container">
+                        <label>Duration: <span id="cardDurationValue">3s</span></label>
+                        <input type="range" min="1" max="10" value="3" id="cardDurationSlider">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="timeline-container">
+            <h2><i class="fas fa-timeline"></i> Timeline</h2>
+            <div class="timeline">
+                <div class="timeline-content">
+                    <div class="timeline-item">0:00-0:05</div>
+                    <div class="timeline-item card">Card 1</div>
+                    <div class="timeline-item">0:06-0:12</div>
+                    <div class="timeline-item">0:13-0:18</div>
+                    <div class="timeline-item card">Card 2</div>
+                    <div class="timeline-item">0:19-0:25</div>
+                    <div class="timeline-item">0:26-0:32</div>
+                </div>
+                <div class="timeline-playhead"></div>
+            </div>
+        </div>
+        
+        <div class="feature-list">
+            <div class="feature-card">
+                <h3><i class="fas fa-crop-alt"></i> Advanced Cropping</h3>
+                <p>Crop your videos with precision to any aspect ratio or custom dimensions.</p>
+                <ul>
+                    <li>Multiple preset aspect ratios</li>
+                    <li>Custom crop dimensions</li>
+                    <li>Rotation and flipping</li>
+                    <li>Real-time preview</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h3><i class="fas fa-magic"></i> Professional Filters</h3>
+                <p>Enhance your videos with our collection of professionally designed filters.</p>
+                <ul>
+                    <li>30+ unique filters</li>
+                    <li>Adjustable intensity</li>
+                    <li>Custom filter creation</li>
+                    <li>Color correction tools</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h3><i class="fas fa-film"></i> Animation Effects</h3>
+                <p>Bring your videos to life with smooth animations and transitions.</p>
+                <ul>
+                    <li>Text animations</li>
+                    <li>Video transitions</li>
+                    <li>Motion effects</li>
+                    <li>Keyframe animation</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h3><i class="fas fa-cut"></i> Precision Editing</h3>
+                <p>Split, trim and rearrange your video clips with frame accuracy.</p>
+                <ul>
+                    <li>Frame-accurate cutting</li>
+                    <li>Multi-track timeline</li>
+                    <li>Ripple and roll edits</li>
+                    <li>Audio waveform display</li>
+                </ul>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 Web Video Editor | All-in-One Browser-Based Video Editing Solution</p>
+            <p>No installation required - Works on all modern browsers</p>
+        </footer>
+    </div>
+
+    <script>
+        // Update slider values
+        document.getElementById('rotationSlider').addEventListener('input', function() {
+            document.getElementById('rotationValue').textContent = this.value + '°';
+        });
+        
+        document.getElementById('intensitySlider').addEventListener('input', function() {
+            document.getElementById('intensityValue').textContent = this.value + '%';
+        });
+        
+        document.getElementById('durationSlider').addEventListener('input', function() {
+            document.getElementById('durationValue').textContent = this.value + 's';
+        });
+        
+        document.getElementById('positionSlider').addEventListener('input', function() {
+            const minutes = Math.floor(this.value / 20);
+            const seconds = Math.floor((this.value % 20) * 3);
+            document.getElementById('positionValue').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        });
+        
+        document.getElementById('cardDurationSlider').addEventListener('input', function() {
+            document.getElementById('cardDurationValue').textContent = this.value + 's';
+        });
+        
+        // Make buttons toggle active state
+        document.querySelectorAll('.btn-group .btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // For filter buttons, only one can be active
+                if(this.parentElement.previousElementSibling.textContent.includes('Filters')) {
+                    this.parentElement.querySelectorAll('.btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                }
+                this.classList.toggle('active');
+            });
+        });
+        
+        // Upload area interaction
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.addEventListener('click', function() {
+            this.innerHTML = `
+                <i class="fas fa-sync fa-spin"></i>
+                <h3>Processing Video...</h3>
+                <p>Your video is being prepared for editing</p>
+            `;
+            
+            // Simulate processing
+            setTimeout(() => {
+                this.innerHTML = `
+                    <video controls>
+                        <source src="#" type="video/mp4">
+                    </video>
+                    <p class="file-info">sample_video.mp4 | 1920x1080 | 00:30</p>
+                `;
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Video Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --dark: #1d3557;
+            --light: #f8f9fa;
+            --success: #4cc9f0;
+            --danger: #e63946;
+            --warning: #ff9e00;
+            --gray: #8d99ae;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #2c3e50);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--success), var(--primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            color: #a5d8ff;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .editor-container {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .preview-section {
+            flex: 1;
+            background: rgba(29, 53, 87, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .preview-section h2 {
+            margin-bottom: 20px;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .video-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            height: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .video-container video {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 8px;
+            background: #000;
+        }
+        
+        .video-placeholder {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .video-placeholder i {
+            font-size: 5rem;
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+        
+        .video-placeholder p {
+            font-size: 1.2rem;
+            color: var(--gray);
+        }
+        
+        .upload-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+        
+        .upload-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .controls-section {
+            flex: 1;
+            background: rgba(29, 53, 87, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .controls-section h2 {
+            margin-bottom: 20px;
+            color: var(--warning);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .control-group {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .control-group:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-5px);
+        }
+        
+        .control-group h3 {
+            margin-bottom: 15px;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 12px;
+            background: rgba(67, 97, 238, 0.2);
+            color: var(--light);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .control-btn i {
+            font-size: 1.5rem;
+        }
+        
+        .control-btn:hover {
+            background: var(--primary);
+            transform: scale(1.05);
+        }
+        
+        .control-btn.active {
+            background: var(--primary);
+            box-shadow: 0 0 15px rgba(67, 97, 238, 0.5);
+        }
+        
+        .timeline-section {
+            background: rgba(29, 53, 87, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .timeline-section h2 {
+            margin-bottom: 20px;
+            color: #ff70a6;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .timeline {
+            height: 100px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            overflow-x: auto;
+            gap: 15px;
+        }
+        
+        .timeline-item {
+            height: 70px;
+            min-width: 100px;
+            border-radius: 8px;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .timeline-item.video {
+            background: linear-gradient(45deg, var(--primary), var(--success));
+        }
+        
+        .timeline-item.card {
+            background: linear-gradient(45deg, var(--warning), #ff70a6);
+        }
+        
+        .timeline-item i {
+            font-size: 1.8rem;
+            color: white;
+        }
+        
+        .action-btns {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .action-btn {
+            padding: 16px 40px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .action-btn.primary {
+            background: linear-gradient(90deg, var(--success), var(--primary));
+            color: white;
+        }
+        
+        .action-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .filter-preview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .filter-item {
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .filter-item.active {
+            border-color: var(--success);
+            box-shadow: 0 0 15px rgba(76, 201, 240, 0.5);
+        }
+        
+        .filter-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .filter-name {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 5px;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .modal-content {
+            background: var(--dark);
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            padding: 30px;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 992px) {
+            .editor-container {
+                flex-direction: column;
+            }
+            
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .filter-preview {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .action-btns {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-film"></i> Pro Video Editor</h1>
+            <p>Edit your videos with professional tools: crop, apply filters, add animations, insert cards, and more. Export your creation with all effects applied.</p>
+        </header>
+        
+        <div class="editor-container">
+            <div class="preview-section">
+                <h2><i class="fas fa-play-circle"></i> Video Preview</h2>
+                <div class="video-container">
+                    <div class="video-placeholder">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Upload a video to get started</p>
+                    </div>
+                </div>
+                <button class="upload-btn">
+                    <i class="fas fa-upload"></i> Upload Video
+                </button>
+            </div>
+            
+            <div class="controls-section">
+                <h2><i class="fas fa-sliders-h"></i> Editing Tools</h2>
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <h3><i class="fas fa-crop-alt"></i> Crop Video</h3>
+                        <div class="btn-group">
+                            <button class="control-btn">
+                                <i class="fas fa-crop"></i>
+                                <span>Standard</span>
+                            </button>
+                            <button class="control-btn">
+                                <i class="fas fa-square"></i>
+                                <span>Square</span>
+                            </button>
+                            <button class="control-btn">
+                                <i class="fas fa-expand"></i>
+                                <span>Freeform</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h3><i class="fas fa-magic"></i> Filters</h3>
+                        <div class="btn-group">
+                            <button class="control-btn active">
+                                <i class="fas fa-sun"></i>
+                                <span>Vintage</span>
+                            </button>
+                            <button class="control-btn">
+                                <i class="fas fa-moon"></i>
+                                <span>Dark</span>
+                            </button>
+                            <button class="control-btn">
+                                <i class="fas fa-cloud"></i>
+                                <span>Cool</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h3><i class="fas fa-star"></i> Animations</h3>
+                        <div class="btn-group">
+                            <button class="control-btn">
+                                <i class="fas fa-bolt"></i>
+                                <span>Fade In</span>
+                            </button>
+                            <button class="control-btn">
+                                <i class="fas fa-fire"></i>
+                                <span>Zoom</span>
+                            </button>
+                            <button class="control-btn">
+                                <i class="fas fa-wind"></i>
+                                <span>Slide</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <h3><i class="fas fa-cut"></i> Splitting Tools</h3>
+                        <div class="btn-group">
+                            <button class="control-btn">
+                                <i class="fas fa-cut"></i>
+                                <span>Split</span>
+                            </button>
+                            <button class="control-btn">
+                                <i class="fas fa-plus-square"></i>
+                                <span>Insert Card</span>
+                            </button>
+                            <button class="control-btn">
+                                <i class="fas fa-trash-alt"></i>
+                                <span>Delete</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3 style="margin: 25px 0 15px;"><i class="fas fa-filter"></i> Filter Preview</h3>
+                <div class="filter-preview">
+                    <div class="filter-item active">
+                        <div style="background: linear-gradient(45deg, #ff9a9e, #fad0c4); height: 100%;"></div>
+                        <div class="filter-name">Warm Vintage</div>
+                    </div>
+                    <div class="filter-item">
+                        <div style="background: linear-gradient(45deg, #a1c4fd, #c2e9fb); height: 100%;"></div>
+                        <div class="filter-name">Cool Frost</div>
+                    </div>
+                    <div class="filter-item">
+                        <div style="background: linear-gradient(45deg, #d4fc79, #96e6a1); height: 100%;"></div>
+                        <div class="filter-name">Green Tint</div>
+                    </div>
+                    <div class="filter-item">
+                        <div style="background: linear-gradient(45deg, #ffecd2, #fcb69f); height: 100%;"></div>
+                        <div class="filter-name">Sunset</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="timeline-section">
+            <h2><i class="fas fa-stream"></i> Editing Timeline</h2>
+            <div class="timeline">
+                <div class="timeline-item video">
+                    <i class="fas fa-play"></i>
+                </div>
+                <div class="timeline-item card">
+                    <i class="fas fa-image"></i>
+                </div>
+                <div class="timeline-item video">
+                    <i class="fas fa-play"></i>
+                </div>
+                <div class="timeline-item card">
+                    <i class="fas fa-image"></i>
+                </div>
+                <div class="timeline-item video">
+                    <i class="fas fa-play"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-btns">
+            <button class="action-btn primary">
+                <i class="fas fa-play-circle"></i> Preview Video
+            </button>
+            <button class="action-btn secondary">
+                <i class="fas fa-download"></i> Download Video
+            </button>
+        </div>
+    </div>
+    
+    <div class="modal" id="upload-modal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <h2><i class="fas fa-cloud-upload-alt"></i> Upload Video</h2>
+            <div style="border: 2px dashed rgba(255,255,255,0.3); border-radius: 10px; padding: 40px; text-align: center; margin: 25px 0;">
+                <i class="fas fa-file-video" style="font-size: 3rem; color: var(--success); margin-bottom: 20px;"></i>
+                <p>Drag & drop your video file here</p>
+                <p style="font-size: 0.9rem; color: var(--gray); margin: 10px 0 20px;">Supported formats: MP4, MOV, AVI</p>
+                <button class="upload-btn" style="max-width: 200px; margin: 0 auto;">
+                    <i class="fas fa-folder-open"></i> Browse Files
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Modal functionality
+        const uploadBtn = document.querySelector('.upload-btn');
+        const modal = document.querySelector('.modal');
+        const closeModal = document.querySelector('.close-modal');
+        
+        uploadBtn.addEventListener('click', () => {
+            modal.classList.add('active');
+        });
+        
+        closeModal.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+        
+        // Filter selection
+        const filterItems = document.querySelectorAll('.filter-item');
+        filterItems.forEach(item => {
+            item.addEventListener('click', () => {
+                filterItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+            });
+        });
+        
+        // Control button selection
+        const controlBtns = document.querySelectorAll('.control-btn');
+        controlBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons in the same group
+                const group = btn.closest('.btn-group');
+                group.querySelectorAll('.control-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+                
+                // Add active class to clicked button
+                btn.classList.add('active');
+            });
+        });
+        
+        // Simulate video upload
+        const videoPlaceholder = document.querySelector('.video-placeholder');
+        document.querySelector('.modal .upload-btn').addEventListener('click', () => {
+            modal.classList.remove('active');
+            videoPlaceholder.innerHTML = `
+                <video controls>
+                    <source src="#" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <p style="margin-top: 15px;">Your Video Title.mp4</p>
+            `;
+        });
+        
+        // Download button functionality
+        document.querySelector('.action-btn.secondary').addEventListener('click', () => {
+            alert('Your edited video is being processed and will download shortly!');
+        });
+    </script>
+</body>
+</html>

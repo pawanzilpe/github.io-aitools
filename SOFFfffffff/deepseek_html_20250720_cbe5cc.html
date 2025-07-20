@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice-Powered Website Builder</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --dark: #1d3557;
+            --light: #f8f9fa;
+            --success: #4cc9f0;
+            --danger: #f72585;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1d3557 0%, #457b9d 100%);
+            min-height: 100vh;
+            color: var(--light);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--success), #90e0ef);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .main-content {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .voice-section {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 25px;
+            flex: 1;
+            min-width: 300px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .voice-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: var(--dark);
+            box-shadow: 0 4px 10px rgba(76, 201, 240, 0.3);
+        }
+        
+        .btn-success:hover {
+            background: #38b9d8;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 4px 10px rgba(247, 37, 133, 0.3);
+        }
+        
+        .btn-danger:hover {
+            background: #e71d6d;
+            transform: translateY(-2px);
+        }
+        
+        .voice-output {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            min-height: 100px;
+            margin-top: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .voice-output p {
+            line-height: 1.6;
+        }
+        
+        .code-section {
+            flex: 2;
+            min-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .code-tabs {
+            display: flex;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px 10px 0 0;
+            overflow: hidden;
+        }
+        
+        .tab {
+            padding: 15px 25px;
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .tab.active {
+            background: var(--primary);
+        }
+        
+        .tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .code-container {
+            position: relative;
+            flex: 1;
+        }
+        
+        .code-editor {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 0 0 10px 10px;
+            height: 300px;
+            padding: 20px;
+            overflow: auto;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            line-height: 1.5;
+        }
+        
+        .preview-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            flex: 1;
+            min-width: 300px;
+            color: #333;
+        }
+        
+        .preview-section h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+        
+        .preview-content {
+            background: white;
+            border-radius: 10px;
+            min-height: 300px;
+            padding: 20px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+            overflow: auto;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .pulse {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--danger);
+            animation: pulse 1.5s infinite;
+        }
+        
+        .listening .pulse {
+            background: var(--success);
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+        
+        .example-commands {
+            margin-top: 25px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .example-commands h3 {
+            margin-bottom: 10px;
+            color: var(--success);
+        }
+        
+        .command-list {
+            list-style-type: none;
+        }
+        
+        .command-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .command-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .voice-icon {
+            font-size: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .code-section {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Voice-Powered Website Builder</h1>
+            <p class="subtitle">Build websites using voice commands. Just speak and watch your website come to life!</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="voice-section">
+                <h2>Voice Controls</h2>
+                <div class="voice-controls">
+                    <button id="startBtn" class="btn btn-primary">
+                        <span class="voice-icon">🎙️</span> Start Listening
+                    </button>
+                    <button id="generateBtn" class="btn btn-success">
+                        <span class="voice-icon">✨</span> Generate Website
+                    </button>
+                    <button id="clearBtn" class="btn btn-danger">
+                        <span class="voice-icon">🗑️</span> Clear
+                    </button>
+                </div>
+                
+                <div class="voice-output">
+                    <p id="voiceText">No voice input detected. Press "Start Listening" and speak your website requirements.</p>
+                </div>
+                
+                <div class="status" id="status">
+                    <div class="pulse"></div>
+                    <span>Status: Ready to listen</span>
+                </div>
+                
+                <div class="example-commands">
+                    <h3>Example Commands</h3>
+                    <ul class="command-list">
+                        <li>"Create a website with a blue header"</li>
+                        <li>"Add a heading that says 'Welcome to my website'"</li>
+                        <li>"Insert a contact form with name and email fields"</li>
+                        <li>"Make a gallery section with 3 columns"</li>
+                        <li>"Add a footer with copyright information"</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="code-section">
+                <div class="code-tabs">
+                    <div class="tab active" data-tab="html">HTML</div>
+                    <div class="tab" data-tab="css">CSS</div>
+                    <div class="tab" data-tab="js">JavaScript</div>
+                </div>
+                
+                <div class="code-container">
+                    <div id="html-code" class="code-editor" contenteditable="true">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Voice Generated Website&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;!-- Your generated content will appear here --&gt;
+&lt;/body&gt;
+&lt;/html&gt;</div>
+                    <div id="css-code" class="code-editor" contenteditable="true">/* CSS will be generated here */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+}</div>
+                    <div id="js-code" class="code-editor" contenteditable="true">// JavaScript will be generated here
+document.addEventListener('DOMContentLoaded', function() {
+    // Your interactive functionality
+});</div>
+                </div>
+            </div>
+            
+            <div class="preview-section">
+                <h2>Live Preview</h2>
+                <div class="preview-content" id="previewFrame">
+                    <!-- Preview will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const startBtn = document.getElementById('startBtn');
+        const generateBtn = document.getElementById('generateBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const voiceText = document.getElementById('voiceText');
+        const status = document.getElementById('status');
+        const htmlCode = document.getElementById('html-code');
+        const cssCode = document.getElementById('css-code');
+        const jsCode = document.getElementById('js-code');
+        const previewFrame = document.getElementById('previewFrame');
+        const tabs = document.querySelectorAll('.tab');
+        const codeEditors = document.querySelectorAll('.code-editor');
+        
+        // Tab switching
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                tabs.forEach(t => t.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Hide all code editors
+                codeEditors.forEach(editor => editor.style.display = 'none');
+                
+                // Show the selected code editor
+                const tabName = tab.getAttribute('data-tab');
+                document.getElementById(`${tabName}-code`).style.display = 'block';
+            });
+        });
+        
+        // Speech Recognition
+        let recognition;
+        let isListening = false;
+        
+        if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+            
+            recognition.onstart = function() {
+                isListening = true;
+                status.classList.add('listening');
+                status.querySelector('span').textContent = 'Status: Listening...';
+                startBtn.innerHTML = '<span class="voice-icon">🔴</span> Stop Listening';
+            };
+            
+            recognition.onresult = function(event) {
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    if (event.results[i].isFinal) {
+                        transcript += event.results[i][0].transcript;
+                    }
+                }
+                
+                if (transcript) {
+                    voiceText.textContent = transcript;
+                }
+            };
+            
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error', event.error);
+                stopListening();
+                status.querySelector('span').textContent = `Error: ${event.error}`;
+            };
+            
+            recognition.onend = function() {
+                stopListening();
+            };
+        } else {
+            voiceText.textContent = "Speech recognition not supported in this browser. Try Chrome or Edge.";
+            startBtn.disabled = true;
+        }
+        
+        function startListening() {
+            if (!isListening) {
+                try {
+                    recognition.start();
+                } catch (error) {
+                    console.error('Speech recognition start error:', error);
+                }
+            }
+        }
+        
+        function stopListening() {
+            isListening = false;
+            status.classList.remove('listening');
+            status.querySelector('span').textContent = 'Status: Ready to listen';
+            startBtn.innerHTML = '<span class="voice-icon">🎙️</span> Start Listening';
+        }
+        
+        startBtn.addEventListener('click', function() {
+            if (isListening) {
+                recognition.stop();
+            } else {
+                startListening();
+            }
+        });
+        
+        // Generate website from voice input
+        generateBtn.addEventListener('click', function() {
+            const command = voiceText.textContent.toLowerCase();
+            
+            // Generate HTML based on voice command
+            let htmlContent = `<header style="background-color: #4361ee; color: white; padding: 20px; text-align: center;">
+    <h1>Voice Generated Website</h1>
+    <p>Created with Voice-Powered Website Builder</p>
+</header>
+<main style="max-width: 1200px; margin: 30px auto; padding: 20px;">
+    <section style="margin-bottom: 40px;">
+        <h2>Welcome to Your Generated Website</h2>
+        <p>This website was created based on your voice command: "${command}"</p>
+    </section>`;
+            
+            // Add sections based on voice commands
+            if (command.includes('heading')) {
+                htmlContent += `<section style="margin-bottom: 40px;">
+        <h2>Special Heading Section</h2>
+        <p>This section was added because you mentioned "heading" in your command.</p>
+    </section>`;
+            }
+            
+            if (command.includes('form') || command.includes('contact')) {
+                htmlContent += `<section style="background-color: #f8f9fa; padding: 25px; border-radius: 10px; margin-bottom: 40px;">
+        <h2>Contact Form</h2>
+        <form style="max-width: 500px; margin: 0 auto;">
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px;">Name:</label>
+                <input type="text" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px;">Email:</label>
+                <input type="email" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px;">Message:</label>
+                <textarea style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ddd; height: 100px;"></textarea>
+            </div>
+            <button type="submit" style="background-color: #4361ee; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Submit</button>
+        </form>
+    </section>`;
+            }
+            
+            if (command.includes('gallery') || command.includes('image')) {
+                htmlContent += `<section style="margin-bottom: 40px;">
+        <h2>Image Gallery</h2>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+            <div style="background-color: #e9ecef; height: 150px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">Image 1</div>
+            <div style="background-color: #e9ecef; height: 150px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">Image 2</div>
+            <div style="background-color: #e9ecef; height: 150px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">Image 3</div>
+        </div>
+    </section>`;
+            }
+            
+            htmlContent += `</main>
+<footer style="background-color: #1d3557; color: white; text-align: center; padding: 20px; margin-top: 40px;">
+    <p>&copy; ${new Date().getFullYear()} Voice Generated Website. All rights reserved.</p>
+</footer>`;
+            
+            // Generate CSS
+            const cssContent = `body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f4f4f9;
+}
+
+header {
+    background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+    color: white;
+    padding: 40px 20px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+h2 {
+    color: #4361ee;
+    border-bottom: 2px solid #4cc9f0;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+main {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+section {
+    margin-bottom: 40px;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+footer {
+    background: #1d3557;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+}
+
+button {
+    background: linear-gradient(to right, #4361ee, #4cc9f0);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}`;
+            
+            // Generate JS
+            const jsContent = `document.addEventListener('DOMContentLoaded', function() {
+    // Form submission handling
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Thank you for your message! This is a demo form.');
+            form.reset();
+        });
+    });
+    
+    // Any additional functionality based on voice commands
+    console.log('Website generated successfully!');
+});`;
+            
+            // Update code editors
+            htmlCode.textContent = htmlContent;
+            cssCode.textContent = cssContent;
+            jsCode.textContent = jsContent;
+            
+            // Update preview
+            updatePreview();
+        });
+        
+        // Clear all content
+        clearBtn.addEventListener('click', function() {
+            voiceText.textContent = "No voice input detected. Press 'Start Listening' and speak your website requirements.";
+            htmlCode.textContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Generated Website</title>
+</head>
+<body>
+    <!-- Your generated content will appear here -->
+</body>
+</html>`;
+            cssCode.textContent = `/* CSS will be generated here */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+}`;
+            jsCode.textContent = `// JavaScript will be generated here
+document.addEventListener('DOMContentLoaded', function() {
+    // Your interactive functionality
+});`;
+            previewFrame.innerHTML = "<div style='text-align: center; padding: 50px; color: #666;'><h3>Preview Area</h3><p>Generated content will appear here</p></div>";
+        });
+        
+        // Update preview function
+        function updatePreview() {
+            const html = htmlCode.textContent;
+            const css = cssCode.textContent;
+            const js = jsCode.textContent;
+            
+            const previewDoc = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>${css}</style>
+                </head>
+                <body>
+                    ${html}
+                    <script>${js}<\/script>
+                </body>
+                </html>
+            `;
+            
+            previewFrame.innerHTML = '';
+            const iframe = document.createElement('iframe');
+            iframe.style.width = '100%';
+            iframe.style.height = '400px';
+            iframe.style.border = 'none';
+            iframe.style.borderRadius = '8px';
+            previewFrame.appendChild(iframe);
+            
+            const iframeDoc = iframe.contentWindow.document;
+            iframeDoc.open();
+            iframeDoc.write(previewDoc);
+            iframeDoc.close();
+        }
+        
+        // Initialize the preview
+        updatePreview();
+        
+        // Update preview when code changes
+        [htmlCode, cssCode, jsCode].forEach(editor => {
+            editor.addEventListener('input', updatePreview);
+        });
+    </script>
+</body>
+</html>

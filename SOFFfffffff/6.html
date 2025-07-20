@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Vacancy Card Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            transition: transform 0.3s ease;
+        }
+        
+        .panel:hover {
+            transform: translateY(-5px);
+        }
+        
+        .panel-title {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            color: #1a2a6c;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        .input-group input, 
+        .input-group textarea,
+        .input-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group input:focus, 
+        .input-group textarea:focus,
+        .input-group select:focus {
+            border-color: #1a2a6c;
+            outline: none;
+        }
+        
+        .input-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #1a2a6c, #b21f1f);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn i {
+            font-size: 1.2rem;
+        }
+        
+        .card-preview {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            height: 100%;
+        }
+        
+        .card-header {
+            background: linear-gradient(to right, #1a2a6c, #3a56c0);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .card-header h2 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .card-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .card-body {
+            padding: 25px;
+        }
+        
+        .job-details {
+            margin-bottom: 25px;
+        }
+        
+        .job-details h3 {
+            font-size: 1.4rem;
+            color: #1a2a6c;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .job-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .info-item {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        
+        .info-item i {
+            color: #b21f1f;
+            font-size: 1.2rem;
+            margin-top: 3px;
+        }
+        
+        .requirements {
+            margin-top: 10px;
+        }
+        
+        .requirements ul {
+            padding-left: 25px;
+        }
+        
+        .requirements li {
+            margin-bottom: 8px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn.apply {
+            background: linear-gradient(to right, #1a2a6c, #3a56c0);
+            color: white;
+        }
+        
+        .action-btn.save {
+            background: linear-gradient(to right, #b21f1f, #d64c4c);
+            color: white;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .code-section {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .code-tabs {
+            display: flex;
+            background: #1e1e1e;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+        }
+        
+        .code-tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            background: #3c3c3c;
+            color: #aaa;
+            transition: all 0.3s;
+        }
+        
+        .code-tab.active {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            font-weight: bold;
+        }
+        
+        .code-content {
+            display: none;
+            padding: 15px;
+        }
+        
+        .code-content.active {
+            display: block;
+        }
+        
+        .preview-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .preview-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .tab-btn {
+            background: #e0e0e0;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            background: #1a2a6c;
+            color: white;
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            margin-top: 30px;
+        }
+        
+        .instructions h2 {
+            font-size: 1.8rem;
+            color: #1a2a6c;
+            margin-bottom: 15px;
+        }
+        
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .step {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .step-number {
+            background: #1a2a6c;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .step h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .step p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, #1a2a6c, #b21f1f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Job Vacancy <span class="highlight">Card Generator</span></h1>
+            <p>Create professional job vacancy cards with real-time preview and code generation</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="panel">
+                <h2 class="panel-title"><i class="fas fa-edit"></i> Create Vacancy</h2>
+                
+                <div class="input-group">
+                    <label for="jobTitle">Job Title</label>
+                    <input type="text" id="jobTitle" placeholder="Enter job title" value="Senior Web Developer">
+                </div>
+                
+                <div class="input-group">
+                    <label for="company">Company Name</label>
+                    <input type="text" id="company" placeholder="Enter company name" value="Tech Innovations Ltd.">
+                </div>
+                
+                <div class="input-group">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" placeholder="Enter job location" value="Remote / Bangalore">
+                </div>
+                
+                <div class="input-group">
+                    <label for="salary">Salary Range</label>
+                    <input type="text" id="salary" placeholder="Enter salary range" value="₹12,00,000 - ₹18,00,000">
+                </div>
+                
+                <div class="input-group">
+                    <label for="jobType">Job Type</label>
+                    <select id="jobType">
+                        <option>Full-time</option>
+                        <option>Part-time</option>
+                        <option>Contract</option>
+                        <option>Internship</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="description">Job Description</label>
+                    <textarea id="description">We are looking for an experienced Web Developer to join our team. You will be responsible for building and maintaining web applications using modern technologies.
+
+Responsibilities:
+- Develop new user-facing features
+- Build reusable code and libraries
+- Optimize applications for maximum speed and scalability
+- Collaborate with back-end developers and web designers
+- Ensure high quality graphic standards and brand consistency</textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label for="requirements">Requirements</label>
+                    <textarea id="requirements">- 5+ years of experience in front-end development
+- Proficient in HTML, CSS, JavaScript
+- Experience with React, Angular or Vue.js
+- Knowledge of responsive design principles
+- Familiarity with version control (Git)
+- Strong problem-solving skills
+- Excellent communication abilities</textarea>
+                </div>
+                
+                <button id="generateBtn" class="btn"><i class="fas fa-magic"></i> Generate Vacancy Card</button>
+            </div>
+            
+            <div class="panel">
+                <div class="preview-container">
+                    <div class="preview-title">
+                        <h2 class="panel-title"><i class="fas fa-eye"></i> Preview</h2>
+                        <div class="tab-buttons">
+                            <button class="tab-btn active" data-tab="output">Output</button>
+                            <button class="tab-btn" data-tab="frontend">Frontend</button>
+                            <button class="tab-btn" data-tab="backend">Backend</button>
+                        </div>
+                    </div>
+                    
+                    <div id="outputPreview" class="card-preview">
+                        <div class="card-header">
+                            <h2 id="previewTitle">Senior Web Developer</h2>
+                            <p id="previewCompany">Tech Innovations Ltd.</p>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="job-details">
+                                <div class="job-info">
+                                    <div class="info-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <div>
+                                            <strong>Location:</strong>
+                                            <p id="previewLocation">Remote / Bangalore</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="info-item">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                        <div>
+                                            <strong>Salary:</strong>
+                                            <p id="previewSalary">₹12,00,000 - ₹18,00,000</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="info-item">
+                                        <i class="fas fa-briefcase"></i>
+                                        <div>
+                                            <strong>Job Type:</strong>
+                                            <p id="previewType">Full-time</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="info-item">
+                                        <i class="fas fa-clock"></i>
+                                        <div>
+                                            <strong>Posted:</strong>
+                                            <p>3 days ago</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <h3>Job Description</h3>
+                                <p id="previewDescription">We are looking for an experienced Web Developer to join our team. You will be responsible for building and maintaining web applications using modern technologies.</p>
+                                
+                                <div class="requirements">
+                                    <h3>Requirements</h3>
+                                    <ul id="previewRequirements">
+                                        <li>5+ years of experience in front-end development</li>
+                                        <li>Proficient in HTML, CSS, JavaScript</li>
+                                        <li>Experience with React, Angular or Vue.js</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <div class="action-btn apply">Apply Now</div>
+                                <div class="action-btn save">Save Job</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="codePreview" class="code-section" style="display: none;">
+                        <div class="code-tabs">
+                            <div class="code-tab active" data-code="html">HTML</div>
+                            <div class="code-tab" data-code="css">CSS</div>
+                            <div class="code-tab" data-code="js">JavaScript</div>
+                        </div>
+                        
+                        <div class="code-content active" id="htmlCode">
+                            <pre>&lt;div class="job-card"&gt;
+  &lt;div class="card-header"&gt;
+    &lt;h2&gt;Senior Web Developer&lt;/h2&gt;
+    &lt;p&gt;Tech Innovations Ltd.&lt;/p&gt;
+  &lt;/div&gt;
+  
+  &lt;div class="card-body"&gt;
+    &lt;div class="job-info"&gt;
+      &lt;div class="info-item"&gt;
+        &lt;i class="fas fa-map-marker-alt"&gt;&lt;/i&gt;
+        &lt;div&gt;
+          &lt;strong&gt;Location:&lt;/strong&gt;
+          &lt;p&gt;Remote / Bangalore&lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;!-- More job info --&gt;
+    &lt;/div&gt;
+    
+    &lt;h3&gt;Job Description&lt;/h3&gt;
+    &lt;p&gt;We are looking for an experienced...&lt;/p&gt;
+    
+    &lt;div class="requirements"&gt;
+      &lt;h3&gt;Requirements&lt;/h3&gt;
+      &lt;ul&gt;
+        &lt;li&gt;5+ years of experience...&lt;/li&gt;
+        &lt;!-- More requirements --&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="action-buttons"&gt;
+      &lt;div class="action-btn apply"&gt;Apply Now&lt;/div&gt;
+      &lt;div class="action-btn save"&gt;Save Job&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+                        </div>
+                        
+                        <div class="code-content" id="cssCode">
+                            <pre>.job-card {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+.card-header {
+  background: linear-gradient(to right, #1a2a6c, #3a56c0);
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+.job-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.info-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.action-btn {
+  flex: 1;
+  text-align: center;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.apply {
+  background: linear-gradient(to right, #1a2a6c, #3a56c0);
+  color: white;
+}</pre>
+                        </div>
+                        
+                        <div class="code-content" id="jsCode">
+                            <pre>// Sample JavaScript for job card functionality
+document.querySelectorAll('.action-btn').forEach(button => {
+  button.addEventListener('click', function() {
+    const action = this.classList.contains('apply') ? 
+                  'apply' : 'save';
+    
+    if (action === 'apply') {
+      // Redirect to application form
+      window.location.href = '/apply';
+    } else {
+      // Save job to favorites
+      const jobId = this.closest('.job-card').dataset.id;
+      saveJobToFavorites(jobId);
+    }
+  });
+});
+
+function saveJobToFavorites(jobId) {
+  // API call to save job
+  fetch(`/api/jobs/${jobId}/save`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${userToken}`
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      showNotification('Job saved successfully!');
+    }
+  });
+}</pre>
+                        </div>
+                    </div>
+                    
+                    <div id="backendPreview" class="code-section" style="display: none;">
+                        <div class="code-tabs">
+                            <div class="code-tab active" data-code="model">Model</div>
+                            <div class="code-tab" data-code="controller">Controller</div>
+                            <div class="code-tab" data-code="route">Route</div>
+                        </div>
+                        
+                        <div class="code-content active" id="modelCode">
+                            <pre>// Job model (MongoDB schema)
+const mongoose = require('mongoose');
+
+const jobSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true
+  },
+  company: {
+    type: String,
+    required: true
+  },
+  location: String,
+  salary: String,
+  jobType: {
+    type: String,
+    enum: ['Full-time', 'Part-time', 'Contract', 'Internship']
+  },
+  description: String,
+  requirements: [String],
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+module.exports = mongoose.model('Job', jobSchema);</pre>
+                        </div>
+                        
+                        <div class="code-content" id="controllerCode">
+                            <pre>// Job controller
+exports.createJob = async (req, res) => {
+  try {
+    const { title, company, location, salary, jobType, description, requirements } = req.body;
+    
+    const job = new Job({
+      title,
+      company,
+      location,
+      salary,
+      jobType,
+      description,
+      requirements: requirements.split('\n'),
+      createdBy: req.user.id
+    });
+    
+    await job.save();
+    
+    res.status(201).json({
+      success: true,
+      data: job
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: 'Server error'
+    });
+  }
+};
+
+exports.getJobs = async (req, res) => {
+  try {
+    const jobs = await Job.find().sort({ createdAt: -1 });
+    res.json({
+      success: true,
+      count: jobs.length,
+      data: jobs
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: 'Server error'
+    });
+  }
+};</pre>
+                        </div>
+                        
+                        <div class="code-content" id="routeCode">
+                            <pre>// Job routes
+const express = require('express');
+const router = express.Router();
+const { protect } = require('../middleware/auth');
+const {
+  createJob,
+  getJobs,
+  getJob,
+  updateJob,
+  deleteJob
+} = require('../controllers/jobs');
+
+// Public routes
+router.route('/')
+  .get(getJobs);
+
+router.route('/:id')
+  .get(getJob);
+
+// Protected routes (require authentication)
+router.use(protect);
+
+router.route('/')
+  .post(createJob);
+
+router.route('/:id')
+  .put(updateJob)
+  .delete(deleteJob);
+
+module.exports = router;</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h2>How to Use the Job Vacancy Generator</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Enter Job Details</h3>
+                    <p>Fill in all the required fields in the form including job title, company, location, salary, and description.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Generate Card</h3>
+                    <p>Click the "Generate Vacancy Card" button to create your job card with the information you provided.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Preview Output</h3>
+                    <p>View the generated job card in the preview section. The output tab shows how the card will appear to applicants.</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Get Code</h3>
+                    <p>Switch between Frontend and Backend tabs to view the HTML, CSS, JavaScript and backend code for your job card.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements
+            const generateBtn = document.getElementById('generateBtn');
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const codeTabs = document.querySelectorAll('.code-tab');
+            
+            // Form inputs
+            const jobTitleInput = document.getElementById('jobTitle');
+            const companyInput = document.getElementById('company');
+            const locationInput = document.getElementById('location');
+            const salaryInput = document.getElementById('salary');
+            const jobTypeInput = document.getElementById('jobType');
+            const descriptionInput = document.getElementById('description');
+            const requirementsInput = document.getElementById('requirements');
+            
+            // Preview elements
+            const previewTitle = document.getElementById('previewTitle');
+            const previewCompany = document.getElementById('previewCompany');
+            const previewLocation = document.getElementById('previewLocation');
+            const previewSalary = document.getElementById('previewSalary');
+            const previewType = document.getElementById('previewType');
+            const previewDescription = document.getElementById('previewDescription');
+            const previewRequirements = document.getElementById('previewRequirements');
+            
+            // Initialize preview with default values
+            updatePreview();
+            
+            // Event listeners
+            generateBtn.addEventListener('click', updatePreview);
+            
+            // Tab switching functionality
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tab = this.dataset.tab;
+                    
+                    // Update active tab button
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show corresponding preview
+                    if (tab === 'output') {
+                        document.getElementById('outputPreview').style.display = 'block';
+                        document.getElementById('codePreview').style.display = 'none';
+                        document.getElementById('backendPreview').style.display = 'none';
+                    } else if (tab === 'frontend') {
+                        document.getElementById('outputPreview').style.display = 'none';
+                        document.getElementById('codePreview').style.display = 'block';
+                        document.getElementById('backendPreview').style.display = 'none';
+                    } else if (tab === 'backend') {
+                        document.getElementById('outputPreview').style.display = 'none';
+                        document.getElementById('codePreview').style.display = 'none';
+                        document.getElementById('backendPreview').style.display = 'block';
+                    }
+                });
+            });
+            
+            // Code tab switching
+            codeTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const codeType = this.dataset.code;
+                    
+                    // Update active code tab
+                    codeTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show corresponding code
+                    document.querySelectorAll('.code-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    if (this.closest('#codePreview')) {
+                        document.getElementById(codeType + 'Code').classList.add('active');
+                    } else {
+                        document.getElementById(codeType + 'Code').classList.add('active');
+                    }
+                });
+            });
+            
+            // Update preview function
+            function updatePreview() {
+                previewTitle.textContent = jobTitleInput.value;
+                previewCompany.textContent = companyInput.value;
+                previewLocation.textContent = locationInput.value;
+                previewSalary.textContent = salaryInput.value;
+                previewType.textContent = jobTypeInput.value;
+                previewDescription.textContent = descriptionInput.value;
+                
+                // Format requirements as list
+                const requirements = requirementsInput.value.split('\n');
+                previewRequirements.innerHTML = '';
+                
+                requirements.forEach(req => {
+                    if (req.trim() !== '') {
+                        const li = document.createElement('li');
+                        li.textContent = req.trim();
+                        previewRequirements.appendChild(li);
+                    }
+                });
+                
+                // Show success message
+                showNotification('Job card updated successfully!');
+            }
+            
+            // Show notification function
+            function showNotification(message) {
+                // Remove existing notification if any
+                const existingNotification = document.querySelector('.notification');
+                if (existingNotification) {
+                    existingNotification.remove();
+                }
+                
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                notification.innerHTML = `
+                    <div style="position: fixed; top: 20px; right: 20px; background: #4CAF50; color: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1000; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-check-circle"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Remove notification after 3 seconds
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

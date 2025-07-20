@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Vacancy Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #e0e0e0;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .main-content {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .input-section {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .preview-section {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: #3498db;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn-generate {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .btn-generate:hover {
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+        }
+        
+        .vacancy-preview {
+            flex: 1;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f9f9f9;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .vacancy-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .vacancy-title {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .vacancy-meta {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #7f8c8d;
+        }
+        
+        .vacancy-description {
+            margin: 25px 0;
+            line-height: 1.8;
+        }
+        
+        .requirements {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .requirements-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .requirements-list {
+            padding-left: 20px;
+        }
+        
+        .requirements-list li {
+            margin-bottom: 8px;
+        }
+        
+        .apply-section {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .code-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #3498db;
+            margin-bottom: 20px;
+        }
+        
+        .tab-btn {
+            padding: 12px 25px;
+            background: #ecf0f1;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #7f8c8d;
+        }
+        
+        .tab-btn.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            color: #95a5a6;
+        }
+        
+        .copy-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background: #2980b9;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: white;
+            font-size: 1rem;
+        }
+        
+        @media (max-width: 1100px) {
+            .main-content {
+                flex-direction: column;
+            }
+        }
+        
+        .highlight {
+            color: #e74c3c;
+        }
+        
+        .keyword {
+            color: #3498db;
+        }
+        
+        .comment {
+            color: #7f8c8d;
+        }
+        
+        .tag {
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Job Vacancy Generator</h1>
+            <p class="subtitle">Create professional job vacancy pages with automatic HTML, CSS & JavaScript code generation. Preview your job posting in real-time!</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="input-section">
+                <h2 class="section-title"><i class="fas fa-edit"></i> Job Details</h2>
+                
+                <div class="form-group">
+                    <label for="jobTitle">Job Title</label>
+                    <input type="text" id="jobTitle" placeholder="Enter job title (e.g., Senior Frontend Developer)" value="Senior Web Developer">
+                </div>
+                
+                <div class="form-group">
+                    <label for="company">Company Name</label>
+                    <input type="text" id="company" placeholder="Enter company name" value="Tech Innovations Ltd.">
+                </div>
+                
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" placeholder="Enter job location" value="Remote / New York, NY">
+                </div>
+                
+                <div class="form-group">
+                    <label for="salary">Salary Range</label>
+                    <input type="text" id="salary" placeholder="Enter salary range" value="$90,000 - $120,000 per year">
+                </div>
+                
+                <div class="form-group">
+                    <label for="jobType">Job Type</label>
+                    <select id="jobType">
+                        <option>Full-time</option>
+                        <option>Part-time</option>
+                        <option selected>Contract</option>
+                        <option>Freelance</option>
+                        <option>Internship</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Job Description</label>
+                    <textarea id="description">We are seeking a talented Senior Web Developer to join our growing team. You will be responsible for building and maintaining our web applications using modern JavaScript frameworks.
+
+Responsibilities:
+- Develop new user-facing features
+- Build reusable code and libraries
+- Optimize applications for maximum speed and scalability
+- Collaborate with back-end developers and web designers
+- Ensure high quality graphic standards and brand consistency</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="requirements">Requirements (separate with commas)</label>
+                    <textarea id="requirements">5+ years of experience in web development, Strong proficiency in JavaScript, including DOM manipulation, Experience with React.js and its core principles, Familiarity with RESTful APIs, Knowledge of modern authorization mechanisms, Familiarity with code versioning tools (Git)</textarea>
+                </div>
+                
+                <button class="btn btn-generate" id="generateBtn">
+                    <i class="fas fa-code"></i> Generate Vacancy Page
+                </button>
+            </div>
+            
+            <div class="preview-section">
+                <h2 class="section-title"><i class="fas fa-eye"></i> Live Preview</h2>
+                <div class="vacancy-preview">
+                    <div class="vacancy-card">
+                        <h2 class="vacancy-title">Senior Web Developer</h2>
+                        <div class="vacancy-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-building"></i>
+                                <span>Tech Innovations Ltd.</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Remote / New York, NY</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-dollar-sign"></i>
+                                <span>$90,000 - $120,000 per year</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-briefcase"></i>
+                                <span>Contract</span>
+                            </div>
+                        </div>
+                        
+                        <div class="vacancy-description">
+                            <p>We are seeking a talented Senior Web Developer to join our growing team. You will be responsible for building and maintaining our web applications using modern JavaScript frameworks.</p>
+                            <p>Responsibilities:</p>
+                            <ul>
+                                <li>Develop new user-facing features</li>
+                                <li>Build reusable code and libraries</li>
+                                <li>Optimize applications for maximum speed and scalability</li>
+                                <li>Collaborate with back-end developers and web designers</li>
+                                <li>Ensure high quality graphic standards and brand consistency</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="requirements">
+                            <h3 class="requirements-title">Requirements:</h3>
+                            <ul class="requirements-list">
+                                <li>5+ years of experience in web development</li>
+                                <li>Strong proficiency in JavaScript, including DOM manipulation</li>
+                                <li>Experience with React.js and its core principles</li>
+                                <li>Familiarity with RESTful APIs</li>
+                                <li>Knowledge of modern authorization mechanisms</li>
+                                <li>Familiarity with code versioning tools (Git)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="apply-section">
+                            <button class="btn">
+                                <i class="fas fa-paper-plane"></i> Apply Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="code-section">
+            <h2 class="section-title"><i class="fas fa-file-code"></i> Generated Code</h2>
+            
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="html">HTML</button>
+                <button class="tab-btn" data-tab="css">CSS</button>
+                <button class="tab-btn" data-tab="js">JavaScript</button>
+                <button class="tab-btn" data-tab="backend">Backend (Node.js)</button>
+            </div>
+            
+            <div id="html-tab" class="tab-content active">
+                <div class="code-header">
+                    <span>vacancy.html</span>
+                    <button class="copy-btn" data-code="html"><i class="fas fa-copy"></i> Copy Code</button>
+                </div>
+                <pre class="code-block" id="html-code"><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Senior Web Developer - Tech Innovations Ltd.&lt;/title&gt;
+    &lt;link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"&gt;
+    &lt;style&gt;
+        /* CSS will be generated separately */
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="vacancy-container"&gt;
+        &lt;div class="vacancy-card"&gt;
+            &lt;h1 class="vacancy-title"&gt;Senior Web Developer&lt;/h1&gt;
+            
+            &lt;div class="vacancy-meta"&gt;
+                &lt;div class="meta-item"&gt;
+                    &lt;i class="fas fa-building"&gt;&lt;/i&gt;
+                    &lt;span&gt;Tech Innovations Ltd.&lt;/span&gt;
+                &lt;/div&gt;
+                &lt;div class="meta-item"&gt;
+                    &lt;i class="fas fa-map-marker-alt"&gt;&lt;/i&gt;
+                    &lt;span&gt;Remote / New York, NY&lt;/span&gt;
+                &lt;/div&gt;
+                &lt;div class="meta-item"&gt;
+                    &lt;i class="fas fa-dollar-sign"&gt;&lt;/i&gt;
+                    &lt;span&gt;$90,000 - $120,000 per year&lt;/span&gt;
+                &lt;/div&gt;
+                &lt;div class="meta-item"&gt;
+                    &lt;i class="fas fa-briefcase"&gt;&lt;/i&gt;
+                    &lt;span&gt;Contract&lt;/span&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+            
+            &lt;div class="vacancy-description"&gt;
+                &lt;p&gt;We are seeking a talented Senior Web Developer to join our growing team. You will be responsible for building and maintaining our web applications using modern JavaScript frameworks.&lt;/p&gt;
+                
+                &lt;p&gt;Responsibilities:&lt;/p&gt;
+                &lt;ul&gt;
+                    &lt;li&gt;Develop new user-facing features&lt;/li&gt;
+                    &lt;li&gt;Build reusable code and libraries&lt;/li&gt;
+                    &lt;li&gt;Optimize applications for maximum speed and scalability&lt;/li&gt;
+                    &lt;li&gt;Collaborate with back-end developers and web designers&lt;/li&gt;
+                    &lt;li&gt;Ensure high quality graphic standards and brand consistency&lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/div&gt;
+            
+            &lt;div class="requirements"&gt;
+                &lt;h3&gt;Requirements:&lt;/h3&gt;
+                &lt;ul class="requirements-list"&gt;
+                    &lt;li&gt;5+ years of experience in web development&lt;/li&gt;
+                    &lt;li&gt;Strong proficiency in JavaScript, including DOM manipulation&lt;/li&gt;
+                    &lt;li&gt;Experience with React.js and its core principles&lt;/li&gt;
+                    &lt;li&gt;Familiarity with RESTful APIs&lt;/li&gt;
+                    &lt;li&gt;Knowledge of modern authorization mechanisms&lt;/li&gt;
+                    &lt;li&gt;Familiarity with code versioning tools (Git)&lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/div&gt;
+            
+            &lt;div class="apply-section"&gt;
+                &lt;button id="applyBtn" class="apply-btn"&gt;
+                    &lt;i class="fas fa-paper-plane"&gt;&lt;/i&gt; Apply Now
+                &lt;/button&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    
+    &lt;script&gt;
+        // JavaScript will be generated separately
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            </div>
+            
+            <div id="css-tab" class="tab-content">
+                <div class="code-header">
+                    <span>styles.css</span>
+                    <button class="copy-btn" data-code="css"><i class="fas fa-copy"></i> Copy Code</button>
+                </div>
+                <pre class="code-block" id="css-code"><code>/* Job Vacancy Page Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+}
+
+.vacancy-container {
+    max-width: 800px;
+    margin: 40px auto;
+}
+
+.vacancy-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+.vacancy-title {
+    font-size: 2.2rem;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 15px;
+}
+
+.vacancy-meta {
+    display: flex;
+    gap: 25px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #555;
+    font-size: 1.05rem;
+}
+
+.meta-item i {
+    color: #3498db;
+    font-size: 1.1rem;
+}
+
+.vacancy-description {
+    margin: 25px 0;
+    line-height: 1.8;
+    font-size: 1.1rem;
+}
+
+.vacancy-description p {
+    margin-bottom: 15px;
+}
+
+.vacancy-description ul {
+    padding-left: 25px;
+    margin: 15px 0;
+}
+
+.vacancy-description li {
+    margin-bottom: 8px;
+}
+
+.requirements {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 10px;
+    margin: 30px 0;
+    border-left: 4px solid #3498db;
+}
+
+.requirements h3 {
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+.requirements-list {
+    padding-left: 25px;
+}
+
+.requirements-list li {
+    margin-bottom: 10px;
+    font-size: 1.05rem;
+}
+
+.apply-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    text-align: center;
+}
+
+.apply-btn {
+    background: linear-gradient(to right, #3498db, #2980b9);
+    color: white;
+    border: none;
+    padding: 14px 35px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.apply-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+}
+
+.apply-btn:active {
+    transform: translateY(1px);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .vacancy-meta {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .vacancy-title {
+        font-size: 1.8rem;
+    }
+}</code></pre>
+            </div>
+            
+            <div id="js-tab" class="tab-content">
+                <div class="code-header">
+                    <span>script.js</span>
+                    <button class="copy-btn" data-code="js"><i class="fas fa-copy"></i> Copy Code</button>
+                </div>
+                <pre class="code-block" id="js-code"><code>// Job Vacancy Page JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the apply button
+    const applyBtn = document.getElementById('applyBtn');
+    
+    // Add click event to apply button
+    applyBtn.addEventListener('click', function() {
+        // Get applicant name
+        const name = prompt('Please enter your name:');
+        
+        if (name) {
+            // Get applicant email
+            const email = prompt('Please enter your email:');
+            
+            if (email) {
+                // Show confirmation message
+                alert(`Thank you ${name}! Your application has been submitted. We will contact you at ${email} soon.`);
+                
+                // Here you would typically send the data to a server
+                // For this example, we'll just log it
+                console.log('Application submitted:', { name, email });
+            }
+        }
+    });
+    
+    // Additional functionality can be added here
+    // For example: favorite button, share button, etc.
+    
+    // Share functionality
+    const shareBtn = document.createElement('button');
+    shareBtn.textContent = 'Share this Job';
+    shareBtn.className = 'share-btn';
+    shareBtn.style.marginLeft = '15px';
+    shareBtn.style.background = '#95a5a6';
+    
+    shareBtn.addEventListener('click', function() {
+        if (navigator.share) {
+            navigator.share({
+                title: document.querySelector('.vacancy-title').textContent,
+                text: 'Check out this job opportunity!',
+                url: window.location.href
+            })
+            .then(() => console.log('Shared successfully'))
+            .catch(error => console.log('Sharing failed', error));
+        } else {
+            alert('Web Share API not supported in your browser. You can copy the URL manually.');
+        }
+    });
+    
+    document.querySelector('.apply-section').appendChild(shareBtn);
+});</code></pre>
+            </div>
+            
+            <div id="backend-tab" class="tab-content">
+                <div class="code-header">
+                    <span>server.js</span>
+                    <button class="copy-btn" data-code="backend"><i class="fas fa-copy"></i> Copy Code</button>
+                </div>
+                <pre class="code-block" id="backend-code"><code>// Simple Node.js backend for job vacancy application
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+const port = 3000;
+
+// Middleware to parse JSON and form data
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Serve static files (HTML, CSS, JS)
+app.use(express.static('public'));
+
+// In-memory database for job applications
+let applications = [];
+
+// API endpoint to submit job application
+app.post('/apply', (req, res) => {
+    const { jobId, name, email, resume } = req.body;
+    
+    if (!name || !email) {
+        return res.status(400).json({ error: 'Name and email are required' });
+    }
+    
+    // Create application object
+    const application = {
+        id: applications.length + 1,
+        jobId,
+        name,
+        email,
+        resume: resume || null,
+        date: new Date().toISOString(),
+        status: 'Submitted'
+    };
+    
+    // Add to applications array
+    applications.push(application);
+    
+    // Log the application
+    console.log('New application received:', application);
+    
+    // Send success response
+    res.json({ 
+        success: true, 
+        message: 'Application submitted successfully!', 
+        applicationId: application.id 
+    });
+});
+
+// API endpoint to get job details
+app.get('/job/:id', (req, res) => {
+    const jobId = req.params.id;
+    
+    // In a real app, this would come from a database
+    const job = {
+        id: jobId,
+        title: 'Senior Web Developer',
+        company: 'Tech Innovations Ltd.',
+        location: 'Remote / New York, NY',
+        salary: '$90,000 - $120,000 per year',
+        type: 'Contract',
+        description: 'We are seeking a talented Senior Web Developer...',
+        requirements: [
+            '5+ years of experience in web development',
+            'Strong proficiency in JavaScript',
+            'Experience with React.js',
+            'Familiarity with RESTful APIs'
+        ]
+    };
+    
+    res.json(job);
+});
+
+// Start the server
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+});
+
+module.exports = app;</code></pre>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Job Vacancy Generator Tool &copy; 2023 | Create professional job postings in seconds</p>
+        </footer>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab functionality
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove active class from all buttons and contents
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    btn.classList.add('active');
+                    
+                    // Show corresponding content
+                    const tabId = btn.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+            
+            // Copy button functionality
+            const copyBtns = document.querySelectorAll('.copy-btn');
+            copyBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const codeType = btn.getAttribute('data-code');
+                    const codeBlock = document.getElementById(`${codeType}-code`);
+                    const text = codeBlock.textContent;
+                    
+                    navigator.clipboard.writeText(text)
+                        .then(() => {
+                            // Show copied feedback
+                            const originalText = btn.innerHTML;
+                            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                            
+                            setTimeout(() => {
+                                btn.innerHTML = originalText;
+                            }, 2000);
+                        })
+                        .catch(err => {
+                            console.error('Failed to copy: ', err);
+                        });
+                });
+            });
+            
+            // Generate button functionality
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.addEventListener('click', generateVacancy);
+            
+            // Initialize with sample data
+            generateVacancy();
+            
+            function generateVacancy() {
+                // Get form values
+                const jobTitle = document.getElementById('jobTitle').value || 'Senior Web Developer';
+                const company = document.getElementById('company').value || 'Tech Innovations Ltd.';
+                const location = document.getElementById('location').value || 'Remote / New York, NY';
+                const salary = document.getElementById('salary').value || '$90,000 - $120,000 per year';
+                const jobType = document.getElementById('jobType').value || 'Contract';
+                const description = document.getElementById('description').value || 'No description provided.';
+                const requirementsText = document.getElementById('requirements').value || 'No requirements specified.';
+                
+                // Split requirements into array
+                const requirements = requirementsText.split(',').map(req => req.trim()).filter(req => req);
+                
+                // Update preview
+                document.querySelector('.vacancy-title').textContent = jobTitle;
+                document.querySelector('.vacancy-meta .meta-item:nth-child(1) span').textContent = company;
+                document.querySelector('.vacancy-meta .meta-item:nth-child(2) span').textContent = location;
+                document.querySelector('.vacancy-meta .meta-item:nth-child(3) span').textContent = salary;
+                document.querySelector('.vacancy-meta .meta-item:nth-child(4) span').textContent = jobType;
+                
+                // Format description with line breaks and lists
+                let formattedDescription = description;
+                
+                // Convert lines starting with "- " to list items
+                if (description.includes('- ')) {
+                    const parts = description.split('\n');
+                    formattedDescription = '';
+                    
+                    parts.forEach(part => {
+                        if (part.startsWith('- ')) {
+                            formattedDescription += `<li>${part.substring(2)}</li>`;
+                        } else {
+                            if (formattedDescription !== '' && !formattedDescription.endsWith('</ul>')) {
+                                formattedDescription += '</ul>';
+                            }
+                            formattedDescription += `<p>${part}</p>`;
+                        }
+                    });
+                    
+                    // Close any open lists
+                    if (!formattedDescription.endsWith('</ul>')) {
+                        formattedDescription += '</ul>';
+                    }
+                    
+                    // Wrap list items in ul
+                    formattedDescription = formattedDescription.replace(/<li>(.*?)<\/li>/g, (match, p1) => {
+                        if (formattedDescription.indexOf('<ul>') === -1) {
+                            return `<ul><li>${p1}</li>`;
+                        }
+                        return match;
+                    });
+                }
+                
+                document.querySelector('.vacancy-description').innerHTML = formattedDescription;
+                
+                // Update requirements
+                let requirementsHtml = '';
+                requirements.forEach(req => {
+                    requirementsHtml += `<li>${req}</li>`;
+                });
+                document.querySelector('.requirements-list').innerHTML = requirementsHtml;
+                
+                // Update generated HTML code
+                document.getElementById('html-code').textContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${jobTitle} - ${company}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* CSS will be generated separately */
+    </style>
+</head>
+<body>
+    <div class="vacancy-container">
+        <div class="vacancy-card">
+            <h1 class="vacancy-title">${jobTitle}</h1>
+            
+            <div class="vacancy-meta">
+                <div class="meta-item">
+                    <i class="fas fa-building"></i>
+                    <span>${company}</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>${location}</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-dollar-sign"></i>
+                    <span>${salary}</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-briefcase"></i>
+                    <span>${jobType}</span>
+                </div>
+            </div>
+            
+            <div class="vacancy-description">
+                ${formattedDescription.replace(/\n/g, '<br>')}
+            </div>
+            
+            <div class="requirements">
+                <h3>Requirements:</h3>
+                <ul class="requirements-list">
+                    ${requirements.map(req => `<li>${req}</li>`).join('')}
+                </ul>
+            </div>
+            
+            <div class="apply-section">
+                <button id="applyBtn" class="apply-btn">
+                    <i class="fas fa-paper-plane"></i> Apply Now
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // JavaScript will be generated separately
+    <\/script>
+</body>
+</html>`;
+                
+                // Update generated CSS code
+                document.getElementById('css-code').textContent = `/* Job Vacancy Page Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+}
+
+.vacancy-container {
+    max-width: 800px;
+    margin: 40px auto;
+}
+
+.vacancy-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+.vacancy-title {
+    font-size: 2.2rem;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 15px;
+}
+
+.vacancy-meta {
+    display: flex;
+    gap: 25px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #555;
+    font-size: 1.05rem;
+}
+
+.meta-item i {
+    color: #3498db;
+    font-size: 1.1rem;
+}
+
+.vacancy-description {
+    margin: 25px 0;
+    line-height: 1.8;
+    font-size: 1.1rem;
+}
+
+.vacancy-description p {
+    margin-bottom: 15px;
+}
+
+.vacancy-description ul {
+    padding-left: 25px;
+    margin: 15px 0;
+}
+
+.vacancy-description li {
+    margin-bottom: 8px;
+}
+
+.requirements {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 10px;
+    margin: 30px 0;
+    border-left: 4px solid #3498db;
+}
+
+.requirements h3 {
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+.requirements-list {
+    padding-left: 25px;
+}
+
+.requirements-list li {
+    margin-bottom: 10px;
+    font-size: 1.05rem;
+}
+
+.apply-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    text-align: center;
+}
+
+.apply-btn {
+    background: linear-gradient(to right, #3498db, #2980b9);
+    color: white;
+    border: none;
+    padding: 14px 35px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.apply-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+}
+
+.apply-btn:active {
+    transform: translateY(1px);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .vacancy-meta {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .vacancy-title {
+        font-size: 1.8rem;
+    }
+}`;
+                
+                // Update generated JavaScript code
+                document.getElementById('js-code').textContent = `// Job Vacancy Page JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the apply button
+    const applyBtn = document.getElementById('applyBtn');
+    
+    // Add click event to apply button
+    applyBtn.addEventListener('click', function() {
+        // Get applicant name
+        const name = prompt('Please enter your name:');
+        
+        if (name) {
+            // Get applicant email
+            const email = prompt('Please enter your email:');
+            
+            if (email) {
+                // Show confirmation message
+                alert(\`Thank you \${name}! Your application has been submitted. We will contact you at \${email} soon.\`);
+                
+                // Here you would typically send the data to a server
+                // For this example, we'll just log it
+                console.log('Application submitted:', { name, email });
+            }
+        }
+    });
+    
+    // Additional functionality can be added here
+    // For example: favorite button, share button, etc.
+    
+    // Share functionality
+    const shareBtn = document.createElement('button');
+    shareBtn.textContent = 'Share this Job';
+    shareBtn.className = 'share-btn';
+    shareBtn.style.marginLeft = '15px';
+    shareBtn.style.background = '#95a5a6';
+    
+    shareBtn.addEventListener('click', function() {
+        if (navigator.share) {
+            navigator.share({
+                title: document.querySelector('.vacancy-title').textContent,
+                text: 'Check out this job opportunity!',
+                url: window.location.href
+            })
+            .then(() => console.log('Shared successfully'))
+            .catch(error => console.log('Sharing failed', error));
+        } else {
+            alert('Web Share API not supported in your browser. You can copy the URL manually.');
+        }
+    });
+    
+    document.querySelector('.apply-section').appendChild(shareBtn);
+});`;
+            }
+        });
+    </script>
+</body>
+</html>

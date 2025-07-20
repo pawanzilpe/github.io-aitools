@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SearchXpert - Custom Search Engine</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        header {
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .logo-icon {
+            background: linear-gradient(45deg, #4285f4, #34a853);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .logo-text {
+            font-size: 42px;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ffffff, #e0e0e0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -1px;
+        }
+        
+        .tagline {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.85);
+            margin-top: 10px;
+            font-weight: 500;
+        }
+        
+        .search-container {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+            max-width: 700px;
+            margin: 0 auto 30px;
+            padding: 15px;
+            position: relative;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 16px 20px;
+            border: none;
+            font-size: 18px;
+            outline: none;
+            background: transparent;
+        }
+        
+        .search-btn {
+            background: linear-gradient(45deg, #4285f4, #34a853);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(66, 133, 244, 0.4);
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(66, 133, 244, 0.6);
+        }
+        
+        .search-icon {
+            color: #4285f4;
+            font-size: 22px;
+            margin-right: 15px;
+        }
+        
+        .search-tips {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .search-tip {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .search-tip:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+        
+        .results-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            padding: 30px;
+            display: none;
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .result-count {
+            font-size: 16px;
+            color: #70757a;
+        }
+        
+        .results {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .result-item {
+            padding: 15px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .result-item:hover {
+            background: #f8f9fa;
+            border-left: 4px solid #4285f4;
+            transform: translateX(5px);
+        }
+        
+        .result-title {
+            font-size: 20px;
+            font-weight: 500;
+            color: #1a0dab;
+            margin-bottom: 8px;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .result-title:hover {
+            text-decoration: underline;
+        }
+        
+        .result-url {
+            color: #006621;
+            font-size: 16px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .result-snippet {
+            color: #545454;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .page-btn {
+            background: #f1f3f4;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .page-btn:hover, .page-btn.active {
+            background: #4285f4;
+            color: white;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            padding: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .logo-text {
+                font-size: 32px;
+            }
+            
+            .search-container {
+                padding: 12px;
+            }
+            
+            .search-box input {
+                padding: 14px;
+                font-size: 16px;
+            }
+            
+            .search-btn {
+                padding: 12px 24px;
+            }
+            
+            .results-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h1 class="logo-text">SearchXpert</h1>
+            </div>
+            <p class="tagline">The world's knowledge at your fingertips</p>
+        </header>
+        
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="search-input" placeholder="Search anything...">
+                <button class="search-btn" id="search-button">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+            
+            <div class="search-tips">
+                <div class="search-tip">Web Development</div>
+                <div class="search-tip">Latest Technology</div>
+                <div class="search-tip">Science News</div>
+                <div class="search-tip">Programming Tips</div>
+            </div>
+        </div>
+        
+        <div class="results-container" id="results-container">
+            <div class="result-header">
+                <h2>Search Results</h2>
+                <div class="result-count">About 375,000,000 results (0.45 seconds)</div>
+            </div>
+            
+            <div class="results" id="results">
+                <!-- Results will be dynamically inserted here -->
+            </div>
+            
+            <div class="pagination">
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">4</button>
+                <button class="page-btn">5</button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2023 SearchXpert - A custom search interface | Made with ❤️ for information seekers</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            const searchButton = document.getElementById('search-button');
+            const resultsContainer = document.getElementById('results-container');
+            const resultsElement = document.getElementById('results');
+            const searchTips = document.querySelectorAll('.search-tip');
+            
+            // Sample search results data
+            const sampleResults = [
+                {
+                    title: "Web Development Tutorial - W3Schools",
+                    url: "https://www.w3schools.com/webdevelopment",
+                    snippet: "Learn web development with our comprehensive tutorials. HTML, CSS, JavaScript, frameworks and more. Perfect for beginners and advanced developers."
+                },
+                {
+                    title: "MDN Web Docs - Resources for Developers",
+                    url: "https://developer.mozilla.org",
+                    snippet: "The MDN Web Docs site provides information about Open Web technologies including HTML, CSS, and APIs for both Web sites and progressive web apps."
+                },
+                {
+                    title: "FreeCodeCamp - Learn to Code for Free",
+                    url: "https://www.freecodecamp.org",
+                    snippet: "Learn to code for free. Build projects. Earn certifications. FreeCodeCamp's open source curriculum has helped more than 40,000 people get jobs as developers."
+                },
+                {
+                    title: "CSS Tricks - Tips, Tricks, and Techniques",
+                    url: "https://css-tricks.com",
+                    snippet: "CSS-Tricks is a website about websites. It features articles, guides, and examples about CSS, HTML, JavaScript, and all things related to web design and development."
+                },
+                {
+                    title: "JavaScript.info - The Modern JavaScript Tutorial",
+                    url: "https://javascript.info",
+                    snippet: "How it's done now. From the basics to advanced topics with simple, but detailed explanations. Main course contains 2 parts which cover JavaScript as a programming language and working with a browser."
+                },
+                {
+                    title: "GitHub - Where the world builds software",
+                    url: "https://github.com",
+                    snippet: "GitHub is where over 100 million developers shape the future of software, together. Contribute to the open source community, manage your Git repositories, review code like a pro."
+                },
+                {
+                    title: "Stack Overflow - Where Developers Learn & Share",
+                    url: "https://stackoverflow.com",
+                    snippet: "Stack Overflow is the largest, most trusted online community for developers to learn, share their programming knowledge, and build their careers."
+                }
+            ];
+            
+            // Function to perform search
+            function performSearch() {
+                const query = searchInput.value.trim();
+                
+                if (query === '') {
+                    alert('Please enter a search query');
+                    return;
+                }
+                
+                // Clear previous results
+                resultsElement.innerHTML = '';
+                
+                // Show loading state
+                resultsElement.innerHTML = '<div class="loading" style="text-align:center; padding:40px; color:#666;">Searching the web...</div>';
+                resultsContainer.style.display = 'block';
+                
+                // Simulate search delay
+                setTimeout(() => {
+                    displayResults(query);
+                }, 800);
+            }
+            
+            // Function to display search results
+            function displayResults(query) {
+                resultsElement.innerHTML = '';
+                
+                // Display results
+                sampleResults.forEach(result => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'result-item';
+                    
+                    // Highlight query in title and snippet
+                    const highlightedTitle = result.title.replace(new RegExp(query, 'gi'), match => `<span style="background-color: #ffff00;">${match}</span>`);
+                    const highlightedSnippet = result.snippet.replace(new RegExp(query, 'gi'), match => `<span style="background-color: #ffff00;">${match}</span>`);
+                    
+                    resultItem.innerHTML = `
+                        <a href="#" class="result-title">${highlightedTitle}</a>
+                        <div class="result-url">${result.url}</div>
+                        <div class="result-snippet">${highlightedSnippet}</div>
+                    `;
+                    
+                    resultsElement.appendChild(resultItem);
+                });
+                
+                // Scroll to results
+                resultsContainer.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            // Event listeners
+            searchButton.addEventListener('click', performSearch);
+            
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            // Add click events to search tips
+            searchTips.forEach(tip => {
+                tip.addEventListener('click', function() {
+                    searchInput.value = this.textContent;
+                    performSearch();
+                });
+            });
+            
+            // Add click events to pagination buttons
+            document.querySelectorAll('.page-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    document.querySelectorAll('.page-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // In a real app, this would fetch the next page of results
+                });
+            });
+        });
+    </script>
+</body>
+</html>

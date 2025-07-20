@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Email Agent - Bulk Email Sender</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            width: 100%;
+            max-width: 800px;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, #1a2a6c, #b21f1f);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+        
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .ai-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            color: #ffd700;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #1a2a6c;
+            font-size: 1.1rem;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            border-color: #1a2a6c;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26, 42, 108, 0.2);
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .recipients-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .recipients-input {
+            flex: 1;
+        }
+        
+        .add-recipient {
+            background: #1a2a6c;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 0 20px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+        
+        .add-recipient:hover {
+            background: #b21f1f;
+            transform: scale(1.05);
+        }
+        
+        .recipient-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .recipient-tag {
+            background: #e3f2fd;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .recipient-tag button {
+            background: none;
+            border: none;
+            color: #ff5252;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 0;
+        }
+        
+        .recipient-tag button:hover {
+            color: #d32f2f;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #1a2a6c, #2c387e);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(to right, #2c387e, #1a2a6c);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .status {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f0f7ff;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .status h3 {
+            margin-bottom: 15px;
+            color: #1a2a6c;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, #4caf50, #8bc34a);
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .success-message {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+            display: none;
+            border-left: 5px solid #4caf50;
+        }
+        
+        .success-message h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .recipient-list {
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .recipient-list div {
+            padding: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .recipient-list div:last-child {
+            border-bottom: none;
+        }
+        
+        @media (max-width: 600px) {
+            .actions {
+                flex-direction: column;
+            }
+            
+            header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .container {
+                border-radius: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <i class="fas fa-robot ai-icon"></i>
+            <h1>AI Email Agent</h1>
+            <p>Send emails to multiple recipients in one click</p>
+        </header>
+        
+        <div class="content">
+            <div class="form-group">
+                <label for="from">From:</label>
+                <input type="email" id="from" placeholder="your.email@example.com" value="admin@company.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="subject">Subject:</label>
+                <input type="text" id="subject" placeholder="Email subject" value="Important Company Update">
+            </div>
+            
+            <div class="form-group">
+                <label for="recipients">Recipients:</label>
+                <div class="recipients-container">
+                    <div class="recipients-input">
+                        <input type="email" id="new-recipient" placeholder="Enter email address">
+                    </div>
+                    <button class="add-recipient" id="add-recipient">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div class="recipient-tags" id="recipient-tags">
+                    <!-- Recipient tags will appear here -->
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="message">Message:</label>
+                <textarea id="message">Hello Team,
+
+We're excited to announce new updates to our platform. 
+
+Key improvements include:
+- Enhanced security features
+- Improved user interface
+- Faster processing times
+
+Please let us know if you have any questions.
+
+Best regards,
+The Management Team</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="template">Email Template:</label>
+                <select id="template">
+                    <option value="default">Default Template</option>
+                    <option value="newsletter">Company Newsletter</option>
+                    <option value="meeting">Meeting Invitation</option>
+                    <option value="announcement">Important Announcement</option>
+                </select>
+            </div>
+            
+            <div class="actions">
+                <button class="btn btn-primary" id="send-btn">
+                    <i class="fas fa-paper-plane"></i> Send Emails
+                </button>
+                <button class="btn btn-secondary" id="save-btn">
+                    <i class="fas fa-save"></i> Save Draft
+                </button>
+            </div>
+            
+            <div class="status" id="status">
+                <h3><i class="fas fa-sync fa-spin"></i> Sending Emails...</h3>
+                <p>Processing recipients: <span id="progress-text">0/0</span></p>
+                <div class="progress-bar">
+                    <div class="progress" id="progress"></div>
+                </div>
+            </div>
+            
+            <div class="success-message" id="success">
+                <h3><i class="fas fa-check-circle"></i> Emails Sent Successfully!</h3>
+                <p>Your message has been delivered to <strong id="sent-count">0</strong> recipients.</p>
+                <div class="recipient-list" id="sent-recipients">
+                    <!-- Sent recipients will appear here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const recipients = [];
+            const recipientTagsContainer = document.getElementById('recipient-tags');
+            const newRecipientInput = document.getElementById('new-recipient');
+            const addRecipientBtn = document.getElementById('add-recipient');
+            const sendBtn = document.getElementById('send-btn');
+            const saveBtn = document.getElementById('save-btn');
+            const statusDiv = document.getElementById('status');
+            const successDiv = document.getElementById('success');
+            const progressBar = document.getElementById('progress');
+            const progressText = document.getElementById('progress-text');
+            const sentCount = document.getElementById('sent-count');
+            const sentRecipients = document.getElementById('sent-recipients');
+            
+            // Add sample recipients
+            ['john@example.com', 'sarah@company.com', 'mike@business.org'].forEach(email => {
+                addRecipient(email);
+            });
+            
+            // Add recipient function
+            function addRecipient(email) {
+                if (!validateEmail(email)) {
+                    alert('Please enter a valid email address');
+                    return;
+                }
+                
+                if (recipients.includes(email)) {
+                    alert('This email is already added');
+                    return;
+                }
+                
+                recipients.push(email);
+                renderRecipientTags();
+                newRecipientInput.value = '';
+            }
+            
+            // Remove recipient function
+            function removeRecipient(email) {
+                const index = recipients.indexOf(email);
+                if (index !== -1) {
+                    recipients.splice(index, 1);
+                    renderRecipientTags();
+                }
+            }
+            
+            // Render recipient tags
+            function renderRecipientTags() {
+                recipientTagsContainer.innerHTML = '';
+                recipients.forEach(email => {
+                    const tag = document.createElement('div');
+                    tag.className = 'recipient-tag';
+                    tag.innerHTML = `
+                        <span>${email}</span>
+                        <button type="button" class="remove-recipient">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    tag.querySelector('.remove-recipient').addEventListener('click', () => {
+                        removeRecipient(email);
+                    });
+                    recipientTagsContainer.appendChild(tag);
+                });
+            }
+            
+            // Email validation
+            function validateEmail(email) {
+                const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return re.test(String(email).toLowerCase());
+            }
+            
+            // Event listeners
+            addRecipientBtn.addEventListener('click', () => {
+                const email = newRecipientInput.value.trim();
+                if (email) {
+                    addRecipient(email);
+                }
+            });
+            
+            newRecipientInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const email = newRecipientInput.value.trim();
+                    if (email) {
+                        addRecipient(email);
+                    }
+                }
+            });
+            
+            saveBtn.addEventListener('click', () => {
+                alert('Draft saved successfully!');
+            });
+            
+            sendBtn.addEventListener('click', () => {
+                if (recipients.length === 0) {
+                    alert('Please add at least one recipient');
+                    return;
+                }
+                
+                const from = document.getElementById('from').value;
+                const subject = document.getElementById('subject').value;
+                const message = document.getElementById('message').value;
+                
+                if (!from || !subject || !message) {
+                    alert('Please fill all required fields');
+                    return;
+                }
+                
+                // Show sending status
+                statusDiv.style.display = 'block';
+                successDiv.style.display = 'none';
+                
+                // Simulate sending process
+                let sent = 0;
+                const total = recipients.length;
+                progressText.textContent = `0/${total}`;
+                progressBar.style.width = '0%';
+                
+                const sendInterval = setInterval(() => {
+                    sent++;
+                    progressText.textContent = `${sent}/${total}`;
+                    progressBar.style.width = `${(sent / total) * 100}%`;
+                    
+                    if (sent === total) {
+                        clearInterval(sendInterval);
+                        
+                        // Show success message
+                        statusDiv.style.display = 'none';
+                        successDiv.style.display = 'block';
+                        sentCount.textContent = total;
+                        
+                        // Display sent recipients
+                        sentRecipients.innerHTML = '';
+                        recipients.forEach(email => {
+                            const recipientDiv = document.createElement('div');
+                            recipientDiv.textContent = email;
+                            sentRecipients.appendChild(recipientDiv);
+                        });
+                    }
+                }, 300);
+            });
+        });
+    </script>
+</body>
+</html>

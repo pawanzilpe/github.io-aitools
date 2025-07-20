@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Video Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ff9966, #ff5e62);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 25px;
+        }
+        
+        .video-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .preview-container {
+            position: relative;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 450px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #videoPreview {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+        }
+        
+        .upload-area {
+            border: 3px dashed rgba(255, 255, 255, 0.4);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .upload-area:hover {
+            border-color: #ff5e62;
+            background: rgba(255, 94, 98, 0.1);
+        }
+        
+        .upload-area i {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            color: #ff9966;
+        }
+        
+        .upload-area h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+        
+        .upload-area p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 25px;
+        }
+        
+        .upload-btn {
+            background: linear-gradient(45deg, #ff9966, #ff5e62);
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 94, 98, 0.4);
+        }
+        
+        .controls-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            height: fit-content;
+        }
+        
+        .controls-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            color: #ff9966;
+        }
+        
+        .control-group {
+            margin-bottom: 25px;
+        }
+        
+        .control-group h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .control-group h3 i {
+            margin-right: 10px;
+            color: #ff5e62;
+        }
+        
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            flex: 1;
+            min-width: 120px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .control-btn:hover {
+            background: rgba(255, 94, 98, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .control-btn.active {
+            background: linear-gradient(45deg, #ff9966, #ff5e62);
+        }
+        
+        .slider-group {
+            margin-top: 15px;
+        }
+        
+        .slider-container {
+            margin-bottom: 15px;
+        }
+        
+        .slider-container label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff5e62;
+            cursor: pointer;
+        }
+        
+        .timeline-container {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .timeline {
+            height: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        
+        .timeline-progress {
+            position: absolute;
+            height: 100%;
+            width: 35%;
+            background: linear-gradient(90deg, rgba(255, 153, 102, 0.7), rgba(255, 94, 98, 0.7));
+        }
+        
+        .timeline-marker {
+            position: absolute;
+            height: 100%;
+            width: 3px;
+            background: white;
+            left: 25%;
+        }
+        
+        .timeline-controls {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .timeline-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .timeline-btn:hover {
+            background: rgba(255, 94, 98, 0.3);
+        }
+        
+        .export-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #00c853, #00b248);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 200, 83, 0.4);
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+        
+        .feature-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .feature-card i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #ff9966;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card p {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        @media (max-width: 900px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .preview-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-film"></i> Advanced Video Editor</h1>
+            <p>Upload any video and apply professional editing tools - crop, filters, animations, split, add cards, and download your masterpiece!</p>
+        </header>
+        
+        <div class="app-container">
+            <div class="video-section">
+                <div class="preview-container">
+                    <video id="videoPreview" controls></video>
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3>Upload Your Video</h3>
+                        <p>Drag & drop your video file here or click to browse</p>
+                        <button class="upload-btn" id="uploadBtn">Choose Video File</button>
+                        <input type="file" id="videoInput" accept="video/*" hidden>
+                    </div>
+                </div>
+                
+                <div class="timeline-container">
+                    <div class="timeline">
+                        <div class="timeline-progress"></div>
+                        <div class="timeline-marker"></div>
+                    </div>
+                    <div class="timeline-controls">
+                        <button class="timeline-btn"><i class="fas fa-step-backward"></i> Previous</button>
+                        <button class="timeline-btn"><i class="fas fa-play"></i> Play</button>
+                        <button class="timeline-btn">Next <i class="fas fa-step-forward"></i></button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls-section">
+                <h2><i class="fas fa-sliders-h"></i> Editing Tools</h2>
+                
+                <div class="control-group">
+                    <h3><i class="fas fa-crop-alt"></i> Crop & Trim</h3>
+                    <div class="btn-group">
+                        <button class="control-btn active"><i class="fas fa-crop"></i> Crop</button>
+                        <button class="control-btn"><i class="fas fa-cut"></i> Trim</button>
+                        <button class="control-btn"><i class="fas fa-expand"></i> Resize</button>
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-container">
+                            <label>Crop Position: <span id="cropPos">50%</span></label>
+                            <input type="range" min="0" max="100" value="50" id="cropSlider">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <h3><i class="fas fa-magic"></i> Filters & Effects</h3>
+                    <div class="btn-group">
+                        <button class="control-btn"><i class="fas fa-sun"></i> Brighten</button>
+                        <button class="control-btn active"><i class="fas fa-moon"></i> Contrast</button>
+                        <button class="control-btn"><i class="fas fa-tint"></i> Saturation</button>
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-container">
+                            <label>Filter Intensity: <span id="filterIntensity">75%</span></label>
+                            <input type="range" min="0" max="100" value="75" id="filterSlider">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <h3><i class="fas fa-star"></i> Animations</h3>
+                    <div class="btn-group">
+                        <button class="control-btn"><i class="fas fa-hand-sparkles"></i> Fade In</button>
+                        <button class="control-btn"><i class="fas fa-sparkles"></i> Zoom</button>
+                        <button class="control-btn active"><i class="fas fa-arrows-alt-h"></i> Pan</button>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <h3><i class="fas fa-layer-group"></i> Cards & Overlays</h3>
+                    <div class="btn-group">
+                        <button class="control-btn"><i class="fas fa-font"></i> Text</button>
+                        <button class="control-btn active"><i class="fas fa-sticky-note"></i> Card</button>
+                        <button class="control-btn"><i class="fas fa-image"></i> Image</button>
+                    </div>
+                </div>
+                
+                <button class="export-btn">
+                    <i class="fas fa-download"></i> Export & Download Video
+                </button>
+            </div>
+        </div>
+        
+        <div class="feature-list">
+            <div class="feature-card">
+                <i class="fas fa-crop-alt"></i>
+                <h3>Precision Cropping</h3>
+                <p>Easily crop your videos to any aspect ratio or remove unwanted areas with pixel-perfect accuracy.</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-filter"></i>
+                <h3>Professional Filters</h3>
+                <p>Apply cinematic filters and color grading to enhance your videos and create the perfect mood.</p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-bolt"></i>
+                <h3>Smooth Animations</h3>
+                <p>Add engaging animations, transitions, and motion effects to make your content stand out.</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 Advanced Video Editor | All editing happens directly in your browser - no uploads to servers!</p>
+        </footer>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const videoInput = document.getElementById('videoInput');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const uploadArea = document.getElementById('uploadArea');
+            const videoPreview = document.getElementById('videoPreview');
+            const cropSlider = document.getElementById('cropSlider');
+            const cropPos = document.getElementById('cropPos');
+            const filterSlider = document.getElementById('filterSlider');
+            const filterIntensity = document.getElementById('filterIntensity');
+            
+            // Upload button click
+            uploadBtn.addEventListener('click', () => {
+                videoInput.click();
+            });
+            
+            // Drag and drop
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#ff5e62';
+                uploadArea.style.backgroundColor = 'rgba(255, 94, 98, 0.1)';
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+                uploadArea.style.backgroundColor = 'transparent';
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+                uploadArea.style.backgroundColor = 'transparent';
+                
+                if (e.dataTransfer.files.length) {
+                    handleVideoFile(e.dataTransfer.files[0]);
+                }
+            });
+            
+            // File input change
+            videoInput.addEventListener('change', (e) => {
+                if (e.target.files.length) {
+                    handleVideoFile(e.target.files[0]);
+                }
+            });
+            
+            // Handle video file
+            function handleVideoFile(file) {
+                if (!file.type.match('video.*')) {
+                    alert('Please select a video file');
+                    return;
+                }
+                
+                const videoURL = URL.createObjectURL(file);
+                videoPreview.src = videoURL;
+                videoPreview.style.display = 'block';
+                uploadArea.style.display = 'none';
+                
+                // Simulate video processing
+                setTimeout(() => {
+                    videoPreview.play();
+                }, 1000);
+            }
+            
+            // Slider events
+            cropSlider.addEventListener('input', () => {
+                cropPos.textContent = `${cropSlider.value}%`;
+            });
+            
+            filterSlider.addEventListener('input', () => {
+                filterIntensity.textContent = `${filterSlider.value}%`;
+            });
+            
+            // Control buttons
+            const controlBtns = document.querySelectorAll('.control-btn');
+            controlBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove active class from all buttons in the same group
+                    const group = btn.closest('.btn-group');
+                    group.querySelectorAll('.control-btn').forEach(b => {
+                        b.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked button
+                    btn.classList.add('active');
+                });
+            });
+            
+            // Export button
+            document.querySelector('.export-btn').addEventListener('click', () => {
+                alert('Video export started! This would process your video with all edits and download it. In a real app, this would use advanced browser processing.');
+                
+                // Simulate download
+                setTimeout(() => {
+                    alert('Your edited video is ready for download!');
+                }, 3000);
+            });
+        });
+    </script>
+</body>
+</html>

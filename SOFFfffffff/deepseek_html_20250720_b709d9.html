@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>सरल खोज इंजन</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 0;
+            animation: fadeIn 1s ease-in-out;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .tagline {
+            font-size: 1.4rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        
+        .search-box {
+            max-width: 700px;
+            margin: 0 auto 40px;
+            position: relative;
+            animation: slideUp 0.8s ease-out;
+        }
+        
+        #search-input {
+            width: 100%;
+            padding: 18px 25px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        #search-input:focus {
+            box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+            transform: scale(1.02);
+        }
+        
+        #search-btn {
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            padding: 12px 30px;
+            background: #ff8c00;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+        }
+        
+        #search-btn:hover {
+            background: #ff6a00;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        
+        .examples {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 40px;
+            animation: fadeIn 1.2s ease-in-out;
+        }
+        
+        .example-btn {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 30px;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .example-btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-3px);
+        }
+        
+        .results-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.18);
+            margin-bottom: 40px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .result-count {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        
+        .result-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .result-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .result-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: #ffcc70;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .result-url {
+            font-size: 0.9rem;
+            color: #4dabf7;
+            margin-bottom: 12px;
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .result-snippet {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #e9ecef;
+            margin-bottom: 15px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2rem;
+            display: none;
+        }
+        
+        .dot-flashing {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #fff;
+            margin: 0 5px;
+            animation: dot-flashing 1s infinite linear alternate;
+            animation-delay: 0.5s;
+        }
+        
+        .dot-flashing:nth-child(2) {
+            animation-delay: 1s;
+        }
+        
+        .dot-flashing:nth-child(3) {
+            animation-delay: 1.5s;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.3rem;
+            display: none;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-top: 20px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes dot-flashing {
+            0% { opacity: 0.3; }
+            50%, 100% { opacity: 1; }
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .tagline { font-size: 1.1rem; }
+            .results { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>सरल खोज इंजन</h1>
+            <p class="tagline">कोई भी सवाल पूछें, हम Google से जानकारी लाकर दिखाएँगे</p>
+        </header>
+        
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="अपना सवाल यहाँ टाइप करें...">
+            <button id="search-btn">खोजें</button>
+        </div>
+        
+        <div class="examples">
+            <div class="example-btn" data-query="भारत की राजधानी क्या है?">भारत की राजधानी क्या है?</div>
+            <div class="example-btn" data-query="COVID-19 के लक्षण क्या हैं?">COVID-19 के लक्षण क्या हैं?</div>
+            <div class="example-btn" data-query="सबसे अच्छा स्मार्टफोन कौन सा है?">सबसे अच्छा स्मार्टफोन कौन सा है?</div>
+            <div class="example-btn" data-query="योग कैसे करें?">योग कैसे करें?</div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <p>खोज रहा है <span class="dot-flashing">.</span><span class="dot-flashing">.</span><span class="dot-flashing">.</span></p>
+        </div>
+        
+        <div class="no-results" id="no-results">
+            <p>कोई परिणाम नहीं मिला। कृपया कोई अन्य सवाल पूछें।</p>
+        </div>
+        
+        <div class="results-container">
+            <div class="results-header">
+                <h2>खोज परिणाम</h2>
+                <div class="result-count" id="result-count">0 परिणाम मिले</div>
+            </div>
+            <div class="results" id="results">
+                <!-- खोज परिणाम यहाँ दिखाई देंगे -->
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 सरल खोज इंजन | सभी अधिकार सुरक्षित</p>
+        </footer>
+    </div>
+    
+    <script>
+        // DOM Elements
+        const searchInput = document.getElementById('search-input');
+        const searchBtn = document.getElementById('search-btn');
+        const resultsContainer = document.getElementById('results');
+        const resultCount = document.getElementById('result-count');
+        const loading = document.getElementById('loading');
+        const noResults = document.getElementById('no-results');
+        const exampleBtns = document.querySelectorAll('.example-btn');
+        
+        // सैंपल खोज परिणाम डेटा
+        const sampleResults = [
+            {
+                title: "भारत की राजधानी - नई दिल्ली",
+                url: "https://hi.wikipedia.org/wiki/नई_दिल्ली",
+                snippet: "नई दिल्ली भारत की राजधानी है और दिल्ली राष्ट्रीय राजधानी क्षेत्र का एक हिस्सा है। यह भारत का एक केंद्र शासित प्रदेश भी है।"
+            },
+            {
+                title: "भारत की राजधानी क्या है?",
+                url: "https://www.bharatkagoj.com/india-capital",
+                snippet: "भारत की राजधानी नई दिल्ली है। यह देश की राजनीतिक और प्रशासनिक राजधानी है और यहाँ संसद भवन, राष्ट्रपति भवन और कई मंत्रालय स्थित हैं।"
+            },
+            {
+                title: "नई दिल्ली: इतिहास और महत्व",
+                url: "https://www.tourismofindia.com/delhi",
+                snippet: "नई दिल्ली को ब्रिटिश वास्तुकार सर एडविन लुटियंस ने डिजाइन किया था और 1931 में इसे औपचारिक रूप से भारत की राजधानी घोषित किया गया था।"
+            },
+            {
+                title: "दिल्ली के बारे में 10 रोचक तथ्य",
+                url: "https://www.facthindi.com/delhi-facts",
+                snippet: "1. दिल्ली दुनिया के सबसे पुराने शहरों में से एक है, जिसका इतिहास महाभारत काल से जुड़ा है। 2. यहाँ 7 यूनेस्को विश्व धरोहर स्थल हैं। 3. दिल्ली में दुनिया का सबसे बड़ा स्पाइस मार्केट है।"
+            },
+            {
+                title: "दिल्ली की यात्रा गाइड",
+                url: "https://www.travelguide.com/delhi",
+                snippet: "दिल्ली में घूमने लायक प्रमुख स्थान: इंडिया गेट, लाल किला, कुतुब मीनार, लोटस टेम्पल, अक्षरधाम मंदिर, चांदनी चौक और हुमायूँ का मकबरा।"
+            },
+            {
+                title: "दिल्ली का मौसम और सबसे अच्छा समय यात्रा के लिए",
+                url: "https://www.weatherdelhi.com/best-time",
+                snippet: "दिल्ली घूमने का सबसे अच्छा समय अक्टूबर से मार्च के बीच है जब मौसम सुहावना रहता है। गर्मियों में तापमान 45°C तक पहुँच सकता है।"
+            }
+        ];
+        
+        // खोज बटन पर क्लिक करने पर कार्रवाई
+        searchBtn.addEventListener('click', performSearch);
+        
+        // Enter दबाने पर खोज करें
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        // उदाहरण बटन पर क्लिक करने पर
+        exampleBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                searchInput.value = btn.getAttribute('data-query');
+                performSearch();
+            });
+        });
+        
+        // खोज फ़ंक्शन
+        function performSearch() {
+            const query = searchInput.value.trim();
+            
+            if (query === '') {
+                alert('कृपया खोजने के लिए कुछ टाइप करें!');
+                return;
+            }
+            
+            // लोडिंग दिखाएँ
+            loading.style.display = 'block';
+            noResults.style.display = 'none';
+            resultsContainer.innerHTML = '';
+            resultCount.textContent = '0 परिणाम मिले';
+            
+            // वास्तविक API कॉल के स्थान पर सिमुलेशन
+            setTimeout(() => {
+                displayResults(query);
+                loading.style.display = 'none';
+            }, 1500);
+        }
+        
+        // परिणाम प्रदर्शित करें
+        function displayResults(query) {
+            // वास्तविक दुनिया में, यहाँ आप Google Search API या किसी अन्य API को कॉल करेंगे
+            // इस डेमो के लिए, हम नमूना डेटा का उपयोग कर रहे हैं
+            
+            if (query.toLowerCase().includes('भारत की राजधानी')) {
+                // प्रासंगिक परिणाम दिखाएँ
+                resultCount.textContent = `${sampleResults.length} परिणाम मिले`;
+                
+                sampleResults.forEach(result => {
+                    const resultCard = document.createElement('div');
+                    resultCard.className = 'result-card';
+                    
+                    resultCard.innerHTML = `
+                        <a href="${result.url}" class="result-title" target="_blank">${result.title}</a>
+                        <a href="${result.url}" class="result-url" target="_blank">${result.url}</a>
+                        <p class="result-snippet">${result.snippet}</p>
+                    `;
+                    
+                    resultsContainer.appendChild(resultCard);
+                });
+            } else {
+                // कोई परिणाम नहीं मिला
+                noResults.style.display = 'block';
+                resultCount.textContent = '0 परिणाम मिले';
+            }
+        }
+        
+        // पेज लोड होने पर कुछ डिफ़ॉल्ट परिणाम दिखाएँ
+        window.addEventListener('load', () => {
+            searchInput.value = 'भारत की राजधानी क्या है?';
+            performSearch();
+        });
+    </script>
+</body>
+</html>
